@@ -1,6 +1,7 @@
 package liang.lollipop.electronicclock.widget
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.Size
 import android.view.InflateException
@@ -9,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import kotlin.math.abs
-import kotlin.math.min
 
 /**
  * @author lollipop
@@ -32,6 +32,9 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private val layoutInflater = LayoutInflater.from(context)
 
     private var gridSize = EMPTY_SIZE
+
+    private val tmpRect1 = Rect()
+    private val tmpRect2 = Rect()
 
     var gridCount = 6
         set(value) {
@@ -62,6 +65,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
         val offsetX = paddingLeft
         val offsetY = paddingTop
+
     }
 
     private fun calculateGridSize(w: Int, h: Int) {
@@ -123,6 +127,45 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             }
         }
         throw InflateException("Found a view that does not correspond to a panel")
+    }
+
+    private fun canPlace(panel: Panel): Boolean {
+        for (p in panelList) {
+            if (panel == p) {
+                continue
+            }
+            if (hasIntersection(p, panel)) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun hasIntersection(p0: Panel, p1: Panel): Boolean {
+        p0.copyBounds(tmpRect1)
+        tmpRect1.selfCheck()
+        p1.copyBounds(tmpRect2)
+        tmpRect2.selfCheck()
+        val vertical = tmpRect1.bottom <= tmpRect2.top || tmpRect1.top >= tmpRect2.bottom
+        val horizontal = tmpRect1.right <= tmpRect2.left || tmpRect1.left >= tmpRect2.right
+        return !(vertical || horizontal)
+    }
+
+    private fun Rect.selfCheck() {
+        if (this.left > this.right) {
+            val tmp = this.right
+            this.right = this.left
+            this.left = tmp
+        }
+        if (this.top > this.bottom) {
+            val tmp = this.bottom
+            this.bottom = this.top
+            this.top = tmp
+        }
+    }
+
+    private fun cantLayoutPanel(panel: Panel) {
+        // TODO
     }
 
     override fun addView(child: View?) {
