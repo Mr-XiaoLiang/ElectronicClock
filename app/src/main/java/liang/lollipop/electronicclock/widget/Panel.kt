@@ -11,13 +11,16 @@ import android.view.ViewGroup
  * @date 2019-07-30 19:41
  * 面板组件的包装类
  */
-abstract class Panel {
+abstract class Panel(val panelInfo: PanelInfo) {
 
     private val bounds = Rect()
 
     companion object {
         val EMPTY_SIZE = Size(0, 0)
     }
+
+    var viewIsInitializer = false
+        private set
 
     /**
      * 面板的View
