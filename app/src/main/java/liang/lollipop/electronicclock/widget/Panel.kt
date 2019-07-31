@@ -38,6 +38,11 @@ abstract class Panel(val panelInfo: PanelInfo) {
      */
     open val minHeight = 0
 
+    val visibility: Int
+        get() {
+            return view?.visibility ?: View.GONE
+        }
+
     fun copyBounds(rect: Rect) {
         rect.set(bounds)
     }
@@ -58,16 +63,12 @@ abstract class Panel(val panelInfo: PanelInfo) {
     /**
      * View构造完成时
      */
-    open fun onViewCreated(view: View) {
-
-    }
+    open fun onViewCreated(view: View) {}
 
     /**
      * 需要更新时
      */
-    open fun onUpdate() {
-
-    }
+    open fun onUpdate() {}
 
     fun layout(l: Int, t: Int, r: Int, b: Int) {
         val w = r - l
@@ -78,6 +79,11 @@ abstract class Panel(val panelInfo: PanelInfo) {
         if (layoutChange) {
             onSizeChange(w, h)
         }
+    }
+
+    fun saveLocation() {
+        panelInfo.sizeChange(bounds.width(), bounds.height())
+        panelInfo.offset(bounds.left, bounds.top)
     }
 
     /**
