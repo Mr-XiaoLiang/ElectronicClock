@@ -25,21 +25,64 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     constructor(context: Context): this(context, null)
 
     companion object {
+        /**
+         * 空的尺寸，默认为容器未完成排版的时候初始值
+         */
         private val EMPTY_SIZE = Size(0, 0)
     }
 
+    /**
+     * 面板组件的集合
+     * 用于保存面板对象，从中获取数据
+     */
     private val panelList = ArrayList<Panel>()
+    /**
+     * 待移除面板的集合
+     * 当布局过程中，发现无法添加的面板，将会添加到这里，然后移除
+     */
+    private val pendingRemoveList = ArrayList<Panel>()
 
+    /**
+     * 用于实例化Panel中View的上下文
+     */
     private val layoutInflater = LayoutInflater.from(context)
 
+    /**
+     * 单元格的尺寸
+     */
     private var gridSize = EMPTY_SIZE
 
+    /**
+     * 临时的矩形对象
+     * 用于辅助计算
+     */
     private val tmpRect1 = Rect()
+    /**
+     * 临时的矩形对象
+     * 用于辅助计算
+     */
     private val tmpRect2 = Rect()
+    /**
+     * 临时的点对象
+     * 用于辅助计算
+     */
     private val tmpPoint = Point()
 
+    /**
+     * 横向的格数
+     * 这是通过{#gridCount}计算出来的横向格数
+     */
     private var spanCountX = 0
+    /**
+     * 纵向的格数
+     * 这是通过{#gridCount}计算出来的纵向格数
+     */
     private var spanCountY = 0
+
+    /**
+     * 无法进行排列的面板的通知函数
+     */
+    private var cantLayoutPanelListener: ((Panel) -> Unit)? = null
 
     /**
      * 格子数量
@@ -78,7 +121,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
+//        super.onLayout(changed, left, top, right, bottom)
         val widthSize = right - left - paddingLeft - paddingRight
         val heightSize = bottom - top - paddingTop - paddingBottom
         if (widthSize < 1 || heightSize < 1) {
@@ -91,14 +134,45 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
         val offsetX = paddingLeft
         val offsetY = paddingTop
+
         for (i in 0 until childCount) {
             val view = getChildAt(i)
             val panel = findPanelByView(view)
-            if (view.visibility == View.GONE) {
+            // 如果View是隐藏的，那么跳过
+            if (panel.visibility == View.GONE) {
                 panel.layout(0, 0, 0, 0)
                 continue
             }
+            val info = panel.panelInfo
+            if (info.width < 1 || info.height < 1 || info.x < 0 || info.y < 0) {
+                // 如果位置信息不完整，那么开始尝试排版
+                val location = findGrid(info.spanX, info.spanY)
+                if (location.isEffective()) {
+                    val panelWidth = info.spanX * gridSize.width
+                    val panelHeight = info.spanY * gridSize.height
+                    val x = location.x * gridSize.width + offsetX
+                    val y = location.y * gridSize.height + offsetY
+                    panel.layout(x, y, panelWidth + x, panelHeight + y)
+                } else {
+                    // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
+                    panelList.remove(panel)
+                    pendingRemoveList.add(panel)
+                }
+            } else {
+                // 如果有排版位置了，那么直接进行相应位置的排版
+                panel.layout(info.x, info.y, info.width + info.x, info.height + info.y)
+                if (!canPlace(panel)) {
+                    // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
+                    panelList.remove(panel)
+                    pendingRemoveList.add(panel)
+                }
+            }
         }
+        for (p in pendingRemoveList) {
+            removeViewInLayout(p.view)
+            cantLayoutPanel(p)
+        }
+        pendingRemoveList.clear()
     }
 
     /**
@@ -108,7 +182,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private fun findGrid(spanX: Int, spanY: Int, panel: Panel? = null): Point {
         // 遍历每一个格子，直到找到一个符合要求的位置
         tmpRect1.set(0, 0, spanX * gridSize.width, spanY * gridSize.height)
-        var meet = false
+        var meet: Boolean
         for (x in 0 until spanCountX) {
             for (y in 0 until spanCountY) {
                 // 格子尺寸不变，只做位置的偏移
@@ -224,6 +298,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * @return 如果为true，表示可以被放置
      */
     private fun canPlace(panel: Panel): Boolean {
+        panel.copyBounds(tmpRect1)
+        tmpRect1.selfCheck()
+        if (tmpRect1.isEmpty || tmpRect1.left < 0 || tmpRect1.top < 0) {
+            return false
+        }
         for (p in panelList) {
             if (panel == p) {
                 continue
@@ -284,12 +363,26 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     /**
+     * 位置信息是否有效的检查方法
+     */
+    private fun Point.isEffective(): Boolean {
+        return this.x >= 0 && this.y >= 0
+    }
+
+    /**
      * 当panel不能被摆放时，会将不能摆放的panel放置在此处，
      * 然后通过回调函数传出，外部可以选择调整面板尺寸
      * 或者移除此面板
      */
     private fun cantLayoutPanel(panel: Panel) {
-        // TODO
+        cantLayoutPanelListener?.invoke(panel)
+    }
+
+    /**
+     * 监听布局失败的场景
+     */
+    fun onCantLayout(listener: (Panel) -> Unit) {
+        cantLayoutPanelListener = listener
     }
 
     override fun addView(child: View?) {
