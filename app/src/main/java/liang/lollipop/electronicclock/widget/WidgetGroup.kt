@@ -10,7 +10,12 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import liang.lollipop.electronicclock.utils.Utils
+import liang.lollipop.electronicclock.utils.dp
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * @author lollipop
@@ -33,6 +38,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         private val logger = Utils.loggerI("WidgetGroup")
 
         private const val CANCEL_MODE_TIME = 300L
+
+        private const val NO_ID = -1
     }
 
     /**
@@ -52,20 +59,15 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private val layoutInflater = LayoutInflater.from(context)
 
     /**
+     * 回收复用的Rect对象集合
+     */
+    private val recyclerRectList = LinkedList<Rect>()
+
+    /**
      * 单元格的尺寸
      */
     private var gridSize = EMPTY_SIZE
 
-    /**
-     * 临时的矩形对象
-     * 用于辅助计算
-     */
-    private val tmpRect1 = Rect()
-    /**
-     * 临时的矩形对象
-     * 用于辅助计算
-     */
-    private val tmpRect2 = Rect()
     /**
      * 临时的点对象
      * 用于辅助计算
@@ -91,7 +93,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     /**
      * 用来绘制选中面板边框效果的回调函数
      */
-    private var drawSelectedPanelListener: ((Panel<*>, Canvas) -> Unit)? = null
+    private var drawSelectedPanelListener: ((Panel<*>, DragMode, Canvas) -> Unit)? = null
 
     /**
      * 子View的长按点击事件
@@ -122,6 +124,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     var selectedPanel: Panel<*>? = null
         set(value) {
             field = value
+            pendingTouchRequest = true
             invalidate()
         }
 
@@ -133,17 +136,32 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     /**
      * 是否是拖拽模式
      */
-    private val isDragMode: Boolean
+    private val isDragState: Boolean
         get() {
             return selectedPanel != null
         }
 
-    private var activeActionId = 0
+    private var activeActionId = NO_ID
 
     /**
      * 按下位置
      */
     private var touchDown = PointF()
+
+    /**
+     * 拖拽模式
+     */
+    private var dragMode = DragMode.None
+
+    /**
+     * 拖拽的边框宽度，用于调整触发灵敏度
+     */
+    var dragStrokeWidth = resources.dp(5F)
+
+    /**
+     * 请求一次手势拦截
+     */
+    private var pendingTouchRequest = false
 
     /**
      * 添加面板
@@ -155,16 +173,9 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         // 在添加前做位置检查，减少不必要的操作
         if (!gridSize.isEmpty()) {
             val info = panel.panelInfo
-            if (info.width < 1 || info.height < 1 || info.x < 0 || info.y < 0) {
-                val location = findGrid(info.spanX, info.spanY)
-                if (!location.isEffective()) {
-                    return false
-                }
-            } else {
-                tmpRect1.set(info.x, info.y, info.x + info.width, info.y + info.height)
-                if (!canPlace(tmpRect1)) {
-                    return false
-                }
+            val location = findGrid(info.spanX, info.spanY)
+            if (!location.isEffective()) {
+                return false
             }
         }
         if (panel.view == null) {
@@ -188,80 +199,247 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return interceptBySelectedMode(event) || selectedPanel != null || super.onTouchEvent(event)
+        event?:return super.onInterceptTouchEvent(event)
+        // 如果不在拖拽模式，那么放弃手势处理
+        if (!isDragState || dragMode == DragMode.None || activeActionId == NO_ID) {
+            return super.onInterceptTouchEvent(event)
+        }
+        when (event.actionMasked){
+            MotionEvent.ACTION_MOVE -> {
+                val result = onDrag(event.getXById() - touchDown.x, event.getYById() - touchDown.y)
+                if (!result) {
+                    logger("onTouchEvent, ACTION_MOVE, onDrag selectedPanel not found, cancelSelected")
+                    cancelSelected()
+                    return true
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                logger("onTouchEvent, ACTION_UP")
+                // 完成了拖拽，但是符合操作要求，因此保持操作状态
+                activeActionId = NO_ID
+                dragMode = DragMode.None
+                pushPanelWhenTouch()
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+                logger("onTouchEvent, ACTION_POINTER_UP")
+                if (onPointerUp(event)) {
+                    return true
+                }
+            }
+        }
+        if (interceptBySelectedMode(event)) {
+            return true
+        }
+        return (isDragState && dragMode != DragMode.None) || super.onTouchEvent(event)
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev?:return super.onInterceptTouchEvent(ev)
         // 如果不在拖拽模式，那么放弃拦截任何手势
-        if (!isDragMode) {
+        if (!isDragState) {
+            logger("onInterceptTouchEvent, isDragState = false, break")
             return super.onInterceptTouchEvent(ev)
         }
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                touchDown.set(ev.getXById(), ev.getYById())
+                logger("onInterceptTouchEvent, ACTION_DOWN")
+                pendingTouchRequest = false
+                // 检查按下事件是否符合要求，如果符合，那么认为开始拖拽
+                touchDown.set(ev.x, ev.y)
                 if (touchInSelectedPanel(touchDown.x.toInt(), touchDown.y.toInt())) {
                     activeActionId = ev.getPointerId(0)
+                    logger("onInterceptTouchEvent, ACTION_DOWN -> activeActionId = $activeActionId, dragMode = $dragMode")
                 } else {
                     cancelSelected()
+                    logger("onInterceptTouchEvent, ACTION_DOWN -> cancelSelected()")
                     return true
                 }
             }
             MotionEvent.ACTION_POINTER_UP -> {
-                // 如果有手指抬起，那么检查抬起的手指是否是我们锁定的那一个
-                // 如果是，那么尝试更换另一个有效的手指
-                val pointerIndex = ev.actionIndex
-                val pointerId = ev.getPointerId(pointerIndex)
-                if (pointerId == activeActionId) {
-                    // 当活跃的那个指头抬起，那么重新选定一个指头作为事件来源
-                    var newPointerIndex = -1
-                    for (i in 0 until ev.pointerCount) {
-                        if (pointerIndex == i) {
-                            continue
-                        }
-                        if (touchInSelectedPanel(ev.getX(newPointerIndex).toInt(),
-                                ev.getY(newPointerIndex).toInt())) {
-                            newPointerIndex = i
-                        }
-                    }
-                    // 如果没有符合条件的手指，那么放弃事件，认为本次任务结束
-                    if (newPointerIndex < 0) {
-                        cancelSelected()
-                        return true
-                    }
-                    touchDown.set(ev.getX(newPointerIndex), ev.getY(newPointerIndex))
-                    activeActionId = ev.getPointerId(newPointerIndex)
-                    if (!touchInSelectedPanel(touchDown.x.toInt(), touchDown.y.toInt())) {
-                        cancelSelected()
-                        return true
-                    }
-                    // 如果顺利完成了手指的更换，那么放置面板，并且从头开始
-                    pushPanelWhenTouch()
+                logger("onInterceptTouchEvent, ACTION_POINTER_UP")
+                if (onPointerUp(ev)) {
+                    return true
                 }
             }
             MotionEvent.ACTION_UP -> {
-
+                logger("onInterceptTouchEvent, ACTION_UP")
+                // 完成了拖拽，但是符合操作要求，因此保持操作状态
+                activeActionId = NO_ID
+                dragMode = DragMode.None
+                pushPanelWhenTouch()
             }
             MotionEvent.ACTION_CANCEL -> {
+                logger("onInterceptTouchEvent, ACTION_CANCEL")
+                // 事件被拦截，取消操作状态
                 cancelSelected()
                 return true
             }
         }
+        if (pendingTouchRequest) {
+            onPointerUp(ev)
+        }
         if (interceptBySelectedMode(ev)) {
             return true
         }
-        return isDragMode || super.onInterceptTouchEvent(ev)
+        // 只要是拖拽的激活状态，那么就必须要拦截全部手势
+        return isDragState || super.onInterceptTouchEvent(ev)
+    }
+
+    private fun onDrag(offsetX: Float, offsetY: Float): Boolean {
+        val panel = selectedPanel?:return false
+        val offX = offsetX.toInt()
+        val offY = offsetY.toInt()
+        when (dragMode) {
+            DragMode.Move -> {
+                val rect = getRect()
+                panel.copyBounds(rect)
+                val p = moveCheck(rect, offX, offY, panel)
+                panel.offsetByGrid(p.x, p.y)
+                touchDown.x += p.x * gridSize.width
+                touchDown.y += p.y * gridSize.height
+                rect.recycle()
+            }
+            DragMode.Left -> {
+                val x = round(1F * offX / gridSize.width)
+                if (x != 0) {
+                    val rect = getRect()
+                    panel.copyBounds(rect)
+                    rect.left += x
+                    if (canPlace(rect, panel)) {
+                        val info = panel.panelInfo
+                        panel.layoutByGrid(info.x + x, info.y, info.spanX - x, info.spanY)
+                        touchDown.x += x * gridSize.width
+                    }
+                    rect.recycle()
+                }
+            }
+            DragMode.Right -> {
+                val x = round(1F * offX / gridSize.width)
+                if (x != 0) {
+                    val rect = getRect()
+                    panel.copyBounds(rect)
+                    rect.right += x
+                    if (canPlace(rect, panel)) {
+                        val info = panel.panelInfo
+                        panel.layoutByGrid(info.x, info.y, info.spanX + x, info.spanY)
+                        touchDown.x += x * gridSize.width
+                    }
+                    rect.recycle()
+                }
+            }
+            DragMode.Top -> {
+                val y = round(1F * offY / gridSize.height)
+                if (y != 0) {
+                    val rect = getRect()
+                    panel.copyBounds(rect)
+                    rect.top += y
+                    if (canPlace(rect, panel)) {
+                        val info = panel.panelInfo
+                        panel.layoutByGrid(info.x, info.y + y, info.spanX, info.spanY - y)
+                        touchDown.y += y * gridSize.height
+                    }
+                    rect.recycle()
+                }
+            }
+            DragMode.Bottom -> {
+                val y = round(1F * offY / gridSize.height)
+                if (y != 0) {
+                    val rect = getRect()
+                    panel.copyBounds(rect)
+                    rect.bottom += y
+                    if (canPlace(rect, panel)) {
+                        val info = panel.panelInfo
+                        panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY + y)
+                        touchDown.y += y * gridSize.height
+                    }
+                    rect.recycle()
+                }
+            }
+        }
+        invalidate()
+        return true
+    }
+
+    private fun round(f: Float): Int {
+        return if (f >= 0) {
+            (f + 0.5F).toInt()
+        } else {
+            (f - 0.5F).toInt()
+        }
+    }
+
+    private fun moveCheck(rect: Rect, offX: Int, offY: Int, skip: Panel<*>? = null): Point {
+        val p = tmpPoint
+        p.x = round(1F * offX / gridSize.width)
+        p.y = round(1F * offY / gridSize.height)
+        if (p.x + rect.left < 0) {
+            p.x = - rect.left
+        }
+        if (rect.right + p.x > spanCountX) {
+            p.x = spanCountX - rect.right
+        }
+        if (rect.top + p.y < 0) {
+            p.y = - rect.top
+        }
+        if (rect.bottom + p.y > spanCountY) {
+            p.y = spanCountY - rect.bottom
+        }
+        val tmp = getRect()
+        tmp.set(rect)
+        tmp.offset(p.x, p.y)
+        if (!canPlace(tmp, skip)) {
+            p.set(0, 0)
+        }
+        tmp.recycle()
+        return p
+    }
+
+    private fun onPointerUp(ev: MotionEvent): Boolean {
+        logger("onPointerUp")
+        // 如果有手指抬起，那么检查抬起的手指是否是我们锁定的那一个
+        // 如果是，那么尝试更换另一个有效的手指
+        val pointerIndex = ev.actionIndex
+        val pointerId = ev.getPointerId(pointerIndex)
+        if (pointerId == activeActionId || activeActionId == NO_ID) {
+            // 当活跃的那个指头抬起，那么重新选定一个指头作为事件来源
+            var newPointerIndex = -1
+            for (i in 0 until ev.pointerCount) {
+                if (pointerIndex == i && ev.actionMasked == MotionEvent.ACTION_POINTER_UP) {
+                    continue
+                }
+                if (touchInSelectedPanel(ev.getX(i).toInt(),
+                        ev.getY(i).toInt())) {
+                    newPointerIndex = i
+                    break
+                }
+            }
+            // 如果没有符合条件的手指，那么放弃事件，认为本次任务结束
+            if (newPointerIndex < 0) {
+                cancelSelected()
+                logger("onPointerUp newPointerIndex = $newPointerIndex, cancelSelected")
+                return true
+            }
+            touchDown.set(ev.getX(newPointerIndex), ev.getY(newPointerIndex))
+            activeActionId = ev.getPointerId(newPointerIndex)
+            // 如果顺利完成了手指的更换，那么放置面板，并且从头开始
+            pushPanelWhenTouch()
+            logger("onPointerUp newPointerIndex = $newPointerIndex, pushPanelWhenTouch")
+        }
+        return false
     }
 
     private fun interceptBySelectedMode(ev: MotionEvent?): Boolean {
+        if (dragMode != DragMode.None) {
+            return false
+        }
         when (ev?.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 touchDownTime = System.currentTimeMillis()
-                logger("on touch down: $touchDownTime")
+                logger("interceptBySelectedMode, ACTION_DOWN: $touchDownTime")
             }
             MotionEvent.ACTION_UP -> {
                 val diff = System.currentTimeMillis() - touchDownTime
-                logger("on touch up: diff = $diff")
+                logger("interceptBySelectedMode, ACTION_UP diff = $diff")
                 if (diff < CANCEL_MODE_TIME) {
                     cancelSelected()
                     return true
@@ -272,18 +450,20 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     private fun cancelSelected() {
+        logger("cancelSelected")
         selectedPanel = null
-        activeActionId = -1
+        activeActionId = NO_ID
+        dragMode = DragMode.None
+        pendingTouchRequest = false
         pushPanelWhenTouch()
         invalidate()
     }
 
     private fun pushPanelWhenTouch() {
-        selectedPanel?.let { panel ->
-            panel.offset(panel.translationX.toInt(), panel.translationY.toInt())
-            panel.translationX = 0F
-            panel.translationY = 0F
-        }
+        logger("pushPanelWhenTouch")
+        pendingTouchRequest = false
+        dragMode = DragMode.None
+        invalidate()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -307,13 +487,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 continue
             }
             val info = panel.panelInfo
-            if (info.width < 1 || info.height < 1) {
-                view.measure(MeasureSpec.makeMeasureSpec(info.spanX * gridSize.width, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(info.spanY * gridSize.height, MeasureSpec.EXACTLY))
-            } else {
-                view.measure(MeasureSpec.makeMeasureSpec(info.width, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(info.height, MeasureSpec.EXACTLY))
-            }
+            view.measure(MeasureSpec.makeMeasureSpec(info.spanX * gridSize.width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(info.spanY * gridSize.height, MeasureSpec.EXACTLY))
         }
         setMeasuredDimension(srcWidth, srcHeight)
     }
@@ -332,9 +507,6 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             // 如果格子尺寸是空的，那么尝试做尺寸计算
             calculateGridSize(widthSize, heightSize)
         }
-        val offsetX = paddingLeft
-        val offsetY = paddingTop
-
         for (i in 0 until childCount) {
             val view = getChildAt(i)
             val panel = findPanelByView(view)
@@ -344,15 +516,12 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 continue
             }
             val info = panel.panelInfo
-            if (info.width < 1 || info.height < 1 || info.x < 0 || info.y < 0) {
+            if (info.x < 0 || info.y < 0) {
                 // 如果位置信息不完整，那么开始尝试排版
-                val location = findGrid(info.spanX, info.spanY)
+                val location = findGrid(info.spanX, info.spanY, panel)
+                logger("onLayout: index:$i, location:$location")
                 if (location.isEffective()) {
-                    val panelWidth = info.spanX * gridSize.width
-                    val panelHeight = info.spanY * gridSize.height
-                    val x = location.x * gridSize.width + offsetX
-                    val y = location.y * gridSize.height + offsetY
-                    panel.layout(x, y, panelWidth + x, panelHeight + y)
+                    panel.layoutByGrid(location.x, location.y, info.spanX, info.spanY)
                 } else {
                     // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
                     panelList.remove(panel)
@@ -360,7 +529,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 }
             } else {
                 // 如果有排版位置了，那么直接进行相应位置的排版
-                panel.layout(info.x, info.y, info.width + info.x, info.height + info.y)
+                panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY)
                 if (!canPlace(panel)) {
                     // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
                     panelList.remove(panel)
@@ -375,13 +544,30 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         pendingRemoveList.clear()
     }
 
+    private fun Panel<*>.layoutByGrid(x: Int, y: Int, spanX: Int, spanY: Int) {
+        val panelWidth = spanX * gridSize.width
+        val panelHeight = spanY * gridSize.height
+        val left = x * gridSize.width + paddingLeft
+        val top = y * gridSize.height + paddingTop
+        this.layout(left, top, panelWidth + left, panelHeight + top)
+        this.saveGridLocation(x, y, spanX, spanY)
+    }
+
+    private fun Panel<*>.offsetByGrid(x: Int, y: Int) {
+        val left = x * gridSize.width
+        val top = y * gridSize.height
+        this.offset(left, top)
+        this.panelInfo.offsetBy(x, y)
+    }
+
     /**
      * 找到一个符合要求的格子，并且返回它的坐标
      * 返回的坐标为格子的左上角格子坐标
      */
     private fun findGrid(spanX: Int, spanY: Int, panel: Panel<*>? = null): Point {
         // 遍历每一个格子，直到找到一个符合要求的位置
-        tmpRect1.set(0, 0, spanX * gridSize.width, spanY * gridSize.height)
+        val rect = getRect()
+        rect.set(0, 0, spanX, spanY)
         var meet: Boolean
         for (y in 0 until spanCountY) {
             // 如果超过了最大格数，那么直接返回
@@ -394,20 +580,21 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                     break
                 }
                 // 格子尺寸不变，只做位置的偏移
-                tmpRect1.offsetTo(x * gridSize.width, y * gridSize.height)
-                tmpRect1.offset(paddingLeft, paddingTop)
+                rect.offsetTo(x, y)
                 // 每次检查前，默认为当前格子符合要求
                 meet = true
                 for (p in panelList) {
                     // 如果是自身，那么跳过检查
-                    if (p == panel) {
+                    if (p == panel || p.visibility == View.GONE) {
                         continue
                     }
-                    p.copyBounds(tmpRect2)
+                    val rect2 = getRect()
+                    p.copyBounds(rect2)
                     // 如果和某一个面板存在交集，那么认为这个位置不可用
                     // 结束检查，开始下一轮的循环
-                    if (hasIntersection(tmpRect1, tmpRect2)) {
-                        meet = false
+                    if (hasIntersection(rect, rect2)) { meet = false }
+                    rect2.recycle()
+                    if (!meet) {
                         break
                     }
                 }
@@ -419,6 +606,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             }
         }
         tmpPoint.set(-1, -1)
+        rect.recycle()
         return tmpPoint
     }
 
@@ -426,10 +614,9 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         super.dispatchDraw(canvas)
         canvas?:return
         selectedPanel?.let {
-            drawSelectedPanelListener?.invoke(it, canvas)
+            drawSelectedPanelListener?.invoke(it, dragMode, canvas)
         }
         if (Utils.isDebug) {
-            canvas?:return
             val gridPaint = Paint()
             gridPaint.color = Color.RED
             for (x in 0 until spanCountX) {
@@ -527,8 +714,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * @return 如果为true，表示可以被放置
      */
     private fun canPlace(panel: Panel<*>): Boolean {
-        panel.copyBounds(tmpRect1)
-        return canPlace(tmpRect1)
+        val rect = getRect()
+        panel.copyBounds(rect)
+        val result = canPlace(rect)
+        rect.recycle()
+        return result
     }
 
     /**
@@ -536,32 +726,24 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * 检查面板是否可以被放置
      * @return 如果为true，表示可以被放置
      */
-    private fun canPlace(rect: Rect): Boolean {
+    private fun canPlace(rect: Rect, skip: Panel<*>? = null): Boolean {
         rect.selfCheck()
         if (rect.isEmpty || rect.left < 0 || rect.top < 0) {
             return false
         }
         for (p in panelList) {
-            if (p.visibility == View.GONE) {
+            if (p.visibility == View.GONE || p == skip) {
                 continue
             }
-            p.copyBounds(tmpRect1)
-            if (hasIntersection(tmpRect1, rect)) {
+            val rect2 = getRect()
+            p.copyBounds(rect2)
+            if (hasIntersection(rect2, rect)) {
+                rect2.recycle()
                 return false
             }
+            rect2.recycle()
         }
         return true
-    }
-
-    /**
-     * 两个面板之间是否存在交集
-     * 如果存在交集，那么返回true
-     */
-    private fun hasIntersection(p0: Panel<*>, p1: Panel<*>): Boolean {
-        // 复制得到面板对应的View尺寸及位置
-        p0.copyBounds(tmpRect1)
-        p1.copyBounds(tmpRect2)
-        return hasIntersection(tmpRect1, tmpRect2)
     }
 
     /**
@@ -574,13 +756,21 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         if (r1.isEmpty || r2.isEmpty) {
             return false
         }
+        // left和top小于0的场景默认为未处理状态
+        if (r1.left < 0 || r1.top < 0 || r2.left < 0 || r2.top < 0) {
+            return false
+        }
         // 判断纵向是否存在交集，如果不存在，那么表示为通过
         val vertical = r1.bottom <= r2.top || r1.top >= r2.bottom
         // 判断横向是否存在交集，如果不存在，那么表示为通过
         val horizontal = r1.right <= r2.left || r1.left >= r2.right
         // 如果横向或者纵向不存在交集，那么认为两个矩形处于平行状态
         // 否则认为有交集
-        return !(vertical || horizontal)
+        val has = !(vertical || horizontal)
+        if (has) {
+            logger("hasIntersection: $r1, $r2")
+        }
+        return has
     }
 
     /**
@@ -667,21 +857,115 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * 绘制被选中的面板的回调
      * 将面板的选中效果抛出，由外部绘制
      */
-    fun onDrawSelectedPanel(listener: (Panel<*>, Canvas) -> Unit) {
+    fun onDrawSelectedPanel(listener: (Panel<*>, DragMode, Canvas) -> Unit) {
         drawSelectedPanelListener = listener
     }
 
     private fun MotionEvent.getXById(): Float {
+        if (activeActionId == NO_ID) {
+            return 0F
+        }
         return this.getX(this.findPointerIndex(activeActionId))
     }
 
     private fun MotionEvent.getYById(): Float {
+        if (activeActionId == NO_ID) {
+            return 0F
+        }
         return this.getY(this.findPointerIndex(activeActionId))
     }
 
+    private fun Int.limit(min: Int, max: Int): Int {
+        if (this < min) {
+            return min
+        }
+        if (this > max) {
+            return max
+        }
+        return this
+    }
+
     private fun touchInSelectedPanel(x: Int, y: Int): Boolean {
-        selectedPanel?.copyBounds(tmpRect1)?:return false
-        return tmpRect1.contains(x, y)
+        logger("touchInSelectedPanel")
+        dragMode = DragMode.None
+        val rect = getRect()
+        val panel = selectedPanel?:return false
+        panel.copyBoundsByPixels(rect)
+        // 加上偏移量，应对拖拽场景
+        rect.offset(panel.translationX.toInt(), panel.translationY.toInt())
+        rect.selfCheck()
+        logger("touchInSelectedPanel, bounds:$rect, point:[$x,$y]")
+        if (rect.isEmpty) {
+            rect.recycle()
+            return false
+        }
+        val touchR = dragStrokeWidth / 2
+        // 是否点击在了左侧拖拽范围
+        // X在左侧边缘的有效范围内，并且Y在面板的高度范围内
+        if (x < rect.left + touchR && x > rect.left - touchR
+            && y > rect.top + touchR && y < rect.bottom - touchR) {
+            dragMode = DragMode.Left
+            rect.recycle()
+            return true
+        }
+
+        // 是否点击在了上侧拖拽范围
+        // X在面板的宽度范围内，并且Y在上侧边缘的有效范围内
+        if (x > rect.left + touchR && x < rect.right - touchR
+            && y > rect.top - touchR && y < rect.top + touchR) {
+            dragMode = DragMode.Top
+            rect.recycle()
+            return true
+        }
+
+        // 是否点击在了右侧拖拽范围
+        // X在右侧边缘的有效范围内，并且Y在面板的高度范围内
+        if (x < rect.right + touchR && x > rect.right - touchR
+            && y > rect.top + touchR && y < rect.bottom - touchR) {
+            dragMode = DragMode.Right
+            rect.recycle()
+            return true
+        }
+
+        // 是否点击在了下侧拖拽范围
+        // X在面板的宽度范围内，并且Y在下侧边缘的有效范围内
+        if (x > rect.left + touchR && x < rect.right - touchR
+            && y > rect.bottom - touchR && y < rect.bottom + touchR) {
+            dragMode = DragMode.Bottom
+            rect.recycle()
+            return true
+        }
+
+        // 如果都不符合，那么尝试检查是否在面板的范围内
+        // 如果在，那么就进入移动模式
+        if (rect.contains(x, y)) {
+            dragMode = DragMode.Move
+            rect.recycle()
+            return true
+        }
+
+        rect.recycle()
+        return false
+    }
+
+    enum class DragMode(val value: Int) {
+        None(-1),
+        Move(0),
+        Left(1),
+        Top(2),
+        Right(3),
+        Bottom(4)
+    }
+
+    private fun getRect(): Rect {
+        if (recyclerRectList.isEmpty()) {
+            return Rect()
+        }
+        return recyclerRectList.removeFirst()
+    }
+
+    private fun Rect.recycle() {
+        recyclerRectList.add(this)
     }
 
 }
