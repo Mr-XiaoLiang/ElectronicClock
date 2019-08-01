@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.Size
 import android.view.InflateException
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import liang.lollipop.electronicclock.utils.Utils
@@ -29,6 +30,9 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
          */
         private val EMPTY_SIZE = Size(0, 0)
 
+        private val logger = Utils.loggerI("WidgetGroup")
+
+        private const val CANCEL_MODE_TIME = 300L
     }
 
     /**
@@ -85,6 +89,21 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private var cantLayoutPanelListener: ((Panel<*>) -> Unit)? = null
 
     /**
+     * 用来绘制选中面板边框效果的回调函数
+     */
+    private var drawSelectedPanelListener: ((Panel<*>, Canvas) -> Unit)? = null
+
+    /**
+     * 子View的长按点击事件
+     */
+    private var childLongClickListener: ((Panel<*>) -> Boolean)? = null
+
+    /**
+     * 子View的点击事件
+     */
+    private var childClickListener: ((Panel<*>) -> Unit)? = null
+
+    /**
      * 格子数量
      * 这个数量是指窄边的格子数
      * 长边的数量会依据此数量来进行变化
@@ -96,6 +115,35 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             gridSize = EMPTY_SIZE
             requestLayout()
         }
+
+    /**
+     * 被选中的卡片
+     */
+    var selectedPanel: Panel<*>? = null
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    /**
+     * 手指按下的时间戳
+     */
+    private var touchDownTime = 0L
+
+    /**
+     * 是否是拖拽模式
+     */
+    private val isDragMode: Boolean
+        get() {
+            return selectedPanel != null
+        }
+
+    private var activeActionId = 0
+
+    /**
+     * 按下位置
+     */
+    private var touchDown = PointF()
 
     /**
      * 添加面板
@@ -124,6 +172,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
         panelList.add(panel)
         addView(panel.view)
+        setChildLongClick(panel)
+        setChildClick(panel)
         return true
     }
 
@@ -134,6 +184,105 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         // 如果在集合中成功移除了面板，那么也从View中移除相应的View
         if (panelList.remove(panel)) {
             super.removeView(panel.view)
+        }
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return interceptBySelectedMode(event) || selectedPanel != null || super.onTouchEvent(event)
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        ev?:return super.onInterceptTouchEvent(ev)
+        // 如果不在拖拽模式，那么放弃拦截任何手势
+        if (!isDragMode) {
+            return super.onInterceptTouchEvent(ev)
+        }
+        when (ev.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                touchDown.set(ev.getXById(), ev.getYById())
+                if (touchInSelectedPanel(touchDown.x.toInt(), touchDown.y.toInt())) {
+                    activeActionId = ev.getPointerId(0)
+                } else {
+                    cancelSelected()
+                    return true
+                }
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+                // 如果有手指抬起，那么检查抬起的手指是否是我们锁定的那一个
+                // 如果是，那么尝试更换另一个有效的手指
+                val pointerIndex = ev.actionIndex
+                val pointerId = ev.getPointerId(pointerIndex)
+                if (pointerId == activeActionId) {
+                    // 当活跃的那个指头抬起，那么重新选定一个指头作为事件来源
+                    var newPointerIndex = -1
+                    for (i in 0 until ev.pointerCount) {
+                        if (pointerIndex == i) {
+                            continue
+                        }
+                        if (touchInSelectedPanel(ev.getX(newPointerIndex).toInt(),
+                                ev.getY(newPointerIndex).toInt())) {
+                            newPointerIndex = i
+                        }
+                    }
+                    // 如果没有符合条件的手指，那么放弃事件，认为本次任务结束
+                    if (newPointerIndex < 0) {
+                        cancelSelected()
+                        return true
+                    }
+                    touchDown.set(ev.getX(newPointerIndex), ev.getY(newPointerIndex))
+                    activeActionId = ev.getPointerId(newPointerIndex)
+                    if (!touchInSelectedPanel(touchDown.x.toInt(), touchDown.y.toInt())) {
+                        cancelSelected()
+                        return true
+                    }
+                    // 如果顺利完成了手指的更换，那么放置面板，并且从头开始
+                    pushPanelWhenTouch()
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                cancelSelected()
+                return true
+            }
+        }
+        if (interceptBySelectedMode(ev)) {
+            return true
+        }
+        return isDragMode || super.onInterceptTouchEvent(ev)
+    }
+
+    private fun interceptBySelectedMode(ev: MotionEvent?): Boolean {
+        when (ev?.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                touchDownTime = System.currentTimeMillis()
+                logger("on touch down: $touchDownTime")
+            }
+            MotionEvent.ACTION_UP -> {
+                val diff = System.currentTimeMillis() - touchDownTime
+                logger("on touch up: diff = $diff")
+                if (diff < CANCEL_MODE_TIME) {
+                    cancelSelected()
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun cancelSelected() {
+        selectedPanel = null
+        activeActionId = -1
+        pushPanelWhenTouch()
+        invalidate()
+    }
+
+    private fun pushPanelWhenTouch() {
+        selectedPanel?.let { panel ->
+            panel.offset(panel.translationX.toInt(), panel.translationY.toInt())
+            panel.translationX = 0F
+            panel.translationY = 0F
         }
     }
 
@@ -170,6 +319,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        logger("onLayout: $changed, $left, $top, $right, $bottom")
         val srcWidth = right - left
         val srcHeight = bottom - top
         val widthSize = srcWidth - paddingLeft - paddingRight
@@ -274,6 +424,10 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
 
     override fun dispatchDraw(canvas: Canvas?) {
         super.dispatchDraw(canvas)
+        canvas?:return
+        selectedPanel?.let {
+            drawSelectedPanelListener?.invoke(it, canvas)
+        }
         if (Utils.isDebug) {
             canvas?:return
             val gridPaint = Paint()
@@ -472,6 +626,62 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      */
     fun onCantLayout(listener: (Panel<*>) -> Unit) {
         cantLayoutPanelListener = listener
+    }
+
+    /**
+     * 当子View被长按时，触发
+     */
+    fun onChildLongClick(listener: ((Panel<*>) -> Boolean)?) {
+        childLongClickListener = listener
+        for (p in panelList) {
+            setChildLongClick(p)
+        }
+    }
+
+    private fun setChildLongClick(panel: Panel<*>) {
+        val listener = childLongClickListener
+        if (listener != null) {
+            panel.view?.setOnLongClickListener{ listener(panel) }
+        } else {
+            panel.view?.setOnLongClickListener(null)
+        }
+    }
+
+    fun onChildClick(listener: ((Panel<*>) -> Unit)?) {
+        childClickListener = listener
+        for (p in panelList) {
+            setChildClick(p)
+        }
+    }
+
+    private fun setChildClick(panel: Panel<*>) {
+        val listener = childClickListener
+        if (listener != null) {
+            panel.view?.setOnClickListener{ listener(panel) }
+        } else {
+            panel.view?.setOnClickListener(null)
+        }
+    }
+
+    /**
+     * 绘制被选中的面板的回调
+     * 将面板的选中效果抛出，由外部绘制
+     */
+    fun onDrawSelectedPanel(listener: (Panel<*>, Canvas) -> Unit) {
+        drawSelectedPanelListener = listener
+    }
+
+    private fun MotionEvent.getXById(): Float {
+        return this.getX(this.findPointerIndex(activeActionId))
+    }
+
+    private fun MotionEvent.getYById(): Float {
+        return this.getY(this.findPointerIndex(activeActionId))
+    }
+
+    private fun touchInSelectedPanel(x: Int, y: Int): Boolean {
+        selectedPanel?.copyBounds(tmpRect1)?:return false
+        return tmpRect1.contains(x, y)
     }
 
 }

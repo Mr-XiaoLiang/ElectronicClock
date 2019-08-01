@@ -78,6 +78,20 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
         }
     }
 
+    fun offset(x: Int, y: Int) {
+        bounds.offset(x, y)
+        view?.offsetLeftAndRight(x)
+        view?.offsetTopAndBottom(y)
+    }
+
+    var translationX: Float
+        get() { return view?.translationX?:0F }
+        set(value) { view?.translationX = value }
+
+    var translationY: Float
+        get() { return view?.translationY?:0F }
+        set(value) { view?.translationY = value }
+
     fun saveLocation() {
         panelInfo.sizeChange(bounds.width(), bounds.height())
         panelInfo.offset(bounds.left, bounds.top)
