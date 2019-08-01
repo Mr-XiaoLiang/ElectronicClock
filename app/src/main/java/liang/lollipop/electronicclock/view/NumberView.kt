@@ -29,6 +29,10 @@ class NumberView(context: Context, attr: AttributeSet?,
         Font(1)
     }
 
+    init {
+//        VectorDrawable
+    }
+
     private class TextDrawable(size: Int): Drawable() {
 
         private val paint = Paint().apply {
