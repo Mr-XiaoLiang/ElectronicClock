@@ -40,6 +40,11 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
         }
 
     fun copyBounds(rect: Rect) {
+        rect.set(panelInfo.x, panelInfo.y,
+            panelInfo.x + panelInfo.spanX, panelInfo.y + panelInfo.spanY)
+    }
+
+    fun copyBoundsByPixels(rect: Rect) {
         rect.set(bounds)
     }
 
@@ -92,9 +97,9 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
         get() { return view?.translationY?:0F }
         set(value) { view?.translationY = value }
 
-    fun saveLocation() {
-        panelInfo.sizeChange(bounds.width(), bounds.height())
-        panelInfo.offset(bounds.left, bounds.top)
+    fun saveGridLocation(x: Int, y: Int, spanX: Int, spanY: Int) {
+        panelInfo.sizeChange(spanX, spanY)
+        panelInfo.offset(x, y)
     }
 
     /**

@@ -1,6 +1,8 @@
 package liang.lollipop.electronicclock.utils
 
+import android.content.res.Resources
 import android.util.Log
+import android.util.TypedValue
 
 /**
  * @author lollipop
@@ -17,4 +19,7 @@ object Utils {
         }
     }
 
+}
+fun Resources.dp(value: Float): Float {
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, this.displayMetrics)
 }

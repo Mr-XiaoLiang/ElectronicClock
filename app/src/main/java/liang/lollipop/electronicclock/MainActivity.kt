@@ -16,8 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.utils.Utils
+import liang.lollipop.electronicclock.utils.dp
 import liang.lollipop.electronicclock.widget.Panel
 import liang.lollipop.electronicclock.widget.PanelInfo
+import liang.lollipop.electronicclock.widget.WidgetGroup
 
 /**
  * @author Lollipop
@@ -32,6 +34,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        widgetGroup.dragStrokeWidth = resources.dp(20F)
+
         widgetGroup.onChildLongClick {
             widgetGroup.selectedPanel = it
             Toast.makeText(this, "面板被长按了", Toast.LENGTH_SHORT).show()
@@ -43,18 +47,24 @@ class MainActivity : AppCompatActivity() {
         val rect = Rect()
         val paint = Paint()
         paint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3F, resources.displayMetrics)
-        paint.color = ContextCompat.getColor(this, R.color.colorPrimary)
+        val selectedColor = ContextCompat.getColor(this, R.color.colorAccent)
+        val defaultColor = ContextCompat.getColor(this, R.color.colorPrimary)
         val pointR = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6F, resources.displayMetrics)
-        widgetGroup.onDrawSelectedPanel { panel, canvas ->
-            panel.copyBounds(rect)
+        widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
+            panel.copyBoundsByPixels(rect)
+            rect.offset(panel.translationX.toInt(), panel.translationY.toInt())
             paint.style = Paint.Style.STROKE
+            paint.color = if (dragMode == WidgetGroup.DragMode.Move) { selectedColor } else { defaultColor }
             canvas.drawRect(rect, paint)
             paint.style = Paint.Style.FILL_AND_STROKE
+            paint.color = if (dragMode == WidgetGroup.DragMode.Left) { selectedColor } else { defaultColor }
             canvas.drawCircle(rect.left.toFloat(), rect.exactCenterY(), pointR, paint)
+            paint.color = if (dragMode == WidgetGroup.DragMode.Right) { selectedColor } else { defaultColor }
             canvas.drawCircle(rect.right.toFloat(), rect.exactCenterY(), pointR, paint)
+            paint.color = if (dragMode == WidgetGroup.DragMode.Top) { selectedColor } else { defaultColor }
             canvas.drawCircle(rect.exactCenterX(), rect.top.toFloat(), pointR, paint)
+            paint.color = if (dragMode == WidgetGroup.DragMode.Bottom) { selectedColor } else { defaultColor }
             canvas.drawCircle(rect.exactCenterX(), rect.bottom.toFloat(), pointR, paint)
-            logger("onDrawSelectedPanel: $rect")
         }
 
         widgetGroup.addPanel(TestPanel(TestInfo(2, 1, Color.GREEN), "1"))
