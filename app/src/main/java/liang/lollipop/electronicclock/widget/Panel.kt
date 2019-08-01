@@ -11,13 +11,9 @@ import android.view.ViewGroup
  * @date 2019-07-30 19:41
  * 面板组件的包装类
  */
-abstract class Panel(val panelInfo: PanelInfo) {
+abstract class Panel<T: PanelInfo>(val panelInfo: T) {
 
     private val bounds = Rect()
-
-    companion object {
-        val EMPTY_SIZE = Size(0, 0)
-    }
 
     var viewIsInitializer = false
         private set
@@ -50,6 +46,7 @@ abstract class Panel(val panelInfo: PanelInfo) {
     fun create(layoutInflater: LayoutInflater, parent: ViewGroup): View {
         val v = onCreateView(layoutInflater, parent)
         view = v
+        viewIsInitializer = true
         onViewCreated(v)
         onUpdate()
         return v
