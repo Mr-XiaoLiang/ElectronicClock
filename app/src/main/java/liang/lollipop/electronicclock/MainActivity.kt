@@ -44,6 +44,11 @@ class MainActivity : AppCompatActivity() {
         widgetGroup.onChildClick {
             Toast.makeText(this, "面板被点击了", Toast.LENGTH_SHORT).show()
         }
+        var cantLayoutSize = 0
+        widgetGroup.onCantLayout {
+            cantLayoutSize++
+            Toast.makeText(this, "出现了${cantLayoutSize}个无法排版的View", Toast.LENGTH_SHORT).show()
+        }
         val rect = Rect()
         val paint = Paint()
         paint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3F, resources.displayMetrics)

@@ -11,7 +11,7 @@ import android.util.TypedValue
  */
 object Utils {
 
-    const val isDebug = false
+    const val isDebug = true
 
     fun loggerI(tag: String): ((String) -> Unit) {
         return { value ->
