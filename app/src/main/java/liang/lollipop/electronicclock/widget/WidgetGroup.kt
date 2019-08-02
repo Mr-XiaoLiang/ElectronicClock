@@ -14,8 +14,6 @@ import liang.lollipop.electronicclock.utils.dp
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * @author lollipop
@@ -294,9 +292,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 val rect = getRect()
                 panel.copyBounds(rect)
                 val p = moveCheck(rect, offX, offY, panel)
-                panel.offsetByGrid(p.x, p.y)
-                touchDown.x += p.x * gridSize.width
-                touchDown.y += p.y * gridSize.height
+                if (p.x != 0 || p.y != 0) {
+                    panel.offsetByGrid(p.x, p.y)
+                    touchDown.x += p.x * gridSize.width
+                    touchDown.y += p.y * gridSize.height
+                }
                 rect.recycle()
             }
             DragMode.Left -> {
@@ -305,8 +305,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                     val rect = getRect()
                     panel.copyBounds(rect)
                     rect.left += x
-                    if (canPlace(rect, panel)) {
-                        val info = panel.panelInfo
+                    val info = panel.panelInfo
+                    if (info.spanX - x > 0 && canPlace(rect, panel)) {
                         panel.layoutByGrid(info.x + x, info.y, info.spanX - x, info.spanY)
                         touchDown.x += x * gridSize.width
                     }
@@ -319,8 +319,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                     val rect = getRect()
                     panel.copyBounds(rect)
                     rect.right += x
-                    if (canPlace(rect, panel)) {
-                        val info = panel.panelInfo
+                    val info = panel.panelInfo
+                    if (info.spanX + x > 0 && canPlace(rect, panel)) {
                         panel.layoutByGrid(info.x, info.y, info.spanX + x, info.spanY)
                         touchDown.x += x * gridSize.width
                     }
@@ -333,8 +333,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                     val rect = getRect()
                     panel.copyBounds(rect)
                     rect.top += y
-                    if (canPlace(rect, panel)) {
-                        val info = panel.panelInfo
+                    val info = panel.panelInfo
+                    if (info.spanY - y > 0 && canPlace(rect, panel)) {
                         panel.layoutByGrid(info.x, info.y + y, info.spanX, info.spanY - y)
                         touchDown.y += y * gridSize.height
                     }
@@ -347,13 +347,16 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                     val rect = getRect()
                     panel.copyBounds(rect)
                     rect.bottom += y
-                    if (canPlace(rect, panel)) {
-                        val info = panel.panelInfo
+                    val info = panel.panelInfo
+                    if (info.spanY + y > 0 && canPlace(rect, panel)) {
                         panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY + y)
                         touchDown.y += y * gridSize.height
                     }
                     rect.recycle()
                 }
+            }
+            DragMode.None -> {
+                logger("onDrag but dragMode is None")
             }
         }
         invalidate()
@@ -554,6 +557,9 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     private fun Panel<*>.offsetByGrid(x: Int, y: Int) {
+        if (x == 0 && y == 0) {
+            return
+        }
         val left = x * gridSize.width
         val top = y * gridSize.height
         this.offset(left, top)
@@ -873,16 +879,6 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             return 0F
         }
         return this.getY(this.findPointerIndex(activeActionId))
-    }
-
-    private fun Int.limit(min: Int, max: Int): Int {
-        if (this < min) {
-            return min
-        }
-        if (this > max) {
-            return max
-        }
-        return this
     }
 
     private fun touchInSelectedPanel(x: Int, y: Int): Boolean {
