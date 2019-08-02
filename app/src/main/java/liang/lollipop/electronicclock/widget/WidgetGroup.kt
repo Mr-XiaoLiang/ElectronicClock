@@ -545,26 +545,6 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 panelList.remove(panel)
                 pendingRemoveList.add(panel)
             }
-//            if (info.x < 0 || info.y < 0) {
-//                // 如果位置信息不完整，那么开始尝试排版
-//                val location = findGrid(info.spanX, info.spanY, panel)
-//                logger("onLayout: index:$i, location:$location")
-//                if (location.isEffective()) {
-//                    panel.layoutByGrid(location.x, location.y, info.spanX, info.spanY)
-//                } else {
-//                    // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
-//                    panelList.remove(panel)
-//                    pendingRemoveList.add(panel)
-//                }
-//            } else {
-//                // 如果有排版位置了，那么直接进行相应位置的排版
-//                panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY)
-//                if (!canPlace(panel)) {
-//                    // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
-//                    panelList.remove(panel)
-//                    pendingRemoveList.add(panel)
-//                }
-//            }
         }
         for (p in pendingRemoveList) {
             removeViewInLayout(p.view)
