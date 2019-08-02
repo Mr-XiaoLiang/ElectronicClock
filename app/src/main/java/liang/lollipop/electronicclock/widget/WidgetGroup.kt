@@ -196,6 +196,10 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
     }
 
+    override fun performClick(): Boolean {
+        return if (isDragState && dragMode != DragMode.None) { false } else { super.performClick() }
+    }
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event?:return super.onInterceptTouchEvent(event)
         // 如果不在拖拽模式，那么放弃手势处理
@@ -520,25 +524,47 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             }
             val info = panel.panelInfo
             if (info.x < 0 || info.y < 0) {
-                // 如果位置信息不完整，那么开始尝试排版
+                // 如果没有位置信息，那么尝试寻找一个位置
                 val location = findGrid(info.spanX, info.spanY, panel)
-                logger("onLayout: index:$i, location:$location")
                 if (location.isEffective()) {
-                    panel.layoutByGrid(location.x, location.y, info.spanX, info.spanY)
-                } else {
-                    // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
-                    panelList.remove(panel)
-                    pendingRemoveList.add(panel)
-                }
-            } else {
-                // 如果有排版位置了，那么直接进行相应位置的排版
-                panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY)
-                if (!canPlace(panel)) {
-                    // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
-                    panelList.remove(panel)
-                    pendingRemoveList.add(panel)
+                    // 如果位置有效，那么进行赋值
+                    info.offset(location.x, location.y)
                 }
             }
+            // 如果无法找到有效的位置，那么对View进行移除
+            if (info.x < 0 || info.y < 0) {
+                panelList.remove(panel)
+                pendingRemoveList.add(panel)
+                continue
+            }
+            // 有排版位置了，那么进行相应位置的排版
+            panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY)
+            // 如果排版后的View无法进行正确放置，那么也将他移除
+            if (!canPlace(panel)) {
+                // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
+                panelList.remove(panel)
+                pendingRemoveList.add(panel)
+            }
+//            if (info.x < 0 || info.y < 0) {
+//                // 如果位置信息不完整，那么开始尝试排版
+//                val location = findGrid(info.spanX, info.spanY, panel)
+//                logger("onLayout: index:$i, location:$location")
+//                if (location.isEffective()) {
+//                    panel.layoutByGrid(location.x, location.y, info.spanX, info.spanY)
+//                } else {
+//                    // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
+//                    panelList.remove(panel)
+//                    pendingRemoveList.add(panel)
+//                }
+//            } else {
+//                // 如果有排版位置了，那么直接进行相应位置的排版
+//                panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY)
+//                if (!canPlace(panel)) {
+//                    // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
+//                    panelList.remove(panel)
+//                    pendingRemoveList.add(panel)
+//                }
+//            }
         }
         for (p in pendingRemoveList) {
             removeViewInLayout(p.view)
@@ -722,7 +748,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private fun canPlace(panel: Panel<*>): Boolean {
         val rect = getRect()
         panel.copyBounds(rect)
-        val result = canPlace(rect)
+        val result = canPlace(rect, panel)
         rect.recycle()
         return result
     }
