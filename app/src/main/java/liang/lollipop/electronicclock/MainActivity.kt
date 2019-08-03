@@ -20,6 +20,7 @@ import liang.lollipop.electronicclock.utils.dp
 import liang.lollipop.electronicclock.widget.Panel
 import liang.lollipop.electronicclock.widget.PanelInfo
 import liang.lollipop.electronicclock.widget.WidgetGroup
+import liang.lollipop.electronicclock.widget.WidgetHelper
 
 /**
  * @author Lollipop
@@ -34,20 +35,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        widgetGroup.dragStrokeWidth = resources.dp(20F)
-
-        var cantLayoutSize = 0
-        widgetGroup.onCantLayout {
-            cantLayoutSize++
-            Toast.makeText(this, "出现了${cantLayoutSize}个无法排版的View", Toast.LENGTH_SHORT).show()
+        val helper = WidgetHelper.with(widgetGroup).let {
+            it.dragStrokeWidth = resources.dp(20F)
+            it.selectedBorderWidth = resources.dp(2F)
+            it.touchPointRadius = resources.dp(5F)
+            it.selectedColor = ContextCompat.getColor(this@MainActivity, R.color.colorPrimary)
+            it.focusColor = ContextCompat.getColor(this@MainActivity, R.color.colorAccent)
+            it.pendingLayoutTime = 800L
+            it
+        }.onCantLayout {
+            Toast.makeText(this, "出现了${it.size}个无法排版的View", Toast.LENGTH_SHORT).show()
         }
 
-        widgetGroup.addPanel(TestPanel(TestInfo(2, 1, Color.GREEN), "1"))
-        widgetGroup.addPanel(TestPanel(TestInfo(1, 2, Color.RED), "2"))
-        widgetGroup.addPanel(TestPanel(TestInfo(4, 2, Color.BLUE), "3"))
-        widgetGroup.addPanel(TestPanel(TestInfo(2, 1, Color.GRAY), "4"))
-        widgetGroup.addPanel(TestPanel(TestInfo(2, 1, Color.CYAN), "5"))
-        widgetGroup.addPanel(TestPanel(TestInfo(3, 1, Color.LTGRAY), "6"))
+        helper.addPanel(TestPanel(TestInfo(2, 1, Color.GREEN), "1"))
+        helper.addPanel(TestPanel(TestInfo(1, 2, Color.RED), "2"))
+        helper.addPanel(TestPanel(TestInfo(4, 2, Color.BLUE), "3"))
+        helper.addPanel(TestPanel(TestInfo(2, 1, Color.GRAY), "4"))
+        helper.addPanel(TestPanel(TestInfo(2, 1, Color.CYAN), "5"))
+        helper.addPanel(TestPanel(TestInfo(3, 1, Color.LTGRAY), "6"))
     }
 
     private class TestPanel(info: TestInfo, val value: String): Panel<TestInfo>(info) {

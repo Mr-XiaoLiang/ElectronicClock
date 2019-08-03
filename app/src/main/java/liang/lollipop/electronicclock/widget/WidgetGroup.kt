@@ -86,27 +86,32 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     /**
      * 无法进行排列的面板的通知函数
      */
-    private var cantLayoutPanelListener: ((Panel<*>) -> Unit)? = null
+    private var cantLayoutPanelListener: ((panels: Array<Panel<*>>) -> Unit)? = null
 
     /**
      * 用来绘制选中面板边框效果的回调函数
      */
-    private var drawSelectedPanelListener: ((Panel<*>, DragMode, Canvas) -> Unit)? = null
+    private var drawSelectedPanelListener: ((panel: Panel<*>, mode: DragMode, canvas: Canvas) -> Unit)? = null
 
     /**
      * 子View的长按点击事件
      */
-    private var childLongClickListener: ((Panel<*>) -> Boolean)? = null
+    private var childLongClickListener: ((panel: Panel<*>) -> Boolean)? = null
 
     /**
      * 子View的点击事件
      */
-    private var childClickListener: ((Panel<*>) -> Unit)? = null
+    private var childClickListener: ((panel: Panel<*>) -> Unit)? = null
 
     /**
      * 取消拖拽的监听器
      */
-    private var cancelDragListener: ((Panel<*>?) -> Unit)? = null
+    private var cancelDragListener: ((panel: Panel<*>?) -> Unit)? = null
+
+    /**
+     * 拖拽结束后的监听器
+     */
+    private var dragEndListener: ((panel: Panel<*>?) -> Unit)? = null
 
     /**
      * 格子数量
@@ -223,9 +228,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             MotionEvent.ACTION_UP -> {
                 logger("onTouchEvent, ACTION_UP")
                 // 完成了拖拽，但是符合操作要求，因此保持操作状态
-                activeActionId = NO_ID
-                dragMode = DragMode.None
-                pushPanelWhenTouch()
+                endDrag()
             }
             MotionEvent.ACTION_POINTER_UP -> {
                 logger("onTouchEvent, ACTION_POINTER_UP")
@@ -271,9 +274,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             MotionEvent.ACTION_UP -> {
                 logger("onInterceptTouchEvent, ACTION_UP")
                 // 完成了拖拽，但是符合操作要求，因此保持操作状态
-                activeActionId = NO_ID
-                dragMode = DragMode.None
-                pushPanelWhenTouch()
+                endDrag()
             }
             MotionEvent.ACTION_CANCEL -> {
                 logger("onInterceptTouchEvent, ACTION_CANCEL")
@@ -470,6 +471,13 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         invalidate()
     }
 
+    private fun endDrag() {
+        pushPanelWhenTouch()
+        dragEndListener?.invoke(selectedPanel)
+        activeActionId = NO_ID
+        invalidate()
+    }
+
     private fun pushPanelWhenTouch() {
         logger("pushPanelWhenTouch")
         pendingTouchRequest = false
@@ -518,6 +526,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             // 如果格子尺寸是空的，那么尝试做尺寸计算
             calculateGridSize(widthSize, heightSize)
         }
+        val tmpRect = getRect()
         for (i in 0 until childCount) {
             val view = getChildAt(i)
             val panel = findPanelByView(view)
@@ -541,20 +550,25 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 pendingRemoveList.add(panel)
                 continue
             }
-            // 有排版位置了，那么进行相应位置的排版
-            panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY)
-            // 如果排版后的View无法进行正确放置，那么也将他移除
-            if (!canPlace(panel)) {
+            // 有排版位置了，那么进行一次位置检查
+            tmpRect.set(info.x, info.y, info.spanX + info.x, info.spanY + info.y)
+            // 如果位置检查失败，认为不可用，那么就放弃
+            if (canPlace(tmpRect, panel)) {
+                panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY)
+            } else {
                 // 如果不能正确放置，那么将面板移至待处理列表，待排版任务结束后再处理
                 panelList.remove(panel)
                 pendingRemoveList.add(panel)
             }
         }
-        for (p in pendingRemoveList) {
-            removeViewInLayout(p.view)
-            cantLayoutPanel(p)
+        tmpRect.recycle()
+        if (pendingRemoveList.isNotEmpty()) {
+            for (p in pendingRemoveList) {
+                removeViewInLayout(p.view)
+            }
+            cantLayoutPanel(pendingRemoveList.toTypedArray())
+            pendingRemoveList.clear()
         }
-        pendingRemoveList.clear()
     }
 
     private fun Panel<*>.layoutByGrid(x: Int, y: Int, spanX: Int, spanY: Int) {
@@ -729,19 +743,6 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * 检查面板是否可以被放置
      * @return 如果为true，表示可以被放置
      */
-    private fun canPlace(panel: Panel<*>): Boolean {
-        val rect = getRect()
-        panel.copyBounds(rect)
-        val result = canPlace(rect, panel)
-        rect.recycle()
-        return result
-    }
-
-    /**
-     * 是否可以放置
-     * 检查面板是否可以被放置
-     * @return 如果为true，表示可以被放置
-     */
     private fun canPlace(rect: Rect, skip: Panel<*>? = null): Boolean {
         rect.selfCheck()
         if (rect.isEmpty || rect.left < 0 || rect.top < 0) {
@@ -782,11 +783,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         val horizontal = r1.right <= r2.left || r1.left >= r2.right
         // 如果横向或者纵向不存在交集，那么认为两个矩形处于平行状态
         // 否则认为有交集
-        val has = !(vertical || horizontal)
-        if (has) {
-            logger("hasIntersection: $r1, $r2")
-        }
-        return has
+        return !(vertical || horizontal)
     }
 
     /**
@@ -823,14 +820,14 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * 然后通过回调函数传出，外部可以选择调整面板尺寸
      * 或者移除此面板
      */
-    private fun cantLayoutPanel(panel: Panel<*>) {
-        cantLayoutPanelListener?.invoke(panel)
+    private fun cantLayoutPanel(panels: Array<Panel<*>>) {
+        cantLayoutPanelListener?.invoke(panels)
     }
 
     /**
      * 监听布局失败的场景
      */
-    fun onCantLayout(listener: (Panel<*>) -> Unit) {
+    fun onCantLayout(listener: (Array<Panel<*>>) -> Unit) {
         cantLayoutPanelListener = listener
     }
 
@@ -882,6 +879,13 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      */
     fun onCancelDrag(listener: ((Panel<*>?) -> Unit)) {
         this.cancelDragListener = listener
+    }
+
+    /**
+     * 面板的尺寸被调整时，触发的监听方法
+     */
+    fun onDragEndListener(listener: ((panel: Panel<*>?) -> Unit)) {
+        this.dragEndListener = listener
     }
 
     private fun MotionEvent.getXById(): Float {
