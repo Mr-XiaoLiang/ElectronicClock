@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.view.View
 import liang.lollipop.electronicclock.utils.Utils
 import liang.lollipop.electronicclock.utils.dp
 
@@ -12,7 +13,13 @@ import liang.lollipop.electronicclock.utils.dp
  * @date 2019-07-30 20:41
  * 小部件辅助器
  */
-class WidgetHelper(private val widgetGroup: WidgetGroup) {
+class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
+
+    companion object {
+        fun with(group: WidgetGroup): WidgetHelper {
+            return WidgetHelper(group)
+        }
+    }
 
     private val logger = Utils.loggerI("WidgetHelper")
 
@@ -35,11 +42,17 @@ class WidgetHelper(private val widgetGroup: WidgetGroup) {
             return widgetGroup.dragStrokeWidth
         }
 
+    var selectedBorderWidth = widgetGroup.resources.dp(1F)
+
     private val tmpBounds = Rect()
 
     val panelList = ArrayList<Panel<*>>()
 
     var canDrag = true
+
+    var pendingLayoutTime = -1L
+
+    private var onCancelDragListener: ((Panel<*>?) -> Unit)? = null
 
     init {
         widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
@@ -54,18 +67,25 @@ class WidgetHelper(private val widgetGroup: WidgetGroup) {
                 false
             }
         }
+        widgetGroup.onCancelDrag {
+            (it?.view?:widgetGroup).requestLayout()
+            onCancelDragListener?.invoke(it)
+        }
     }
 
-    fun onChildClick(lis: (Panel<*>) -> Unit) {
+    fun onChildClick(lis: (Panel<*>) -> Unit): WidgetHelper {
         widgetGroup.onChildClick(lis)
+        return this
     }
 
-    fun onCantLayout(lis: (Panel<*>) -> Unit) {
+    fun onCantLayout(lis: (Array<Panel<*>>) -> Unit): WidgetHelper {
         widgetGroup.onCantLayout(lis)
+        return this
     }
 
-    fun onCancelDrag(lis: (Panel<*>?) -> Unit) {
-        widgetGroup.onCancelDrag(lis)
+    fun onCancelDrag(lis: (Panel<*>?) -> Unit): WidgetHelper {
+        onCancelDragListener = lis
+        return this
     }
 
     /**
@@ -82,7 +102,7 @@ class WidgetHelper(private val widgetGroup: WidgetGroup) {
         // 绘制边框，设置为描边模式
         strokePaint.style = Paint.Style.STROKE
         strokePaint.color = if (dragMode == WidgetGroup.DragMode.Move) { focusColor } else { selectedColor }
-        strokePaint.strokeWidth = dragStrokeWidth
+        strokePaint.strokeWidth = selectedBorderWidth
         canvas.drawRect(tmpBounds, strokePaint)
         // 开始绘制四个拖动点，使用填充和描边方式
         strokePaint.style = Paint.Style.FILL_AND_STROKE
@@ -103,9 +123,13 @@ class WidgetHelper(private val widgetGroup: WidgetGroup) {
 
     fun <I: PanelInfo> addPanel(info: I): Panel<I> {
         val panel = PanelAdapter.createPanelByInfo(info)
+        addPanel(panel)
+        return panel
+    }
+
+    fun addPanel(panel: Panel<*>) {
         panelList.add(panel)
         widgetGroup.addPanel(panel)
-        return panel
     }
 
     fun removePanel(panel: Panel<*>) {
