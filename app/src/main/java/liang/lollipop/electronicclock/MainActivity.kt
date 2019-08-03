@@ -49,28 +49,6 @@ class MainActivity : AppCompatActivity() {
             cantLayoutSize++
             Toast.makeText(this, "出现了${cantLayoutSize}个无法排版的View", Toast.LENGTH_SHORT).show()
         }
-        val rect = Rect()
-        val paint = Paint()
-        paint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3F, resources.displayMetrics)
-        val selectedColor = ContextCompat.getColor(this, R.color.colorAccent)
-        val defaultColor = ContextCompat.getColor(this, R.color.colorPrimary)
-        val pointR = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6F, resources.displayMetrics)
-        widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
-            panel.copyBoundsByPixels(rect)
-            rect.offset(panel.translationX.toInt(), panel.translationY.toInt())
-            paint.style = Paint.Style.STROKE
-            paint.color = if (dragMode == WidgetGroup.DragMode.Move) { selectedColor } else { defaultColor }
-            canvas.drawRect(rect, paint)
-            paint.style = Paint.Style.FILL_AND_STROKE
-            paint.color = if (dragMode == WidgetGroup.DragMode.Left) { selectedColor } else { defaultColor }
-            canvas.drawCircle(rect.left.toFloat(), rect.exactCenterY(), pointR, paint)
-            paint.color = if (dragMode == WidgetGroup.DragMode.Right) { selectedColor } else { defaultColor }
-            canvas.drawCircle(rect.right.toFloat(), rect.exactCenterY(), pointR, paint)
-            paint.color = if (dragMode == WidgetGroup.DragMode.Top) { selectedColor } else { defaultColor }
-            canvas.drawCircle(rect.exactCenterX(), rect.top.toFloat(), pointR, paint)
-            paint.color = if (dragMode == WidgetGroup.DragMode.Bottom) { selectedColor } else { defaultColor }
-            canvas.drawCircle(rect.exactCenterX(), rect.bottom.toFloat(), pointR, paint)
-        }
 
         widgetGroup.addPanel(TestPanel(TestInfo(2, 1, Color.GREEN), "1"))
         widgetGroup.addPanel(TestPanel(TestInfo(1, 2, Color.RED), "2"))

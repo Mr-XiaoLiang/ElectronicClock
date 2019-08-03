@@ -19,6 +19,40 @@ object Utils {
         }
     }
 
+    fun logger(tag: String): LogHelper {
+        return LogHelper(tag)
+    }
+
+    class LogHelper(private val tag: String) {
+
+        val E = LogLevel.ERROR
+        val D = LogLevel.DEBUG
+        val I = LogLevel.INFO
+        val V = LogLevel.VERBOSE
+        val W = LogLevel.WARN
+
+        private val LOG_TAG = "Lollipop-$tag"
+
+        fun logger(value: String, level: LogLevel = I) {
+            when(level) {
+                LogLevel.ERROR -> Log.e(LOG_TAG, value)
+                LogLevel.DEBUG -> Log.d(LOG_TAG, value)
+                LogLevel.INFO -> Log.i(LOG_TAG, value)
+                LogLevel.VERBOSE -> Log.v(LOG_TAG, value)
+                LogLevel.WARN -> Log.w(LOG_TAG, value)
+            }
+        }
+
+    }
+
+    enum class LogLevel {
+        ERROR,
+        DEBUG,
+        INFO,
+        VERBOSE,
+        WARN
+    }
+
 }
 fun Resources.dp(value: Float): Float {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, this.displayMetrics)
