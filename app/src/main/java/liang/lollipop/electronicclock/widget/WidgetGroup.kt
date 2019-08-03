@@ -104,6 +104,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private var childClickListener: ((Panel<*>) -> Unit)? = null
 
     /**
+     * 取消拖拽的监听器
+     */
+    private var cancelDragListener: ((Panel<*>?) -> Unit)? = null
+
+    /**
      * 格子数量
      * 这个数量是指窄边的格子数
      * 长边的数量会依据此数量来进行变化
@@ -458,11 +463,10 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
 
     private fun cancelSelected() {
         logger("cancelSelected")
+        pushPanelWhenTouch()
+        cancelDragListener?.invoke(selectedPanel)
         selectedPanel = null
         activeActionId = NO_ID
-        dragMode = DragMode.None
-        pendingTouchRequest = false
-        pushPanelWhenTouch()
         invalidate()
     }
 
@@ -871,6 +875,13 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      */
     fun onDrawSelectedPanel(listener: (Panel<*>, DragMode, Canvas) -> Unit) {
         drawSelectedPanelListener = listener
+    }
+
+    /**
+     * 取消拖拽的监听事件
+     */
+    fun onCancelDrag(listener: ((Panel<*>?) -> Unit)) {
+        this.cancelDragListener = listener
     }
 
     private fun MotionEvent.getXById(): Float {
