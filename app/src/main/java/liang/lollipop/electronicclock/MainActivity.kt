@@ -36,14 +36,6 @@ class MainActivity : AppCompatActivity() {
 
         widgetGroup.dragStrokeWidth = resources.dp(20F)
 
-        widgetGroup.onChildLongClick {
-            widgetGroup.selectedPanel = it
-            Toast.makeText(this, "面板被长按了", Toast.LENGTH_SHORT).show()
-            true
-        }
-        widgetGroup.onChildClick {
-            Toast.makeText(this, "面板被点击了", Toast.LENGTH_SHORT).show()
-        }
         var cantLayoutSize = 0
         widgetGroup.onCantLayout {
             cantLayoutSize++

@@ -39,15 +39,33 @@ class WidgetHelper(private val widgetGroup: WidgetGroup) {
 
     val panelList = ArrayList<Panel<*>>()
 
+    var canDrag = true
+
     init {
         widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
             drawPanelBounds(panel, dragMode, canvas)
         }
         widgetGroup.onChildLongClick {
-            widgetGroup.selectedPanel = it
             logger("onChildLongClick: $it")
-            true
+            if (canDrag) {
+                widgetGroup.selectedPanel = it
+                true
+            } else {
+                false
+            }
         }
+    }
+
+    fun onChildClick(lis: (Panel<*>) -> Unit) {
+        widgetGroup.onChildClick(lis)
+    }
+
+    fun onCantLayout(lis: (Panel<*>) -> Unit) {
+        widgetGroup.onCantLayout(lis)
+    }
+
+    fun onCancelDrag(lis: (Panel<*>?) -> Unit) {
+        widgetGroup.onCancelDrag(lis)
     }
 
     /**
@@ -57,18 +75,28 @@ class WidgetHelper(private val widgetGroup: WidgetGroup) {
      * @param canvas Group的绘制画板，可以选择直接绘制，或者其他方式显示
      */
     private fun drawPanelBounds(panel: Panel<*>, dragMode: WidgetGroup.DragMode, canvas: Canvas) {
+        // 复制边框位置
         panel.copyBoundsByPixels(tmpBounds)
+        // 为显示的偏移量做校准
         tmpBounds.offset(panel.translationX.toInt(), panel.translationY.toInt())
+        // 绘制边框，设置为描边模式
         strokePaint.style = Paint.Style.STROKE
         strokePaint.color = if (dragMode == WidgetGroup.DragMode.Move) { focusColor } else { selectedColor }
+        strokePaint.strokeWidth = dragStrokeWidth
         canvas.drawRect(tmpBounds, strokePaint)
+        // 开始绘制四个拖动点，使用填充和描边方式
         strokePaint.style = Paint.Style.FILL_AND_STROKE
+        strokePaint.strokeWidth = 1F
+        // 左侧
         strokePaint.color = if (dragMode == WidgetGroup.DragMode.Left) { focusColor } else { selectedColor }
         canvas.drawCircle(tmpBounds.left.toFloat(), tmpBounds.exactCenterY(), touchPointRadius, strokePaint)
+        // 右侧
         strokePaint.color = if (dragMode == WidgetGroup.DragMode.Right) { focusColor } else { selectedColor }
         canvas.drawCircle(tmpBounds.right.toFloat(), tmpBounds.exactCenterY(), touchPointRadius, strokePaint)
+        // 顶部
         strokePaint.color = if (dragMode == WidgetGroup.DragMode.Top) { focusColor } else { selectedColor }
         canvas.drawCircle(tmpBounds.exactCenterX(), tmpBounds.top.toFloat(), touchPointRadius, strokePaint)
+        // 底部
         strokePaint.color = if (dragMode == WidgetGroup.DragMode.Bottom) { focusColor } else { selectedColor }
         canvas.drawCircle(tmpBounds.exactCenterX(), tmpBounds.bottom.toFloat(), touchPointRadius, strokePaint)
     }
