@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.widget.WidgetHelper
+import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
 import liang.lollipop.widget.widget.Panel
@@ -27,11 +28,13 @@ class MainActivity : AppCompatActivity() {
         private val logger = Utils.loggerI("MainActivity")
     }
 
+    private lateinit var widgetHelper: WidgetHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val helper = WidgetHelper.with(widgetGroup).let {
+        widgetHelper = WidgetHelper.with(widgetGroup).let {
             it.dragStrokeWidth = resources.dp(20F)
             it.selectedBorderWidth = resources.dp(2F)
             it.touchPointRadius = resources.dp(5F)
@@ -43,12 +46,24 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "出现了${it.size}个无法排版的View", Toast.LENGTH_SHORT).show()
         }
 
-        helper.addPanel(TestPanel(TestInfo(2, 1, Color.GREEN), "1"))
-        helper.addPanel(TestPanel(TestInfo(1, 2, Color.RED), "2"))
-        helper.addPanel(TestPanel(TestInfo(4, 2, Color.BLUE), "3"))
-        helper.addPanel(TestPanel(TestInfo(2, 1, Color.GRAY), "4"))
-        helper.addPanel(TestPanel(TestInfo(2, 1, Color.CYAN), "5"))
-        helper.addPanel(TestPanel(TestInfo(3, 1, Color.LTGRAY), "6"))
+        widgetHelper.addPanel(TestPanel(TestInfo(2, 1, Color.GREEN), "1"))
+        widgetHelper.addPanel(TestPanel(TestInfo(1, 2, Color.RED), "2"))
+        widgetHelper.addPanel(TestPanel(TestInfo(4, 2, Color.BLUE), "3"))
+        widgetHelper.addPanel(TestPanel(TestInfo(2, 1, Color.GRAY), "4"))
+        widgetHelper.addPanel(TestPanel(TestInfo(2, 1, Color.CYAN), "5"))
+        widgetHelper.addPanel(TestPanel(TestInfo(3, 1, Color.LTGRAY), "6"))
+        widgetHelper.addPanel(ClockPanelInfo())
+        widgetHelper.addPanel(PanelInfo())
+    }
+
+    override fun onStart() {
+        super.onStart()
+        widgetHelper.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        widgetHelper.onStop()
     }
 
     private class TestPanel(info: TestInfo, val value: String): Panel<TestInfo>(info) {
@@ -67,8 +82,8 @@ class MainActivity : AppCompatActivity() {
         init {
             spanX = sX
             spanY = sY
+            color = c
         }
-        var color: Int = c
     }
 
 }

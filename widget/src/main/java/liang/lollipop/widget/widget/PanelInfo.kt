@@ -1,5 +1,6 @@
 package liang.lollipop.widget.widget
 
+import android.graphics.Color
 import org.json.JSONObject
 
 /**
@@ -22,7 +23,7 @@ open class PanelInfo {
         const val KEY_X = "KEY_X"
         const val KEY_Y = "KEY_Y"
         const val KEY_ID = "KEY_ID"
-
+        const val KEY_COLOR = "KEY_COLOR"
     }
 
     var spanX = DEF_SPAN_X
@@ -39,6 +40,8 @@ open class PanelInfo {
 
     var id = NO_ID
         private set
+
+    var color = Color.BLACK
 
     fun putId(value: Int) {
         id = value
@@ -65,6 +68,7 @@ open class PanelInfo {
         x = jsonObj.optInt(KEY_X, DEF_X)
         y = jsonObj.optInt(KEY_Y, DEF_Y)
         id = jsonObj.optInt(KEY_ID, NO_ID)
+        color = jsonObj.optInt(KEY_COLOR, Color.BLACK)
     }
 
     open fun serialize(jsonObj: JSONObject) {
@@ -73,6 +77,7 @@ open class PanelInfo {
         jsonObj.put(KEY_X, x)
         jsonObj.put(KEY_Y, y)
         jsonObj.put(KEY_ID, id)
+        jsonObj.put(KEY_COLOR, color)
     }
 
     override fun toString(): String {
