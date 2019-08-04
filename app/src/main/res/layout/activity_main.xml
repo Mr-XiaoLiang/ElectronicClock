@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<liang.lollipop.electronicclock.widget.WidgetGroup
+<liang.lollipop.widget.widget.WidgetGroup
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,4 +8,4 @@
         android:id="@+id/widgetGroup"
         tools:context=".MainActivity">
 
-</liang.lollipop.electronicclock.widget.WidgetGroup>
+</liang.lollipop.widget.widget.WidgetGroup>

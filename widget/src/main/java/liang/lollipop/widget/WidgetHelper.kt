@@ -1,12 +1,15 @@
-package liang.lollipop.electronicclock.widget
+package liang.lollipop.widget
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.view.View
-import liang.lollipop.electronicclock.utils.Utils
-import liang.lollipop.electronicclock.utils.dp
+import liang.lollipop.widget.utils.Utils
+import liang.lollipop.widget.utils.dp
+import liang.lollipop.widget.widget.Panel
+import liang.lollipop.widget.widget.PanelAdapter
+import liang.lollipop.widget.widget.PanelInfo
+import liang.lollipop.widget.widget.WidgetGroup
 
 /**
  * @author lollipop

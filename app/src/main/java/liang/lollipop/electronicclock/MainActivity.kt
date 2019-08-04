@@ -1,10 +1,7 @@
 package liang.lollipop.electronicclock
 
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -15,12 +12,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
-import liang.lollipop.electronicclock.utils.Utils
-import liang.lollipop.electronicclock.utils.dp
-import liang.lollipop.electronicclock.widget.Panel
-import liang.lollipop.electronicclock.widget.PanelInfo
-import liang.lollipop.electronicclock.widget.WidgetGroup
-import liang.lollipop.electronicclock.widget.WidgetHelper
+import liang.lollipop.widget.WidgetHelper
+import liang.lollipop.widget.utils.Utils
+import liang.lollipop.widget.utils.dp
+import liang.lollipop.widget.widget.Panel
+import liang.lollipop.widget.widget.PanelInfo
 
 /**
  * @author Lollipop

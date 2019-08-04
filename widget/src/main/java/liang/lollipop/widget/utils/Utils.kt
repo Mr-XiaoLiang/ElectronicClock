@@ -1,4 +1,4 @@
-package liang.lollipop.electronicclock.utils
+package liang.lollipop.widget.utils
 
 import android.content.res.Resources
 import android.util.Log
@@ -25,21 +25,21 @@ object Utils {
 
     class LogHelper(private val tag: String) {
 
-        val E = LogLevel.ERROR
-        val D = LogLevel.DEBUG
-        val I = LogLevel.INFO
-        val V = LogLevel.VERBOSE
-        val W = LogLevel.WARN
+        val E = Utils.LogLevel.ERROR
+        val D = Utils.LogLevel.DEBUG
+        val I = Utils.LogLevel.INFO
+        val V = Utils.LogLevel.VERBOSE
+        val W = Utils.LogLevel.WARN
 
         private val LOG_TAG = "Lollipop-$tag"
 
         fun logger(value: String, level: LogLevel = I) {
             when(level) {
-                LogLevel.ERROR -> Log.e(LOG_TAG, value)
-                LogLevel.DEBUG -> Log.d(LOG_TAG, value)
-                LogLevel.INFO -> Log.i(LOG_TAG, value)
-                LogLevel.VERBOSE -> Log.v(LOG_TAG, value)
-                LogLevel.WARN -> Log.w(LOG_TAG, value)
+                Utils.LogLevel.ERROR -> Log.e(LOG_TAG, value)
+                Utils.LogLevel.DEBUG -> Log.d(LOG_TAG, value)
+                Utils.LogLevel.INFO -> Log.i(LOG_TAG, value)
+                Utils.LogLevel.VERBOSE -> Log.v(LOG_TAG, value)
+                Utils.LogLevel.WARN -> Log.w(LOG_TAG, value)
             }
         }
 

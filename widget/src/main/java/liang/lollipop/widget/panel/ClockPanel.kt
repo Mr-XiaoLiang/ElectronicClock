@@ -1,10 +1,10 @@
-package liang.lollipop.electronicclock.panel
+package liang.lollipop.widget.panel
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import liang.lollipop.electronicclock.widget.Panel
-import liang.lollipop.electronicclock.widget.PanelInfo
+import liang.lollipop.widget.widget.Panel
+import liang.lollipop.widget.widget.PanelInfo
 
 /**
  * @author lollipop

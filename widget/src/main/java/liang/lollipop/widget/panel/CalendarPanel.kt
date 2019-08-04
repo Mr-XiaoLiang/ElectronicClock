@@ -1,4 +1,4 @@
-package liang.lollipop.electronicclock.panel
+package liang.lollipop.widget.panel
 
 /**
  * @author lollipop

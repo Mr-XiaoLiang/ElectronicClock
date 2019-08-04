@@ -1,4 +1,4 @@
-package liang.lollipop.electronicclock.view
+package liang.lollipop.widget.view
 
 import android.content.Context
 import android.content.res.ColorStateList
