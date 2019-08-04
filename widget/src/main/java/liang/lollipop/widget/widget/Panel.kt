@@ -52,6 +52,7 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
         view = v
         viewIsInitializer = true
         onViewCreated(v)
+        onInfoChange()
         onUpdate()
         return v
     }
@@ -70,6 +71,11 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
      * 需要更新时
      */
     open fun onUpdate() {}
+
+    /**
+     * info改变时，触发
+     */
+    open fun onInfoChange() {}
 
     fun layout(l: Int, t: Int, r: Int, b: Int) {
         val w = r - l

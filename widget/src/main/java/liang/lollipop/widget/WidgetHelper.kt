@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.os.Handler
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
 import liang.lollipop.widget.widget.Panel
@@ -55,6 +56,21 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
 
     var pendingLayoutTime = -1L
 
+    private var lastMinute = 0L
+
+    private val handler = Handler()
+
+    private val updateTask = Runnable {
+        val minute = System.currentTimeMillis() / 1000 / 60
+        if (minute != lastMinute) {
+            lastMinute = minute
+            updateByMinute()
+        } else {
+            updateBySecond()
+        }
+        postUpdate()
+    }
+
     private var onCancelDragListener: ((Panel<*>?) -> Unit)? = null
 
     init {
@@ -89,6 +105,41 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
     fun onCancelDrag(lis: (Panel<*>?) -> Unit): WidgetHelper {
         onCancelDragListener = lis
         return this
+    }
+
+    fun onChildLongClick(lis: (Panel<*>) -> Boolean): WidgetHelper {
+        widgetGroup.onChildLongClick(lis)
+        return this
+    }
+
+    fun startDrag(panel: Panel<*>) {
+        widgetGroup.selectedPanel = panel
+    }
+
+    fun onStart() {
+        postUpdate()
+    }
+
+    fun onStop() {
+        handler.removeCallbacks(updateTask)
+    }
+
+    private fun postUpdate() {
+        handler.postDelayed(updateTask, 1000)
+    }
+
+    private fun updateBySecond() {
+        panelList.forEach {
+            if (PanelAdapter.updateBySecond(it)) {
+                it.onUpdate()
+            }
+        }
+    }
+
+    private fun updateByMinute() {
+        panelList.forEach {
+            it.onUpdate()
+        }
     }
 
     /**
