@@ -4,7 +4,7 @@
     android:viewportHeight="132.0"
     android:viewportWidth="132.0">
     <path
-        android:pathData="@string/origin_number_3"
-        android:strokeColor="@color/colorPrimary"
+        android:pathData="@string/origin_number_6"
+        android:strokeColor="@android:color/black"
         android:strokeWidth="1" />
 </vector>

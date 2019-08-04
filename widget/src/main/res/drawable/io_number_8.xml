@@ -4,8 +4,7 @@
     android:viewportHeight="132.0"
     android:viewportWidth="132.0">
     <path
-        android:name="path_main"
-        android:pathData="@string/nine_five_start"
-        android:strokeColor="@color/colorPrimary"
+        android:pathData="@string/origin_number_8"
+        android:strokeColor="@android:color/black"
         android:strokeWidth="1" />
 </vector>
