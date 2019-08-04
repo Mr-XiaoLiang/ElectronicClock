@@ -1,4 +1,4 @@
-package liang.lollipop.electronicclock.widget
+package liang.lollipop.widget.widget
 
 /**
  * @author lollipop

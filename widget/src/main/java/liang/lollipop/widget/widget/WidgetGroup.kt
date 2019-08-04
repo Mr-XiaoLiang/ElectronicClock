@@ -1,4 +1,4 @@
-package liang.lollipop.electronicclock.widget
+package liang.lollipop.widget.widget
 
 import android.content.Context
 import android.graphics.*
@@ -9,8 +9,8 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
-import liang.lollipop.electronicclock.utils.Utils
-import liang.lollipop.electronicclock.utils.dp
+import liang.lollipop.widget.utils.Utils
+import liang.lollipop.widget.utils.dp
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
