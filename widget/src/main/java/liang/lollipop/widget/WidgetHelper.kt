@@ -56,6 +56,12 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
 
     var pendingLayoutTime = -1L
 
+    var foregroundColor: Int = Color.BLACK
+        set(value) {
+            field = value
+            onColorChange()
+        }
+
     private var lastMinute = 0L
 
     private val handler = Handler()
@@ -124,6 +130,13 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
         handler.removeCallbacks(updateTask)
     }
 
+    private fun onColorChange() {
+        panelList.forEach {
+            it.panelInfo.color = foregroundColor
+            it.onColorChange(foregroundColor)
+        }
+    }
+
     private fun postUpdate() {
         handler.postDelayed(updateTask, 1000)
     }
@@ -182,6 +195,7 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
     }
 
     fun addPanel(panel: Panel<*>) {
+        panel.panelInfo.color = foregroundColor
         panelList.add(panel)
         widgetGroup.addPanel(panel)
     }
