@@ -64,7 +64,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     /**
      * 单元格的尺寸
      */
-    private var gridSize = EMPTY_SIZE
+    var gridSize = EMPTY_SIZE
+        private set
 
     /**
      * 临时的点对象
@@ -180,6 +181,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         // 如果格子数据不为空，那么认为已经有测量结果了
         // 在添加前做位置检查，减少不必要的操作
         if (!gridSize.isEmpty()) {
+            panel.updatePanelInfo(this)
             val info = panel.panelInfo
             val location = findGrid(info.spanX, info.spanY)
             if (!location.isEffective()) {

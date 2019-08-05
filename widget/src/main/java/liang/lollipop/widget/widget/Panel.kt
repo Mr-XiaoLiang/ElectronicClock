@@ -38,6 +38,8 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
             return view?.visibility ?: View.GONE
         }
 
+    open fun updatePanelInfo(group: WidgetGroup) {}
+
     fun copyBounds(rect: Rect) {
         rect.set(panelInfo.x, panelInfo.y,
             panelInfo.x + panelInfo.spanX, panelInfo.y + panelInfo.spanY)
@@ -47,7 +49,7 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
         rect.set(bounds)
     }
 
-    fun create(layoutInflater: LayoutInflater, parent: ViewGroup): View {
+    fun create(layoutInflater: LayoutInflater, parent: WidgetGroup): View {
         val v = onCreateView(layoutInflater, parent)
         view = v
         viewIsInitializer = true
