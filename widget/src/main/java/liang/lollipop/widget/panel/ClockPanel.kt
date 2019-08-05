@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import liang.lollipop.widget.info.ClockPanelInfo
-import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.Panel
 import java.util.*
 import kotlin.math.min
@@ -45,6 +44,15 @@ class ClockPanel(info: ClockPanelInfo): Panel<ClockPanelInfo>(info) {
                     it.setTypeface(panelInfo.typeface)
                 }
                 it.setColor(panelInfo.color)
+            }
+        }
+    }
+
+    override fun onColorChange(color: Int) {
+        super.onColorChange(color)
+        view?.let {
+            if (it is ClockView) {
+                it.setColor(color)
             }
         }
     }
@@ -292,6 +300,7 @@ class ClockPanel(info: ClockPanelInfo): Panel<ClockPanelInfo>(info) {
         var color: Int
             set(value) {
                 paint.color = value
+                invalidateSelf()
             }
             get() {
                 return paint.color
@@ -301,11 +310,13 @@ class ClockPanel(info: ClockPanelInfo): Panel<ClockPanelInfo>(info) {
             get() = paint.typeface
             set(value) {
                 paint.typeface = value
+                invalidateSelf()
             }
 
         var bold: Boolean
             set(value) {
                 paint.isFakeBoldText = value
+                invalidateSelf()
             }
             get() {
                 return paint.isFakeBoldText

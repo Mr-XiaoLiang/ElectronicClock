@@ -73,6 +73,11 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     open fun onUpdate() {}
 
     /**
+     * 当颜色改变时
+     */
+    open fun onColorChange(color: Int) {}
+
+    /**
      * info改变时，触发
      */
     open fun onInfoChange() {}
