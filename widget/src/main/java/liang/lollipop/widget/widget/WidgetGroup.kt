@@ -507,6 +507,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 panel.layout(0, 0, 0, 0)
                 continue
             }
+            // 测量时，刷新一次小部件的尺寸信息，便于调整到合适的尺寸
+            panel.updatePanelInfo(this)
             val info = panel.panelInfo
             view.measure(MeasureSpec.makeMeasureSpec(info.spanX * gridSize.width, MeasureSpec.EXACTLY),
                 MeasureSpec.makeMeasureSpec(info.spanY * gridSize.height, MeasureSpec.EXACTLY))
