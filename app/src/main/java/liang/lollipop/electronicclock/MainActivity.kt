@@ -24,6 +24,7 @@ import liang.lollipop.widget.widget.PanelInfo
 import androidx.customview.widget.ExploreByTouchHelper.HOST_ID
 import liang.lollipop.widget.utils.AppWidgetHelper
 import liang.lollipop.widget.widget.PanelAdapter
+import java.util.*
 
 
 /**
@@ -90,12 +91,14 @@ class MainActivity : AppCompatActivity() {
 
     private class TestPanel(info: TestInfo, val value: String): Panel<TestInfo>(info) {
         override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
+            val random = Random()
             val view = TextView(layoutInflater.context)
-            view.setBackgroundColor(panelInfo.color)
+            view.setBackgroundColor(Color.rgb(random.nextInt(128) + 128,
+                random.nextInt(128) + 128, random.nextInt(128) + 128))
             view.text = value
             view.gravity = Gravity.CENTER
             view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22F)
-            view.setTextColor(Color.WHITE)
+            view.setTextColor(panelInfo.color)
             return view
         }
     }
