@@ -1,10 +1,14 @@
 package liang.lollipop.widget
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Handler
+import liang.lollipop.widget.info.SystemWidgetPanelInfo
+import liang.lollipop.widget.utils.AppWidgetHelper
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
 import liang.lollipop.widget.widget.Panel
@@ -17,11 +21,13 @@ import liang.lollipop.widget.widget.WidgetGroup
  * @date 2019-07-30 20:41
  * 小部件辅助器
  */
-class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
+class WidgetHelper private constructor(
+    private val context: Activity,
+    private val widgetGroup: WidgetGroup) {
 
     companion object {
-        fun with(group: WidgetGroup): WidgetHelper {
-            return WidgetHelper(group)
+        fun with(context: Activity, group: WidgetGroup): WidgetHelper {
+            return WidgetHelper(context, group)
         }
     }
 
@@ -79,6 +85,16 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
 
     private var onCancelDragListener: ((Panel<*>?) -> Unit)? = null
 
+    private val appWidgetHelper = AppWidgetHelper(context).apply {
+        onWidgetCreate {
+            addPanel(it)
+        }
+    }
+
+    private val panelAdapter = PanelAdapter(appWidgetHelper).apply {
+
+    }
+
     init {
         widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
             drawPanelBounds(panel, dragMode, canvas)
@@ -96,6 +112,18 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
             (it?.view?:widgetGroup).requestLayout()
             onCancelDragListener?.invoke(it)
         }
+    }
+
+    fun selectAppWidget() {
+        appWidgetHelper.selectAppWidget()
+    }
+
+    fun onSelectWidgetError(lis: () -> Unit) {
+        appWidgetHelper.onSelectWidgetError(lis)
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        return appWidgetHelper.onActivityResult(requestCode, resultCode, data)
     }
 
     fun onChildClick(lis: (Panel<*>) -> Unit): WidgetHelper {
@@ -124,10 +152,12 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
 
     fun onStart() {
         postUpdate()
+        appWidgetHelper.onStart()
     }
 
     fun onStop() {
         handler.removeCallbacks(updateTask)
+        appWidgetHelper.onStop()
     }
 
     private fun onColorChange() {
@@ -143,7 +173,7 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
 
     private fun updateBySecond() {
         panelList.forEach {
-            if (PanelAdapter.updateBySecond(it)) {
+            if (panelAdapter.updateBySecond(it)) {
                 it.onUpdate()
             }
         }
@@ -189,7 +219,7 @@ class WidgetHelper private constructor(private val widgetGroup: WidgetGroup) {
     }
 
     fun <I: PanelInfo> addPanel(info: I): Panel<I> {
-        val panel = PanelAdapter.createPanelByInfo(info)
+        val panel = panelAdapter.createPanelByInfo(info)
         addPanel(panel)
         return panel
     }
