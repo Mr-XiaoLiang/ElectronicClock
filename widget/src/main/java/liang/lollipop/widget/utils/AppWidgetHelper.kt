@@ -13,7 +13,7 @@ import liang.lollipop.widget.info.SystemWidgetPanelInfo
  * @date 2019-08-05 13:46
  * 系统应用的小部件的辅助类
  */
-class AppWidgetHelper(private val context: Activity, hostId: Int = DEF_HOST_ID) {
+class AppWidgetHelper(private val activity: Activity, hostId: Int = DEF_HOST_ID) {
 
     companion object {
         private const val DEF_HOST_ID = 104096
@@ -21,6 +21,8 @@ class AppWidgetHelper(private val context: Activity, hostId: Int = DEF_HOST_ID) 
         private const val REQUEST_SELECT_WIDGET = 996
         private const val REQUEST_CREATE_WIDGET = 995
     }
+
+    private val context = activity.applicationContext
 
     private val appWidgetHost = AppWidgetHost(context, hostId)
 
@@ -42,7 +44,7 @@ class AppWidgetHelper(private val context: Activity, hostId: Int = DEF_HOST_ID) 
         val pickIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_PICK)
         val newId = appWidgetHost.allocateAppWidgetId()
         pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, newId)
-        context.startActivityForResult(pickIntent, REQUEST_SELECT_WIDGET)
+        activity.startActivityForResult(pickIntent, REQUEST_SELECT_WIDGET)
     }
 
     fun onSelectWidgetError(lis: () -> Unit) {
@@ -88,7 +90,7 @@ class AppWidgetHelper(private val context: Activity, hostId: Int = DEF_HOST_ID) 
             val configureIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
             configureIntent.component = appWidgetProviderInfo.configure
             configureIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            context.startActivityForResult(configureIntent, REQUEST_CREATE_WIDGET)
+            activity.startActivityForResult(configureIntent, REQUEST_CREATE_WIDGET)
             return
         }
         // 如果没有配置的页面，那么认为直接创建成功了
