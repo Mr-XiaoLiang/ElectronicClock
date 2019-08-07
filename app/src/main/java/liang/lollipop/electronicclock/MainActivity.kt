@@ -59,8 +59,8 @@ class MainActivity : AppCompatActivity() {
         widgetHelper.addPanel(ClockPanelInfo())
 
         floatingBtn.setOnClickListener {
-//            widgetHelper.selectAppWidget()
-            startActivity(Intent(this, WidgetActivity::class.java))
+            widgetHelper.selectAppWidget()
+//            startActivity(Intent(this, WidgetActivity::class.java))
         }
     }
 

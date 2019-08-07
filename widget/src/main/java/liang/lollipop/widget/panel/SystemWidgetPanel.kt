@@ -2,6 +2,7 @@ package liang.lollipop.widget.panel
 
 import android.appwidget.AppWidgetHostView
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PointF
 import android.view.*
 import android.widget.FrameLayout
@@ -68,6 +69,13 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
         super.onSizeChange(width, height)
         widgetView.updateAppWidgetSize(null, width, height, width, height)
         widgetView.requestLayout()
+    }
+
+    override fun onColorChange(color: Int) {
+        super.onColorChange(color)
+        view?.let {
+            it.alpha = Color.alpha(color) / 255F
+        }
     }
 
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
