@@ -1,7 +1,9 @@
 package liang.lollipop.electronicclock.activity
 
 import android.graphics.Rect
+import android.os.Build
 import android.view.View
+import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -22,9 +24,40 @@ open class BaseActivity: AppCompatActivity() {
 
     private val windowInset = Rect()
 
+    protected var isFullScreen = false
+        private set
+
     protected fun bindToolBar(t: Toolbar) {
         lToolbar = t
         setSupportActionBar(t)
+    }
+
+    protected fun fullScreen() {
+        isFullScreen = true
+        window.addFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN or
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val lp = this.window.attributes
+            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+            this.window.attributes = lp
+        }
+        hideSystemUI()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isFullScreen) {
+            hideSystemUI()
+        }
+    }
+
+    protected fun hideSystemUI() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
     }
 
     protected fun initInsetListener(rootView: View) {
