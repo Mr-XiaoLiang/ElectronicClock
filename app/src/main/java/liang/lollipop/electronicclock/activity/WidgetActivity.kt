@@ -1,13 +1,10 @@
-package liang.lollipop.electronicclock
+package liang.lollipop.electronicclock.activity
 
-import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_widget.*
-import liang.lollipop.electronicclock.activity.BaseActivity
+import liang.lollipop.electronicclock.R
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
@@ -15,6 +12,7 @@ import liang.lollipop.widget.utils.dp
 
 /**
  * 小部件展示的页面
+ * @author Lollipop
  */
 class WidgetActivity : BaseActivity() {
 
@@ -23,16 +21,8 @@ class WidgetActivity : BaseActivity() {
     private val logger = Utils.loggerI("WidgetActivity")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN or
-//                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val lp = this.window.attributes
-            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            this.window.attributes = lp
-        }
+        fullScreen()
         super.onCreate(savedInstanceState)
-        hideSystemUI()
         setContentView(R.layout.activity_widget)
         initInsetListener(rootGroup)
         initView()
@@ -71,23 +61,10 @@ class WidgetActivity : BaseActivity() {
         widgetHelper.onStop()
     }
 
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
-    }
-
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
         super.onWindowInsetsChange(left, top, right, bottom)
         logger("onWindowInsetsChange($left, $top, $right, $bottom)")
         widgetGroup.setPadding(left, top, right, bottom)
-    }
-
-    private fun hideSystemUI() {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
     }
 
 }
