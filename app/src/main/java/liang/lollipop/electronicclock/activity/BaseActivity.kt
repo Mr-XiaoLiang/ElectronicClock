@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.activity
 
 import android.graphics.Rect
 import android.os.Build
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
@@ -23,6 +24,8 @@ open class BaseActivity: AppCompatActivity() {
     private var lToolbar: Toolbar? = null
 
     private val windowInset = Rect()
+
+    protected var isShowBack = true
 
     protected var isFullScreen = false
         private set
@@ -47,9 +50,22 @@ open class BaseActivity: AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(isShowBack)
+        }
         if (isFullScreen) {
             hideSystemUI()
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     protected fun hideSystemUI() {
