@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Handler
-import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.utils.AppWidgetHelper
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
@@ -21,8 +20,7 @@ import liang.lollipop.widget.widget.WidgetGroup
  * @date 2019-07-30 20:41
  * 小部件辅助器
  */
-class WidgetHelper private constructor(
-    private val context: Activity,
+class WidgetHelper private constructor(activity: Activity,
     private val widgetGroup: WidgetGroup) {
 
     companion object {
@@ -30,6 +28,8 @@ class WidgetHelper private constructor(
             return WidgetHelper(context, group)
         }
     }
+
+    private val context = activity.applicationContext
 
     private val logger = Utils.loggerI("WidgetHelper")
 
@@ -85,7 +85,7 @@ class WidgetHelper private constructor(
 
     private var onCancelDragListener: ((Panel<*>?) -> Unit)? = null
 
-    private val appWidgetHelper = AppWidgetHelper(context).apply {
+    private val appWidgetHelper = AppWidgetHelper(activity).apply {
         onWidgetCreate {
             addPanel(it)
         }

@@ -2,8 +2,6 @@ package liang.lollipop.widget.panel
 
 import android.appwidget.AppWidgetHostView
 import android.content.Context
-import android.graphics.Color
-import android.graphics.Point
 import android.graphics.PointF
 import android.view.*
 import android.widget.FrameLayout
