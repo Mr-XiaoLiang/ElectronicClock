@@ -1,7 +1,5 @@
 package liang.lollipop.electronicclock
 
-import android.appwidget.AppWidgetHost
-import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -21,9 +19,6 @@ import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
 import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.PanelInfo
-import androidx.customview.widget.ExploreByTouchHelper.HOST_ID
-import liang.lollipop.widget.utils.AppWidgetHelper
-import liang.lollipop.widget.widget.PanelAdapter
 import java.util.*
 
 
@@ -52,23 +47,20 @@ class MainActivity : AppCompatActivity() {
             it
         }.onCantLayout {
             Toast.makeText(this, "出现了${it.size}个无法排版的View", Toast.LENGTH_SHORT).show()
+            for (panel in it) {
+                widgetHelper.removePanel(panel)
+            }
         }
 
         widgetHelper.onSelectWidgetError {
             Toast.makeText(this, "选择系统小部件时出现异常", Toast.LENGTH_SHORT).show()
         }
 
-        widgetHelper.addPanel(TestPanel(TestInfo(2, 1, Color.GREEN), "1"))
-        widgetHelper.addPanel(TestPanel(TestInfo(1, 2, Color.RED), "2"))
-        widgetHelper.addPanel(TestPanel(TestInfo(4, 2, Color.BLUE), "3"))
-        widgetHelper.addPanel(TestPanel(TestInfo(2, 1, Color.GRAY), "4"))
-        widgetHelper.addPanel(TestPanel(TestInfo(2, 1, Color.CYAN), "5"))
-        widgetHelper.addPanel(TestPanel(TestInfo(3, 1, Color.LTGRAY), "6"))
         widgetHelper.addPanel(ClockPanelInfo())
-        widgetHelper.addPanel(PanelInfo())
 
         floatingBtn.setOnClickListener {
-            widgetHelper.selectAppWidget()
+//            widgetHelper.selectAppWidget()
+            startActivity(Intent(this, WidgetActivity::class.java))
         }
     }
 

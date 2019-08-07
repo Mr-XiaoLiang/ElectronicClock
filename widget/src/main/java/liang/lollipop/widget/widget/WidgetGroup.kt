@@ -115,6 +115,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private var dragEndListener: ((panel: Panel<*>?) -> Unit)? = null
 
     /**
+     * 当被选中的面板改变时触发的监听器
+     */
+    private var onSelectedPanelChangeListener: ((panel: Panel<*>) -> Unit)? = null
+
+    /**
      * 格子数量
      * 这个数量是指窄边的格子数
      * 长边的数量会依据此数量来进行变化
@@ -171,6 +176,16 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * 请求一次手势拦截
      */
     private var pendingTouchRequest = false
+
+    /**
+     * 锁定拖动和尺寸改变
+     */
+    var lockedGrid = false
+
+    /**
+     *
+     */
+    var lockedTouch = false
 
     /**
      * 添加面板
@@ -246,6 +261,12 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        if (lockedTouch) {
+            return true
+        }
+        if (lockedGrid) {
+            return false
+        }
         ev?:return super.onInterceptTouchEvent(ev)
         // 如果不在拖拽模式，那么放弃拦截任何手势
         if (!isDragState) {
@@ -582,6 +603,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         val top = y * gridSize.height + paddingTop
         this.layout(left, top, panelWidth + left, panelHeight + top)
         this.saveGridLocation(x, y, spanX, spanY)
+        selectedPanelChange(this)
     }
 
     private fun Panel<*>.offsetByGrid(x: Int, y: Int) {
@@ -592,6 +614,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         val top = y * gridSize.height
         this.offset(left, top)
         this.panelInfo.offsetBy(x, y)
+        selectedPanelChange(this)
     }
 
     /**
@@ -883,6 +906,23 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      */
     fun onCancelDrag(listener: ((Panel<*>?) -> Unit)) {
         this.cancelDragListener = listener
+    }
+
+    /**
+     * 触发面板变更事件
+     */
+    private fun selectedPanelChange(p: Panel<*>) {
+        val panel = selectedPanel?:return
+        if (panel == p) {
+            onSelectedPanelChangeListener?.invoke(panel)
+        }
+    }
+
+    /**
+     * 当被选中的面板发生变化时，触发
+     */
+    fun onSelectedPanelChange(listener: (Panel<*>) -> Unit) {
+        onSelectedPanelChangeListener = listener
     }
 
     /**

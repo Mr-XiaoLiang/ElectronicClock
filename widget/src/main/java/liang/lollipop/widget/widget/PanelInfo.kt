@@ -22,7 +22,6 @@ open class PanelInfo {
         const val KEY_SPAN_Y = "KEY_SPAN_Y"
         const val KEY_X = "KEY_X"
         const val KEY_Y = "KEY_Y"
-        const val KEY_ID = "KEY_ID"
         const val KEY_COLOR = "KEY_COLOR"
     }
 
@@ -39,13 +38,8 @@ open class PanelInfo {
         protected set
 
     var id = NO_ID
-        private set
 
     var color = Color.BLACK
-
-    fun putId(value: Int) {
-        id = value
-    }
 
     fun offset(x: Int, y: Int) {
         this.x = x
@@ -67,7 +61,6 @@ open class PanelInfo {
         spanY = jsonObj.optInt(KEY_SPAN_Y, DEF_SPAN_Y)
         x = jsonObj.optInt(KEY_X, DEF_X)
         y = jsonObj.optInt(KEY_Y, DEF_Y)
-        id = jsonObj.optInt(KEY_ID, NO_ID)
         color = jsonObj.optInt(KEY_COLOR, Color.BLACK)
     }
 
@@ -76,7 +69,6 @@ open class PanelInfo {
         jsonObj.put(KEY_SPAN_Y, spanY)
         jsonObj.put(KEY_X, x)
         jsonObj.put(KEY_Y, y)
-        jsonObj.put(KEY_ID, id)
         jsonObj.put(KEY_COLOR, color)
     }
 
