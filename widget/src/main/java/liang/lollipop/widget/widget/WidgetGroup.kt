@@ -188,6 +188,16 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     var lockedTouch = false
 
     /**
+     * 上次的Padding
+     */
+    private val lastPadding = Rect()
+
+    /**
+     * 上次的尺寸
+     */
+    private val lastBounds = Rect()
+
+    /**
      * 添加面板
      * 添加View的唯一途径
      * Group需要根据panel的一些参数决定小部件怎么进行布局排版
@@ -547,10 +557,21 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             // 如果尺寸是空的，那么就放弃本次排版
             return
         }
-        if (gridSize.isEmpty() || measuredWidth != srcWidth || measuredHeight != srcHeight) {
+        val isPaddingChange = lastPadding.top != paddingTop ||
+                lastPadding.left != paddingLeft ||
+                lastPadding.right != paddingRight ||
+                lastPadding.bottom != paddingBottom
+        val isBoundsChange = lastBounds.left != left ||
+                lastBounds.top != top ||
+                lastBounds.right != right ||
+                lastBounds.bottom != bottom
+        if (gridSize.isEmpty() || measuredWidth != srcWidth || measuredHeight != srcHeight ||
+            isPaddingChange || isBoundsChange) {
             // 如果格子尺寸是空的，那么尝试做尺寸计算
             calculateGridSize(widthSize, heightSize)
         }
+        lastPadding.set(paddingLeft, paddingTop, paddingRight, paddingBottom)
+        lastBounds.set(left, top, right, bottom)
         val tmpRect = getRect()
         for (i in 0 until childCount) {
             val view = getChildAt(i)

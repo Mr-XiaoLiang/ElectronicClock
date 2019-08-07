@@ -13,8 +13,7 @@
             android:theme="@style/AppTheme">
         <activity
                 android:launchMode="singleInstance"
-                android:name=".WidgetActivity">
-        </activity>
+                android:name=".WidgetActivity"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

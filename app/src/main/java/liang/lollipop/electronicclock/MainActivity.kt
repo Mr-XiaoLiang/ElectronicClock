@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
+import liang.lollipop.electronicclock.activity.BaseActivity
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
@@ -25,7 +26,7 @@ import java.util.*
 /**
  * @author Lollipop
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     companion object {
         private val logger = Utils.loggerI("MainActivity")
@@ -37,69 +38,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        widgetHelper = WidgetHelper.with(this, widgetGroup).let {
-            it.dragStrokeWidth = resources.dp(20F)
-            it.selectedBorderWidth = resources.dp(2F)
-            it.touchPointRadius = resources.dp(5F)
-            it.selectedColor = ContextCompat.getColor(this@MainActivity, R.color.colorPrimary)
-            it.focusColor = ContextCompat.getColor(this@MainActivity, R.color.colorAccent)
-            it.pendingLayoutTime = 800L
-            it
-        }.onCantLayout {
-            Toast.makeText(this, "出现了${it.size}个无法排版的View", Toast.LENGTH_SHORT).show()
-            for (panel in it) {
-                widgetHelper.removePanel(panel)
-            }
-        }
-
-        widgetHelper.onSelectWidgetError {
-            Toast.makeText(this, "选择系统小部件时出现异常", Toast.LENGTH_SHORT).show()
-        }
-
-        widgetHelper.addPanel(ClockPanelInfo())
-
         floatingBtn.setOnClickListener {
-            widgetHelper.selectAppWidget()
-//            startActivity(Intent(this, WidgetActivity::class.java))
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        widgetHelper.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        widgetHelper.onStop()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (widgetHelper.onActivityResult(requestCode, resultCode, data)) {
-            return
-        }
-    }
-
-    private class TestPanel(info: TestInfo, val value: String): Panel<TestInfo>(info) {
-        override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
-            val random = Random()
-            val view = TextView(layoutInflater.context)
-            view.setBackgroundColor(Color.rgb(random.nextInt(128) + 128,
-                random.nextInt(128) + 128, random.nextInt(128) + 128))
-            view.text = value
-            view.gravity = Gravity.CENTER
-            view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22F)
-            view.setTextColor(panelInfo.color)
-            return view
-        }
-    }
-
-    private class TestInfo(sX: Int, sY: Int, c: Int): PanelInfo() {
-        init {
-            spanX = sX
-            spanY = sY
-            color = c
+//            widgetHelper.selectAppWidget()
+            startActivity(Intent(this, WidgetActivity::class.java))
         }
     }
 
