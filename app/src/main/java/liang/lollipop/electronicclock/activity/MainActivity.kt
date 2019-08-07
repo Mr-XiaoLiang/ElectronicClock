@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.activity
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.widget.Toolbar
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.widget.utils.Utils
@@ -19,7 +20,8 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        bindToolBar(toolbar as Toolbar)
+        initInsetListener(rootGroup)
         protraitEditBtn.setOnClickListener {
             EditActivity.startByPortrait(this)
         }
