@@ -70,7 +70,13 @@ class WidgetHelper private constructor(activity: Activity,
 
     var pendingLayoutTime = -1L
 
-    var foregroundColor: Int = Color.BLACK
+    var foregroundColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            onColorChange()
+        }
+
+    var backgroundColor: Int = Color.BLACK
         set(value) {
             field = value
             onColorChange()
@@ -82,18 +88,29 @@ class WidgetHelper private constructor(activity: Activity,
             lightValue = value
         }
 
+    var isAutoLight = true
+
+    var isInverted = false
+
+    var isAutoInverted = true
+
     private var lastMinute = 0L
 
     private var lightValue = lightMaxValue
         set(value) {
             field = value
-            onLightChange()
+            if (isAutoLight) {
+                onLightChange()
+            }
         }
 
     private val handler = Handler()
 
     private val updateTask = Runnable {
         val minute = System.currentTimeMillis() / 1000 / 60
+        if (isAutoInverted) {
+            isInverted = minute / 60 % 2 == 0L
+        }
         if (minute != lastMinute) {
             lastMinute = minute
             updateByMinute()
@@ -190,13 +207,13 @@ class WidgetHelper private constructor(activity: Activity,
     }
 
     fun onStart() {
-//        registerLightSensor()
+        registerLightSensor()
         postUpdate()
         appWidgetHelper.onStart()
     }
 
     fun onStop() {
-//        unregisterLightSensor()
+        unregisterLightSensor()
         handler.removeCallbacks(updateTask)
         appWidgetHelper.onStop()
     }
@@ -215,15 +232,38 @@ class WidgetHelper private constructor(activity: Activity,
     }
 
     private fun onLightChange() {
-//        Color.alpha()
-        // TODO
+        onColorChange()
     }
 
     private fun onColorChange() {
-        panelList.forEach {
-            it.panelInfo.color = foregroundColor
-            it.onColorChange(foregroundColor)
+        val bg: Int
+        val fg: Int
+        if (isInverted) {
+            fg = backgroundColor
+            bg = foregroundColor.updateColorByLight()
+        } else {
+            bg = backgroundColor
+            fg = foregroundColor.updateColorByLight()
         }
+        panelList.forEach {
+            it.panelInfo.color = fg
+            it.onColorChange(fg)
+        }
+        widgetGroup.setBackgroundColor(bg)
+    }
+
+    private fun Int.updateColorByLight(): Int {
+        if (isAutoLight) {
+            var alpha = (191 * lightValue / lightMaxValue).toInt() + 64
+            if (alpha < 0) {
+                alpha = 0
+            }
+            if (alpha > 255) {
+                alpha = 255
+            }
+            return this and 0xFFFFFF or (alpha shl 24)
+        }
+        return this
     }
 
     private fun postUpdate() {
