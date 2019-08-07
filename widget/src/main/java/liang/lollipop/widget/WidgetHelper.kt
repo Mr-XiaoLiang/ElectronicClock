@@ -1,11 +1,16 @@
 package liang.lollipop.widget
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Handler
 import liang.lollipop.widget.utils.AppWidgetHelper
 import liang.lollipop.widget.utils.Utils
@@ -14,6 +19,7 @@ import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.PanelAdapter
 import liang.lollipop.widget.widget.PanelInfo
 import liang.lollipop.widget.widget.WidgetGroup
+
 
 /**
  * @author lollipop
@@ -27,6 +33,8 @@ class WidgetHelper private constructor(activity: Activity,
         fun with(context: Activity, group: WidgetGroup): WidgetHelper {
             return WidgetHelper(context, group)
         }
+
+        private const val DEF_MAX_LIGHT = 200F
     }
 
     private val context = activity.applicationContext
@@ -68,7 +76,19 @@ class WidgetHelper private constructor(activity: Activity,
             onColorChange()
         }
 
+    var lightMaxValue = DEF_MAX_LIGHT
+        set(value) {
+            field = value
+            lightValue = value
+        }
+
     private var lastMinute = 0L
+
+    private var lightValue = lightMaxValue
+        set(value) {
+            field = value
+            onLightChange()
+        }
 
     private val handler = Handler()
 
@@ -85,24 +105,32 @@ class WidgetHelper private constructor(activity: Activity,
 
     private var onCancelDragListener: ((Panel<*>?) -> Unit)? = null
 
+    private var onStartDragListener: ((Panel<*>) -> Unit)? = null
+
     private val appWidgetHelper = AppWidgetHelper(activity).apply {
         onWidgetCreate {
             addPanel(it)
         }
     }
 
-    private val panelAdapter = PanelAdapter(appWidgetHelper).apply {
+    private val panelAdapter = PanelAdapter(appWidgetHelper)
 
+    private val lightSensorListener = object: SensorEventListener {
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+        override fun onSensorChanged(event: SensorEvent?) {
+            lightValue = event?.values?.get(0)?:lightMaxValue
+        }
     }
 
     init {
         widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
             drawPanelBounds(panel, dragMode, canvas)
         }
-        widgetGroup.onChildLongClick {
+        onChildLongClick {
             logger("onChildLongClick: $it")
             if (canDrag) {
-                widgetGroup.selectedPanel = it
+                startDrag(it)
                 true
             } else {
                 false
@@ -141,23 +169,54 @@ class WidgetHelper private constructor(activity: Activity,
         return this
     }
 
+    fun onStartDrag(lis: (Panel<*>) -> Unit): WidgetHelper {
+        onStartDragListener = lis
+        return this
+    }
+
     fun onChildLongClick(lis: (Panel<*>) -> Boolean): WidgetHelper {
         widgetGroup.onChildLongClick(lis)
         return this
     }
 
+    fun onSelectedPanelChange(lis: (Panel<*>) -> Unit): WidgetHelper {
+        widgetGroup.onSelectedPanelChange(lis)
+        return this
+    }
+
     fun startDrag(panel: Panel<*>) {
         widgetGroup.selectedPanel = panel
+        onStartDragListener?.invoke(panel)
     }
 
     fun onStart() {
+//        registerLightSensor()
         postUpdate()
         appWidgetHelper.onStart()
     }
 
     fun onStop() {
+//        unregisterLightSensor()
         handler.removeCallbacks(updateTask)
         appWidgetHelper.onStop()
+    }
+
+    private fun registerLightSensor() {
+        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+        if (sensor != null) {
+            sensorManager.registerListener(lightSensorListener, sensor, SensorManager.SENSOR_DELAY_UI)
+        }
+    }
+
+    private fun unregisterLightSensor() {
+        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensorManager.unregisterListener(lightSensorListener)
+    }
+
+    private fun onLightChange() {
+//        Color.alpha()
+        // TODO
     }
 
     private fun onColorChange() {

@@ -126,14 +126,8 @@ class AppWidgetHelper(private val activity: Activity, hostId: Int = DEF_HOST_ID)
             panelInfo.appWidgetId, panelInfo.appWidgetProviderInfo)
     }
 
-//    fun getAllWidgetProviderInfo(context: Context): ArrayList<AppWidgetProviderInfo> {
-//        val widgetManager = AppWidgetManager.getInstance(context.applicationContext)
-//        val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
-//        val providers = ArrayList<AppWidgetProviderInfo>()
-//        for (user in userManager.userProfiles) {
-//            providers.addAll(widgetManager.getInstalledProvidersForProfile(user))
-//        }
-//        return providers
-//    }
+    fun deleteWidgetByInfo(panelInfo: SystemWidgetPanelInfo) {
+        appWidgetHost.deleteAppWidgetId(panelInfo.appWidgetId)
+    }
 
 }

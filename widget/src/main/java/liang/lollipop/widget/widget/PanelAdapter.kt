@@ -38,4 +38,18 @@ class PanelAdapter(private val appWidgetHelper: AppWidgetHelper) {
         return true
     }
 
+    companion object {
+        fun className(info: PanelInfo): String {
+            return info.javaClass.name
+        }
+
+        fun newInfo(name: String): PanelInfo {
+            return when (name) {
+                ClockPanelInfo::class.java.name -> ClockPanelInfo()
+                SystemWidgetPanelInfo::class.java.name -> SystemWidgetPanelInfo()
+                else -> PanelInfo()
+            }
+        }
+    }
+
 }
