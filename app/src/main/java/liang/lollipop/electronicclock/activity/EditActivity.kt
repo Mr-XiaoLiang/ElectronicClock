@@ -4,13 +4,18 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_edit.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.list.ActionInfo
+import liang.lollipop.widget.WidgetHelper
+import liang.lollipop.widget.utils.dp
 
 /**
  * 编辑用的Activity
@@ -66,6 +71,8 @@ class EditActivity : BaseActivity() {
 
     private val actionInfoArray = ArrayList<ActionInfo>()
 
+    private lateinit var widgetHelper: WidgetHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setScreenOrientation()
         fullScreen()
@@ -82,6 +89,29 @@ class EditActivity : BaseActivity() {
         rightList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         // 始终让底部的列表左右滚动
         bottomList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+
+        widgetGroup.drawGrid = true
+        widgetGroup.gridColor = Color.GRAY
+        widgetGroup.scaleX
+
+        widgetHelper = WidgetHelper.with(this, widgetGroup).let {
+            it.dragStrokeWidth = resources.dp(16F)
+            it.selectedBorderWidth = resources.dp(2F)
+            it.touchPointRadius = resources.dp(5F)
+            it.selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
+            it.focusColor = ContextCompat.getColor(this, R.color.colorAccent)
+            it.pendingLayoutTime = 800L
+            it
+        }.onCantLayout {
+            Toast.makeText(this, "出现了${it.size}个无法排版的View", Toast.LENGTH_SHORT).show()
+            for (panel in it) {
+                widgetHelper.removePanel(panel)
+            }
+        }
+
+        widgetHelper.onSelectWidgetError {
+            Toast.makeText(this, "选择系统小部件时出现异常", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun initActions() {
@@ -103,13 +133,13 @@ class EditActivity : BaseActivity() {
                 onBackPressed()
             }
             ACTION_DELETE -> {
-
+                widgetHelper.removeSelectedPanel()
             }
             ACTION_DONE -> {
 
             }
             ACTION_WIDGET -> {
-
+                widgetHelper.selectAppWidget()
             }
         }
     }
@@ -117,6 +147,13 @@ class EditActivity : BaseActivity() {
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
         super.onWindowInsetsChange(left, top, right, bottom)
         rootGroup.setPadding(left, top, right, bottom)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (widgetHelper.onActivityResult(requestCode, resultCode, data)) {
+            return
+        }
     }
 
     private fun setScreenOrientation() {

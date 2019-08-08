@@ -12,6 +12,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Handler
+import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.utils.AppWidgetHelper
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
@@ -330,8 +331,19 @@ class WidgetHelper private constructor(activity: Activity,
     }
 
     fun removePanel(panel: Panel<*>) {
+        panel.panelInfo.let { info ->
+            if (info is SystemWidgetPanelInfo) {
+                appWidgetHelper.deleteWidgetByInfo(info)
+            }
+        }
         widgetGroup.removePanel(panel)
         panelList.remove(panel)
+    }
+
+    fun removeSelectedPanel() {
+        widgetGroup.selectedPanel?.let { panel ->
+            removePanel(panel)
+        }
     }
 
 }

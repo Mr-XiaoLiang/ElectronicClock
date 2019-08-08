@@ -198,6 +198,38 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private val lastBounds = Rect()
 
     /**
+     * 绘制格子
+     */
+    var drawGrid = false
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    /**
+     * 绘制格子用的笔
+     */
+    private val gridPaint: Paint by lazy {
+        Paint().apply {
+            isDither = true
+            isAntiAlias = true
+        }
+    }
+
+    /**
+     * 绘制格子
+     */
+    var gridColor: Int
+        set(value) {
+            if (drawGrid) {
+                gridPaint.color = value
+            }
+        }
+        get() {
+            return gridPaint.color
+        }
+
+    /**
      * 添加面板
      * 添加View的唯一途径
      * Group需要根据panel的一些参数决定小部件怎么进行布局排版
@@ -227,6 +259,10 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * 移除一个面板
      */
     fun removePanel(panel: Panel<*>) {
+        // 如果被移除的panel是选中的panel，那么就放弃
+        if (panel == selectedPanel) {
+            cancelSelected()
+        }
         // 如果在集合中成功移除了面板，那么也从View中移除相应的View
         if (panelList.remove(panel)) {
             super.removeView(panel.view)
@@ -694,14 +730,12 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         selectedPanel?.let {
             drawSelectedPanelListener?.invoke(it, dragMode, canvas)
         }
-        if (Utils.isDebug) {
-            val gridPaint = Paint()
-            gridPaint.color = Color.RED
-            for (x in 0 until spanCountX) {
+        if (drawGrid) {
+            for (x in 0 .. spanCountX) {
                 val left = (x * gridSize.width).toFloat()
                 canvas.drawLine(left, 0F, left, height.toFloat(), gridPaint)
             }
-            for (y in 0 until spanCountY) {
+            for (y in 0 .. spanCountY) {
                 val top = (y * gridSize.height).toFloat()
                 canvas.drawLine(0F, top, width.toFloat(), top, gridPaint)
             }
