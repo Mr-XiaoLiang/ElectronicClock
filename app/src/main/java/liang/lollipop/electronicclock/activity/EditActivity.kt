@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_edit.*
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.list.ActionAdapter
+import liang.lollipop.electronicclock.list.ActionInfo
 
 /**
  * 编辑用的Activity
@@ -30,6 +32,11 @@ class EditActivity : BaseActivity() {
             intent.putExtra(ARG_IS_PORTRAIT, false)
             activity.startActivity(intent)
         }
+
+        private const val ACTION_DELETE = -1
+        private const val ACTION_DONE = 0
+        private const val ACTION_BACK = 1
+        private const val ACTION_WIDGET = 2
     }
 
     /**
@@ -57,6 +64,8 @@ class EditActivity : BaseActivity() {
             return if (isPortrait) { bottomList } else { rightList }
         }
 
+    private val actionInfoArray = ArrayList<ActionInfo>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setScreenOrientation()
         fullScreen()
@@ -65,6 +74,7 @@ class EditActivity : BaseActivity() {
         isPortrait = this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         initInsetListener(rootGroup)
         initView()
+        initActions()
     }
 
     private fun initView() {
@@ -72,7 +82,36 @@ class EditActivity : BaseActivity() {
         rightList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         // 始终让底部的列表左右滚动
         bottomList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+    }
 
+    private fun initActions() {
+        actionInfoArray.add(ActionInfo(ACTION_BACK, R.drawable.ic_arrow_back_black_24dp, R.string.action_back))
+        actionInfoArray.add(ActionInfo(ACTION_DELETE, R.drawable.ic_delete_black_24dp, R.string.action_delete))
+        actionInfoArray.add(ActionInfo(ACTION_DONE, R.drawable.ic_done_black_24dp, R.string.action_done))
+        actionInfoArray.add(ActionInfo(ACTION_WIDGET, R.drawable.ic_dashboard_black_24dp, R.string.action_widget))
+
+        val adapter = ActionAdapter(actionInfoArray, layoutInflater) { holder ->
+            onActionSelected(actionInfoArray[holder.adapterPosition].action)
+        }
+        actionList.adapter = adapter
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun onActionSelected(action: Int) {
+        when(action) {
+            ACTION_BACK -> {
+                onBackPressed()
+            }
+            ACTION_DELETE -> {
+
+            }
+            ACTION_DONE -> {
+
+            }
+            ACTION_WIDGET -> {
+
+            }
+        }
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
