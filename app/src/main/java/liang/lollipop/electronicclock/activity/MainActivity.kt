@@ -10,6 +10,7 @@ import liang.lollipop.widget.utils.Utils
 
 /**
  * @author Lollipop
+ * 主页，提供导航跳转功能
  */
 class MainActivity : BaseActivity() {
 
