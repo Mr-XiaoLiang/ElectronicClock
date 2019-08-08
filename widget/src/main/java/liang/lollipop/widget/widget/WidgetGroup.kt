@@ -399,7 +399,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                     panel.copyBounds(rect)
                     rect.right += x
                     val info = panel.panelInfo
-                    if (info.spanX + x > 0 && canPlace(rect, panel)) {
+                    if (info.spanX + x + info.x <= spanCountX && canPlace(rect, panel)) {
                         panel.layoutByGrid(info.x, info.y, info.spanX + x, info.spanY)
                         touchDown.x += x * gridSize.width
                     }
@@ -427,7 +427,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                     panel.copyBounds(rect)
                     rect.bottom += y
                     val info = panel.panelInfo
-                    if (info.spanY + y > 0 && canPlace(rect, panel)) {
+                    if (info.spanY + y + info.y <= spanCountY && canPlace(rect, panel)) {
                         panel.layoutByGrid(info.x, info.y, info.spanX, info.spanY + y)
                         touchDown.y += y * gridSize.height
                     }
