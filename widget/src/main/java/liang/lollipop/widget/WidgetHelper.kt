@@ -38,21 +38,41 @@ class WidgetHelper private constructor(activity: Activity,
         private const val DEF_MAX_LIGHT = 200F
     }
 
+    /**
+     * 应用上下文
+     */
     private val context = activity.applicationContext
 
     private val logger = Utils.loggerI("WidgetHelper")
 
-    private val strokePaint = Paint().apply {
-        isAntiAlias = true
-        isDither = true
+    /**
+     * 边框绘制画笔
+     */
+    private val strokePaint: Paint by lazy {
+        Paint().apply {
+            isAntiAlias = true
+            isDither = true
+        }
     }
 
+    /**
+     * 选中的颜色
+     */
     var selectedColor = Color.RED
 
+    /**
+     * 焦点高亮色
+     */
     var focusColor = Color.WHITE
 
+    /**
+     * 拖拽小点的半径
+     */
     var touchPointRadius = widgetGroup.resources.dp(5F)
 
+    /**
+     * 拖拽的有效范围
+     */
     var dragStrokeWidth: Float
         set(value) {
             widgetGroup.dragStrokeWidth = value
@@ -61,60 +81,115 @@ class WidgetHelper private constructor(activity: Activity,
             return widgetGroup.dragStrokeWidth
         }
 
+    /**
+     * 选中边框的展示宽度
+     */
     var selectedBorderWidth = widgetGroup.resources.dp(1F)
 
+    /**
+     * 临时边界，用于绘制边框时的计算
+     * 减少不必要的创建对象
+     */
     private val tmpBounds = Rect()
 
+    /**
+     * 面板列表的集合
+     */
     private val panelList = ArrayList<Panel<*>>()
 
+    /**
+     * 是否允许拖拽
+     * 当为false的时候，将拒绝长按时间
+     */
     var canDrag = true
 
+    /**
+     * 延迟排版时间
+     */
     var pendingLayoutTime = -1L
 
+    /**
+     * 前景色
+     */
     var foregroundColor: Int = Color.WHITE
         set(value) {
             field = value
             onColorChange()
         }
 
+    /**
+     * 背景色
+     */
     var backgroundColor: Int = Color.BLACK
         set(value) {
             field = value
             onColorChange()
         }
 
+    /**
+     * 亮度的最大阈值
+     */
     var lightMaxValue = DEF_MAX_LIGHT
         set(value) {
             field = value
             lightValue = value
         }
 
+    /**
+     * 是否自动亮度
+     */
     var isAutoLight = true
         set(value) {
             field = value
             onLightChange()
         }
 
+    /**
+     * 是否反色
+     */
     var isInverted = false
         set(value) {
             field = value
             onLightChange()
         }
 
+    /**
+     * 是否自动反色
+     */
     var isAutoInverted = true
 
+    /**
+     * 是否是竖屏
+     */
+    private var isPortrait = true
+
+    /**
+     * 上一分钟，用于选择性的懒更新部分小部件
+     */
     private var lastMinute = 0L
 
+    /**
+     * 亮度值
+     * 用于保存和触发亮度更新
+     * 当亮度值没有变化时，不会触发亮度变化
+     */
     private var lightValue = lightMaxValue
         set(value) {
+            val lastValue = field
             field = value
-            if (isAutoLight) {
+            if (isAutoLight && lastValue != value) {
                 onLightChange()
             }
         }
 
+    /**
+     * 用于做延时任务的Handler
+     */
     private val handler = Handler()
 
+    /**
+     * 每秒更新的任务，用于每秒触发一次页面更新任务
+     */
     private val updateTask = Runnable {
         val minute = System.currentTimeMillis() / 1000 / 60
         if (isAutoInverted) {
@@ -129,30 +204,48 @@ class WidgetHelper private constructor(activity: Activity,
         postUpdate()
     }
 
+    /**
+     * 当取消拖拽时的监听函数
+     */
     private var onCancelDragListener: ((Panel<*>?) -> Unit)? = null
 
+    /**
+     * 开始拖拽的监听事件
+     */
     private var onStartDragListener: ((Panel<*>) -> Unit)? = null
 
+    /**
+     * 系统小部件辅助包装类
+     */
     private val appWidgetHelper = AppWidgetHelper(activity).apply {
         onWidgetCreate {
             addPanel(it)
         }
     }
 
+    /**
+     * 面板组件适配器
+     */
     private val panelAdapter = PanelAdapter(appWidgetHelper)
 
+    /**
+     * 亮度传感器的监听器
+     */
     private val lightSensorListener = object: SensorEventListener {
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
         override fun onSensorChanged(event: SensorEvent?) {
+            // 当无法获取数据时，使用最高值
             lightValue = event?.values?.get(0)?:lightMaxValue
         }
     }
 
     init {
+        // 默认设置绘制状态监听器，处理选中项效果绘制
         widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
             drawPanelBounds(panel, dragMode, canvas)
         }
+        // 设置默认的长按事件
         onChildLongClick {
             logger("onChildLongClick: $it")
             if (canDrag) {
@@ -162,6 +255,7 @@ class WidgetHelper private constructor(activity: Activity,
                 false
             }
         }
+        // 设置默认的取消拖拽事件，并且触发一次排版事件
         widgetGroup.onCancelDrag {
             (it?.view?:widgetGroup).requestLayout()
             onCancelDragListener?.invoke(it)
