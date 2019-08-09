@@ -4,4 +4,7 @@
     <string name="action_delete">移除</string>
     <string name="action_done">完成</string>
     <string name="action_widget">微件</string>
+    <string name="action_preview">预览</string>
+    <string name="action_inverted">反色</string>
+    <string name="action_auto_light">自动亮度</string>
 </resources>

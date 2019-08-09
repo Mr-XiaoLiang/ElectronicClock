@@ -1,11 +1,14 @@
 package liang.lollipop.electronicclock.activity
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,6 +45,9 @@ class EditActivity : BaseActivity() {
         private const val ACTION_DONE = 0
         private const val ACTION_BACK = 1
         private const val ACTION_WIDGET = 2
+        private const val ACTION_PREVIEW = 3
+        private const val ACTION_INVERTED = 4
+        private const val ACTION_AUTO_LIGHT = 5
     }
 
     /**
@@ -90,10 +96,17 @@ class EditActivity : BaseActivity() {
         // 始终让底部的列表左右滚动
         bottomList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
+        // 退出预览模式的按钮
+        exitPreviewBtn.setOnClickListener {
+            isPreview(false)
+        }
+
+        // 绘制格子在屏幕上，以便观察屏幕
         widgetGroup.drawGrid = true
         widgetGroup.gridColor = Color.GRAY
         widgetGroup.scaleX
 
+        // 通过辅助类来完成标准小部件容器的事件绑定
         widgetHelper = WidgetHelper.with(this, widgetGroup).let {
             it.dragStrokeWidth = resources.dp(16F)
             it.selectedBorderWidth = resources.dp(2F)
@@ -101,24 +114,31 @@ class EditActivity : BaseActivity() {
             it.selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
             it.focusColor = ContextCompat.getColor(this, R.color.colorAccent)
             it.pendingLayoutTime = 800L
+            it.isAutoInverted = false
             it
         }.onCantLayout {
+            // 当出现无法排版的面板时
             Toast.makeText(this, "出现了${it.size}个无法排版的View", Toast.LENGTH_SHORT).show()
             for (panel in it) {
                 widgetHelper.removePanel(panel)
             }
-        }
-
-        widgetHelper.onSelectWidgetError {
+        }.onSelectWidgetError {
+            // 当选择系统小部件时，出现异常的提示
             Toast.makeText(this, "选择系统小部件时出现异常", Toast.LENGTH_SHORT).show()
         }
     }
 
+    /**
+     * 初始化控制按钮的列表
+     */
     private fun initActions() {
         actionInfoArray.add(ActionInfo(ACTION_BACK, R.drawable.ic_arrow_back_black_24dp, R.string.action_back))
         actionInfoArray.add(ActionInfo(ACTION_DELETE, R.drawable.ic_delete_black_24dp, R.string.action_delete))
         actionInfoArray.add(ActionInfo(ACTION_DONE, R.drawable.ic_done_black_24dp, R.string.action_done))
         actionInfoArray.add(ActionInfo(ACTION_WIDGET, R.drawable.ic_dashboard_black_24dp, R.string.action_widget))
+        actionInfoArray.add(ActionInfo(ACTION_PREVIEW, R.drawable.ic_visibility_black_24dp, R.string.action_preview))
+        actionInfoArray.add(ActionInfo(ACTION_INVERTED, R.drawable.ic_invert_colors_black_24dp, R.string.action_inverted))
+        actionInfoArray.add(ActionInfo(ACTION_AUTO_LIGHT, R.drawable.ic_brightness_auto_black_24dp, R.string.action_auto_light))
 
         val adapter = ActionAdapter(actionInfoArray, layoutInflater) { holder ->
             onActionSelected(actionInfoArray[holder.adapterPosition].action)
@@ -127,21 +147,85 @@ class EditActivity : BaseActivity() {
         adapter.notifyDataSetChanged()
     }
 
+    override fun onStart() {
+        super.onStart()
+        widgetHelper.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        widgetHelper.onStop()
+    }
+
+    /**
+     * 当操作按钮被点击时的事件处理方法
+     * @param action 时间的id
+     */
     private fun onActionSelected(action: Int) {
         when(action) {
+            // 返回
             ACTION_BACK -> {
                 onBackPressed()
             }
+            // 删除当前选中的小部件
             ACTION_DELETE -> {
                 widgetHelper.removeSelectedPanel()
             }
+            // 完成并保存
             ACTION_DONE -> {
 
             }
+            // 选择并添加系统小部件
             ACTION_WIDGET -> {
                 widgetHelper.selectAppWidget()
             }
+            // 启动预览模式
+            ACTION_PREVIEW -> {
+                isPreview(true)
+            }
+            // 反色调整
+            ACTION_INVERTED -> {
+                widgetHelper.isInverted = !widgetHelper.isInverted
+            }
+            // 自动亮度
+            ACTION_AUTO_LIGHT -> {
+                widgetHelper.isAutoLight = !widgetHelper.isAutoLight
+            }
         }
+    }
+
+    private fun isPreview(value: Boolean) {
+        val groupAnimator = widgetGroup.animate()
+        groupAnimator.cancel()
+
+        val rightAnimator = rightList.animate()
+        rightAnimator.cancel()
+
+        val bottomAnimator = bottomList.animate()
+        bottomAnimator.cancel()
+        if (value) {
+            exitPreviewBtn.visibility = View.VISIBLE
+            groupAnimator
+                .scaleX(1F)
+                .scaleY(1F)
+                .setListener(object: AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        groupAnimator.setListener(null)
+                        widgetGroup.drawGrid = false
+                    }
+                }).start()
+            rightAnimator.translationX(rightList.width.toFloat()).start()
+            bottomAnimator.translationY(bottomList.height.toFloat()).start()
+        } else {
+            widgetGroup.drawGrid = true
+            exitPreviewBtn.visibility = View.INVISIBLE
+            groupAnimator.scaleX(0.8F).scaleY(0.8F).start()
+            rightAnimator.translationX(0F).start()
+            bottomAnimator.translationY(0F).start()
+        }
+        widgetGroup.lockedTouch = value
+        widgetGroup.selectedPanel = null
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {

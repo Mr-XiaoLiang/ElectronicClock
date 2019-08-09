@@ -65,7 +65,7 @@ class WidgetHelper private constructor(activity: Activity,
 
     private val tmpBounds = Rect()
 
-    val panelList = ArrayList<Panel<*>>()
+    private val panelList = ArrayList<Panel<*>>()
 
     var canDrag = true
 
@@ -90,8 +90,16 @@ class WidgetHelper private constructor(activity: Activity,
         }
 
     var isAutoLight = true
+        set(value) {
+            field = value
+            onLightChange()
+        }
 
     var isInverted = false
+        set(value) {
+            field = value
+            onLightChange()
+        }
 
     var isAutoInverted = true
 
@@ -164,8 +172,9 @@ class WidgetHelper private constructor(activity: Activity,
         appWidgetHelper.selectAppWidget()
     }
 
-    fun onSelectWidgetError(lis: () -> Unit) {
+    fun onSelectWidgetError(lis: () -> Unit): WidgetHelper {
         appWidgetHelper.onSelectWidgetError(lis)
+        return this
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
@@ -265,6 +274,40 @@ class WidgetHelper private constructor(activity: Activity,
             return this and 0xFFFFFF or (alpha shl 24)
         }
         return this
+    }
+
+    private fun Int.superimposed(color: Int): Int {
+        val alpha1 = Color.alpha(this).colorWeight()
+        val alpha2 = Color.alpha(color).colorWeight()
+        val alphaBlend = ((alpha1 + alpha2 - alpha1 * alpha2) * 255).toInt()
+
+        val red1 = Color.red(this).colorWeight()
+        val red2 = Color.red(color).colorWeight()
+        val redBlend = (mixingColor(alpha1, alpha2, red1, red2) * 255).toInt()
+
+        val green1 = Color.green(this).colorWeight()
+        val green2 = Color.green(color).colorWeight()
+        val greenBlend = (mixingColor(alpha1, alpha2, green1, green2) * 255).toInt()
+
+        val blue1 = Color.blue(this).colorWeight()
+        val blue2 = Color.blue(color).colorWeight()
+        val blueBlend = (mixingColor(alpha1, alpha2, blue1, blue2) * 255).toInt()
+        return Color.argb(alphaBlend, redBlend, greenBlend, blueBlend)
+    }
+
+    /**
+     * 根据透明度混合单一通道的颜色
+     * @param a1 第一个通道的透明度
+     * @param a2 第二个通道的透明度
+     * @param c1 第一个通道颜色值的分量，value / 255
+     * @param c2 第二个通道颜色值的分量，value / 255
+     */
+    private fun mixingColor(a1: Float, a2: Float, c1: Float, c2: Float): Float {
+        return (c1 * a1 * (1.0F - a2) + c2 * a2) / (a1 + a2 - a1 * a2)
+    }
+
+    private fun Int.colorWeight(): Float {
+        return this / 255F
     }
 
     private fun postUpdate() {
