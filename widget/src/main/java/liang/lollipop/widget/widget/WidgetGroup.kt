@@ -183,7 +183,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     var lockedGrid = false
 
     /**
-     *
+     * 锁定手指事件
      */
     var lockedTouch = false
 
@@ -274,6 +274,12 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (lockedTouch) {
+            return true
+        }
+        if (lockedGrid) {
+            return false
+        }
         event?:return super.onInterceptTouchEvent(event)
         // 如果不在拖拽模式，那么放弃手势处理
         if (!isDragState || dragMode == DragMode.None || activeActionId == NO_ID) {
