@@ -110,6 +110,19 @@ class DatabaseHelper private constructor(context: Context):
             return this
         }
 
+        // 开启一次事务
+        fun transaction(run: (SqlDB.() -> Unit)) {
+            // 由于批量操作，因此开启事务并且try执行，
+            // 由于事务提交本身存在消耗，因此可以提交速度，并且避免损失
+            try {
+                db.beginTransaction()
+                run(this)
+                db.setTransactionSuccessful()
+            } finally {
+                db.endTransaction()
+            }
+        }
+
         private fun newInfo(c: Cursor): PanelInfo {
             val type = c.getStringByName(WidgetTable.TYPE_NAME)
             val info = PanelAdapter.newInfo(type)
