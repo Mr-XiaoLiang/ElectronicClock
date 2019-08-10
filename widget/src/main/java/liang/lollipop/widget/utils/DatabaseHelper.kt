@@ -78,26 +78,36 @@ class DatabaseHelper private constructor(context: Context):
             }
 
         fun getOnePage(direction: String, pageNumber: Int = 0,
-                       panelList: ArrayList<PanelInfo>) {
+                       panelList: ArrayList<PanelInfo>): SqlDB {
             val c = db.rawQuery(WidgetTable.SELECT_ONE_PAGE, arrayOf(direction, "$pageNumber"))
             while (c.moveToNext()) {
                 panelList.add(newInfo(c))
             }
             c.close()
+            return this
         }
 
-        fun install(info: PanelInfo, direction: String, pageNumber: Int = 0) {
-            db.insert(WidgetTable.TABLE, "",
+        fun install(info: PanelInfo, direction: String, pageNumber: Int = 0,
+                    result: ((Long) -> Unit)? = null): SqlDB {
+            val value = db.insert(WidgetTable.TABLE, "",
                 ContentValues().putData(info, direction, pageNumber))
+            result?.invoke(value)
+            return this
         }
 
-        fun update(info: PanelInfo, direction: String, pageNumber: Int = 0) {
-            db.update(WidgetTable.TABLE, ContentValues().putData(info, direction, pageNumber),
+        fun update(info: PanelInfo, direction: String, pageNumber: Int = 0,
+                   result: ((Int) -> Unit)? = null): SqlDB {
+            val value = db.update(WidgetTable.TABLE, ContentValues().putData(info, direction, pageNumber),
                 " ${WidgetTable.ID} = ? ", arrayOf("${info.id}"))
+            result?.invoke(value)
+            return this
         }
 
-        fun delete(id: Int) {
-            db.delete(WidgetTable.TABLE, " ${WidgetTable.ID} = ? ", arrayOf("$id"))
+        fun delete(id: Int,
+                   result: ((Int) -> Unit)? = null): SqlDB {
+            val value = db.delete(WidgetTable.TABLE, " ${WidgetTable.ID} = ? ", arrayOf("$id"))
+            result?.invoke(value)
+            return this
         }
 
         private fun newInfo(c: Cursor): PanelInfo {

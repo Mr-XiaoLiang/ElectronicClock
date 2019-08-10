@@ -72,6 +72,12 @@ open class PanelInfo {
         jsonObj.put(KEY_COLOR, color)
     }
 
+    fun copy(info: PanelInfo) {
+        val value = JSONObject()
+        info.serialize(value)
+        parse(value)
+    }
+
     override fun toString(): String {
         val obj = JSONObject()
         serialize(obj)

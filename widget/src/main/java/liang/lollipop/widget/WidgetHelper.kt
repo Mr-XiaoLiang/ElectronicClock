@@ -1,6 +1,7 @@
 package liang.lollipop.widget
 
 import android.app.Activity
+import android.appwidget.AppWidgetHost
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
@@ -14,6 +15,7 @@ import android.hardware.SensorManager
 import android.os.Handler
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.utils.AppWidgetHelper
+import liang.lollipop.widget.utils.DatabaseHelper
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
 import liang.lollipop.widget.widget.Panel
@@ -28,7 +30,8 @@ import liang.lollipop.widget.widget.WidgetGroup
  * 小部件辅助器
  */
 class WidgetHelper private constructor(activity: Activity,
-    private val widgetGroup: WidgetGroup) {
+                                       private val widgetGroup: WidgetGroup,
+                                       private val hostId: Int = AppWidgetHelper.DEF_HOST_ID) {
 
     companion object {
         fun with(context: Activity, group: WidgetGroup): WidgetHelper {
@@ -217,7 +220,7 @@ class WidgetHelper private constructor(activity: Activity,
     /**
      * 系统小部件辅助包装类
      */
-    private val appWidgetHelper = AppWidgetHelper(activity).apply {
+    private val appWidgetHelper = AppWidgetHelper(activity, hostId).apply {
         onWidgetCreate {
             addPanel(it)
         }
@@ -240,6 +243,14 @@ class WidgetHelper private constructor(activity: Activity,
         }
     }
 
+    /**
+     * 屏幕方向的关键字
+     */
+    private val directionValue: String
+        get() {
+            return if (isPortrait) { "PORTRAIT" } else { "LANDSCAPE" }
+        }
+
     init {
         // 默认设置绘制状态监听器，处理选中项效果绘制
         widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
@@ -260,6 +271,65 @@ class WidgetHelper private constructor(activity: Activity,
             (it?.view?:widgetGroup).requestLayout()
             onCancelDragListener?.invoke(it)
         }
+    }
+
+    /**
+     * 从数据库更新一次面板
+     */
+    fun updateByDB() {
+        // 根据当前参数，获取一次最新的数据
+        val tmpInfoList = ArrayList<PanelInfo>()
+        DatabaseHelper.read(context).getOnePage(directionValue, hostId, tmpInfoList).close()
+        // 记录现有数据的集合
+        val existedList = ArrayList<Panel<*>>()
+        existedList.addAll(panelList)
+        // 新的，需要待添加的集合
+        val newList = ArrayList<PanelInfo>()
+        // 添加新的小部件，移除不需要的，并且更新现有的
+        tmpInfoList.forEach { info ->
+            val panel = findPanelByInfo(existedList, info)
+            if (panel != null) {
+                // 如果面板是存在的，并且是有效的，那么只更新数据状态
+                panel.panelInfo.copy(info)
+                // 这是一个有意义的面板，因此从集合中移除
+                existedList.remove(panel)
+            } else {
+                // 没有从现存的面板中找到有效的面板，那么加入新的集合
+                newList.add(info)
+            }
+        }
+        // 添加新的面板前，需要先移除现有的无效面板，防止位置占用导致的添加失败
+        existedList.forEach { panel ->
+            removePanel(panel)
+        }
+        // 移除所有无效面板后，开始添加新的面板
+        newList.forEach { info ->
+            addPanel(info)
+        }
+        // 如果没有小部件发生变更，那么手动触发一次排版动作
+        // 因为添加或者移除面板，会自动触发面板的更新，因此不做额外的触发
+        if (existedList.isEmpty() && newList.isEmpty()) {
+            widgetGroup.requestLayout()
+        }
+    }
+
+    /**
+     * 保存当前数据到数据库中
+     */
+    fun saveToDB() {
+
+    }
+
+    private fun findPanelByInfo(existedList: ArrayList<Panel<*>>, info: PanelInfo): Panel<*>? {
+        for (panel in existedList) {
+            if (panel.panelInfo == info) {
+                return panel
+            }
+            if (info.id != PanelInfo.NO_ID && info.id == panel.panelInfo.id) {
+                return panel
+            }
+        }
+        return null
     }
 
     fun selectAppWidget() {
