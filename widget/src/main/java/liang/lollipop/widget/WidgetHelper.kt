@@ -276,48 +276,113 @@ class WidgetHelper private constructor(activity: Activity,
     /**
      * 从数据库更新一次面板
      */
-    fun updateByDB() {
-        // 根据当前参数，获取一次最新的数据
-        val tmpInfoList = ArrayList<PanelInfo>()
-        DatabaseHelper.read(context).getOnePage(directionValue, hostId, tmpInfoList).close()
-        // 记录现有数据的集合
-        val existedList = ArrayList<Panel<*>>()
-        existedList.addAll(panelList)
-        // 新的，需要待添加的集合
-        val newList = ArrayList<PanelInfo>()
-        // 添加新的小部件，移除不需要的，并且更新现有的
-        tmpInfoList.forEach { info ->
-            val panel = findPanelByInfo(existedList, info)
-            if (panel != null) {
-                // 如果面板是存在的，并且是有效的，那么只更新数据状态
-                panel.panelInfo.copy(info)
-                // 这是一个有意义的面板，因此从集合中移除
-                existedList.remove(panel)
-            } else {
-                // 没有从现存的面板中找到有效的面板，那么加入新的集合
-                newList.add(info)
+    fun updateByDB(statusListener: ((status: LoadStatus) -> Unit)? = null) {
+        try {
+            statusListener?.invoke(LoadStatus.START)
+            // 根据当前参数，获取一次最新的数据
+            val tmpInfoList = ArrayList<PanelInfo>()
+            DatabaseHelper.read(context).getOnePage(directionValue, hostId, tmpInfoList).close()
+            // 记录现有数据的集合
+            val existedList = ArrayList<Panel<*>>()
+            existedList.addAll(panelList)
+            // 新的，需要待添加的集合
+            val newList = ArrayList<PanelInfo>()
+            // 添加新的小部件，移除不需要的，并且更新现有的
+            tmpInfoList.forEach { info ->
+                val panel = findPanelByInfo(existedList, info)
+                if (panel != null) {
+                    // 如果面板是存在的，并且是有效的，那么只更新数据状态
+                    panel.panelInfo.copy(info)
+                    // 这是一个有意义的面板，因此从集合中移除
+                    existedList.remove(panel)
+                } else {
+                    // 没有从现存的面板中找到有效的面板，那么加入新的集合
+                    newList.add(info)
+                }
             }
-        }
-        // 添加新的面板前，需要先移除现有的无效面板，防止位置占用导致的添加失败
-        existedList.forEach { panel ->
-            removePanel(panel)
-        }
-        // 移除所有无效面板后，开始添加新的面板
-        newList.forEach { info ->
-            addPanel(info)
-        }
-        // 如果没有小部件发生变更，那么手动触发一次排版动作
-        // 因为添加或者移除面板，会自动触发面板的更新，因此不做额外的触发
-        if (existedList.isEmpty() && newList.isEmpty()) {
-            widgetGroup.requestLayout()
+            // 移除了有意义的面板，现存面板中只剩下了多余的面板
+            // 添加新的面板前，需要先移除现有的无效面板，防止位置占用导致的添加失败
+            existedList.forEach { panel ->
+                removePanel(panel)
+            }
+            // 移除所有无效面板后，开始添加新的面板
+            newList.forEach { info ->
+                addPanel(info)
+            }
+            // 如果没有小部件发生变更，那么手动触发一次排版动作
+            // 因为添加或者移除面板，会自动触发面板的更新，因此不做额外的触发
+            if (existedList.isEmpty() && newList.isEmpty()) {
+                widgetGroup.requestLayout()
+            }
+            statusListener?.invoke(LoadStatus.SUCCESSFUL)
+        } catch (e: Exception) {
+            statusListener?.invoke(LoadStatus.ERROR)
         }
     }
 
     /**
      * 保存当前数据到数据库中
      */
-    fun saveToDB() {
+    fun saveToDB(statusListener: ((status: LoadStatus) -> Unit)? = null) {
+        // 由于是数据操作，这里进行加锁保护
+        synchronized("saveToDB-LOCK") {
+            try {
+                statusListener?.invoke(LoadStatus.START)
+                // 新的面板的集合
+                val newList = ArrayList<PanelInfo>()
+                // 被删除的集合
+                val deletedList = ArrayList<PanelInfo>()
+                // 需要更新的集合
+                val updateList = ArrayList<PanelInfo>()
+                // 老的面板集合
+                val oldPanelList = ArrayList<PanelInfo>()
+                // 新的面板集合
+                val newPanelList = ArrayList<Panel<*>>()
+                newPanelList.addAll(panelList)
+                // 从数据库得到现存的面板描述信息
+                val db = DatabaseHelper.write(context).getOnePage(directionValue, hostId, oldPanelList)
+                oldPanelList.forEach { oldInfo ->
+                    // 从现存的集合中寻找
+                    val panel = findPanelByInfo(newPanelList, oldInfo)
+                    if (panel != null) {
+                        // 如果存在，那么表示这是一个被保留下来的面板, 需要更新
+                        // 并且从新面板集合中移除，表示已经检查过了
+                        oldInfo.copy(panel.panelInfo)
+                        updateList.add(oldInfo)
+                        newPanelList.remove(panel)
+                    } else {
+                        // 如果不存在，那么表示这是一个被移除的面板，需要从数据库中移除
+                        deletedList.add(oldInfo)
+                    }
+                }
+                // 遍历后，得到需要更新的集合，需要删除的集合，
+                // 而新面板集合剩下一部分没有被移除的，这些就是被新添加的
+                newPanelList.forEach { panel ->
+                    newList.add(panel.panelInfo)
+                }
 
+                //  对于已经检索出来的集合，进行数据库同步，
+                //  开启数据库事务，来进行数据库更新
+                db.transaction {
+                    //先做删除
+                    deletedList.forEach { info ->
+                        delete(info.id)
+                    }
+                    // 再做添加
+                    newList.forEach { info ->
+                        install(info, directionValue, hostId)
+                    }
+                    // 最后做更新
+                    updateList.forEach { info ->
+                        update(info, directionValue, hostId)
+                    }
+                }
+                // 至此，完成了一次数据更新并存储的服务
+                statusListener?.invoke(LoadStatus.SUCCESSFUL)
+            } catch (e: Exception) {
+                statusListener?.invoke(LoadStatus.ERROR)
+            }
+        }
     }
 
     private fun findPanelByInfo(existedList: ArrayList<Panel<*>>, info: PanelInfo): Panel<*>? {
@@ -551,6 +616,12 @@ class WidgetHelper private constructor(activity: Activity,
         widgetGroup.selectedPanel?.let { panel ->
             removePanel(panel)
         }
+    }
+
+    enum class LoadStatus {
+        SUCCESSFUL,
+        ERROR,
+        START
     }
 
 }
