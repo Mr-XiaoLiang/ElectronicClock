@@ -16,7 +16,7 @@ import liang.lollipop.widget.info.SystemWidgetPanelInfo
 class AppWidgetHelper(private val activity: Activity, hostId: Int = DEF_HOST_ID) {
 
     companion object {
-        private const val DEF_HOST_ID = 104096
+        const val DEF_HOST_ID = 104096
 
         private const val REQUEST_SELECT_WIDGET = 996
         private const val REQUEST_CREATE_WIDGET = 995
