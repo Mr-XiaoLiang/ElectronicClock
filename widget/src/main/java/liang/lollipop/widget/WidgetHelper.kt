@@ -1,7 +1,6 @@
 package liang.lollipop.widget
 
 import android.app.Activity
-import android.appwidget.AppWidgetHost
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
@@ -164,7 +163,7 @@ class WidgetHelper private constructor(activity: Activity,
     /**
      * 是否是竖屏
      */
-    private var isPortrait = true
+    var isPortrait = true
 
     /**
      * 上一分钟，用于选择性的懒更新部分小部件

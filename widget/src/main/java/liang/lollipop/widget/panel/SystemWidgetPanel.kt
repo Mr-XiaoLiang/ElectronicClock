@@ -28,11 +28,9 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
         }
     }
 
-    private var updateInfo = false
-
     override fun updatePanelInfo(group: WidgetGroup) {
         super.updatePanelInfo(group)
-        if (updateInfo) {
+        if (panelInfo.updateSpanByGroup) {
             return
         }
         val gridSize = group.gridSize
@@ -44,7 +42,7 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
             panelInfo.sizeChange(0, 0)
             return
         }
-        updateInfo = true
+        panelInfo.updateSpanByGroup = true
         val providerInfo = panelInfo.appWidgetProviderInfo
         val minWidth = providerInfo.minWidth
         val minHeight = providerInfo.minHeight
