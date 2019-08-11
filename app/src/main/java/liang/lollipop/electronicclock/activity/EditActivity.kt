@@ -48,6 +48,9 @@ class EditActivity : BaseActivity() {
         private const val ACTION_PREVIEW = 3
         private const val ACTION_INVERTED = 4
         private const val ACTION_AUTO_LIGHT = 5
+        private const val ACTION_RESET = 6
+
+        private const val MIN_LOAD_TIME = 800L
     }
 
     /**
@@ -75,6 +78,8 @@ class EditActivity : BaseActivity() {
             return if (isPortrait) { bottomList } else { rightList }
         }
 
+    private var startLoadingTime = 0L
+
     private val actionInfoArray = ArrayList<ActionInfo>()
 
     private lateinit var widgetHelper: WidgetHelper
@@ -88,6 +93,8 @@ class EditActivity : BaseActivity() {
         initInsetListener(rootGroup)
         initView()
         initActions()
+
+        initData()
     }
 
     private fun initView() {
@@ -115,6 +122,7 @@ class EditActivity : BaseActivity() {
             it.focusColor = ContextCompat.getColor(this, R.color.colorAccent)
             it.pendingLayoutTime = 800L
             it.isAutoInverted = false
+            it.isPortrait = isPortrait
             it
         }.onCantLayout {
             // 当出现无法排版的面板时
@@ -126,6 +134,9 @@ class EditActivity : BaseActivity() {
             // 当选择系统小部件时，出现异常的提示
             Toast.makeText(this, "选择系统小部件时出现异常", Toast.LENGTH_SHORT).show()
         }
+
+
+        loadView.setOnTouchListener { _, _ -> true }
     }
 
     /**
@@ -133,18 +144,29 @@ class EditActivity : BaseActivity() {
      */
     private fun initActions() {
         actionInfoArray.add(ActionInfo(ACTION_BACK, R.drawable.ic_arrow_back_black_24dp, R.string.action_back))
-        actionInfoArray.add(ActionInfo(ACTION_DELETE, R.drawable.ic_delete_black_24dp, R.string.action_delete))
         actionInfoArray.add(ActionInfo(ACTION_DONE, R.drawable.ic_done_black_24dp, R.string.action_done))
+        actionInfoArray.add(ActionInfo(ACTION_DELETE, R.drawable.ic_delete_black_24dp, R.string.action_delete))
         actionInfoArray.add(ActionInfo(ACTION_WIDGET, R.drawable.ic_dashboard_black_24dp, R.string.action_widget))
         actionInfoArray.add(ActionInfo(ACTION_PREVIEW, R.drawable.ic_visibility_black_24dp, R.string.action_preview))
         actionInfoArray.add(ActionInfo(ACTION_INVERTED, R.drawable.ic_invert_colors_black_24dp, R.string.action_inverted))
         actionInfoArray.add(ActionInfo(ACTION_AUTO_LIGHT, R.drawable.ic_brightness_auto_black_24dp, R.string.action_auto_light))
+        actionInfoArray.add(ActionInfo(ACTION_RESET, R.drawable.ic_replay_black_24dp, R.string.action_reset))
 
         val adapter = ActionAdapter(actionInfoArray, layoutInflater) { holder ->
             onActionSelected(actionInfoArray[holder.adapterPosition].action)
         }
         actionList.adapter = adapter
         adapter.notifyDataSetChanged()
+    }
+
+    private fun initData() {
+        widgetHelper.updateByDB { status ->
+            if (status == WidgetHelper.LoadStatus.START) {
+                startLoading()
+            } else {
+                stopLoading()
+            }
+        }
     }
 
     override fun onStart() {
@@ -173,7 +195,13 @@ class EditActivity : BaseActivity() {
             }
             // 完成并保存
             ACTION_DONE -> {
-
+                widgetHelper.saveToDB { status ->
+                    if (status == WidgetHelper.LoadStatus.START) {
+                        startLoading()
+                    } else {
+                        stopLoading()
+                    }
+                }
             }
             // 选择并添加系统小部件
             ACTION_WIDGET -> {
@@ -190,6 +218,24 @@ class EditActivity : BaseActivity() {
             // 自动亮度
             ACTION_AUTO_LIGHT -> {
                 widgetHelper.isAutoLight = !widgetHelper.isAutoLight
+            }
+            // 重置数据
+            ACTION_RESET -> {
+                alert {
+                    // 设置对话框内容
+                    setMessage(R.string.dialog_message_reset)
+                    // 设置确认按钮, 使用语义明确的文字来作为对话框的按钮文字
+                    // 避免使用让人不确定的文字如：确定
+                    setPositiveButton(R.string.dialog_positive_reset) { dialog, _ ->
+                        initData()
+                        dialog.dismiss()
+                    }
+                    // 取消按钮，使用语义明确的文字来作为对话框的按钮文字
+                    setNegativeButton(R.string.dialog_negative_reset) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    show()
+                }
             }
         }
     }
@@ -248,6 +294,41 @@ class EditActivity : BaseActivity() {
         } else {
             ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         }
+    }
+
+    private fun startLoading() {
+        startLoadingTime = System.currentTimeMillis()
+        loadView.alpha = 0F
+        val animate = loadView.animate()
+        animate.cancel()
+        animate.alpha(1F)
+            .setListener(object: AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator?) {
+                    super.onAnimationStart(animation)
+                    animate.setListener(null)
+                    loadView.visibility = View.VISIBLE
+                    loadProgressBar.isIndeterminate = true
+                }
+            }).start()
+    }
+
+    private fun stopLoading() {
+        val diff = MIN_LOAD_TIME + startLoadingTime - System.currentTimeMillis()
+        if (diff > 0) {
+            loadView.postDelayed({ stopLoading() }, diff)
+            return
+        }
+        val animate = loadView.animate()
+        animate.cancel()
+        animate.alpha(0F)
+            .setListener(object: AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    animate.setListener(null)
+                    loadView.visibility = View.INVISIBLE
+                    loadProgressBar.isIndeterminate = false
+                }
+            }).start()
     }
 
 }

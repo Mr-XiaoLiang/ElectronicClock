@@ -10,11 +10,6 @@
         tools:context=".activity.EditActivity">
 
     <View
-            android:id="@+id/backgroundView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    <View
             android:id="@+id/widgetBounds"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -67,5 +62,25 @@
             android:background="@drawable/bg_white_oval"
             android:layout_width="48dp"
             android:layout_height="48dp"/>
+
+    <FrameLayout
+            android:visibility="invisible"
+            android:id="@+id/loadView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#6000">
+        <com.google.android.material.card.MaterialCardView
+                android:layout_gravity="center"
+                android:layout_marginBottom="100dp"
+                app:cardCornerRadius="50dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp">
+            <ProgressBar
+                    android:id="@+id/loadProgressBar"
+                    android:layout_gravity="center"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"/>
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

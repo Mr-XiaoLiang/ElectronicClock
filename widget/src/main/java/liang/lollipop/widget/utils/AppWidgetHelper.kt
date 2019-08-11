@@ -22,6 +22,8 @@ class AppWidgetHelper(private val activity: Activity, hostId: Int = DEF_HOST_ID)
         private const val REQUEST_CREATE_WIDGET = 995
     }
 
+    private val logger = Utils.loggerI("AppWidgetHelper")
+
     private val context = activity.applicationContext
 
     private val appWidgetHost = AppWidgetHost(context, hostId)
@@ -120,6 +122,7 @@ class AppWidgetHelper(private val activity: Activity, hostId: Int = DEF_HOST_ID)
 
     fun createViewByInfo(panelInfo: SystemWidgetPanelInfo): AppWidgetHostView? {
         if (panelInfo.isEmpty) {
+            logger("createViewByInfo: info is empty, return null")
             return null
         }
         return appWidgetHost.createView(context,

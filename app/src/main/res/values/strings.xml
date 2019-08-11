@@ -7,4 +7,8 @@
     <string name="action_preview">预览</string>
     <string name="action_inverted">反色</string>
     <string name="action_auto_light">自动亮度</string>
+    <string name="action_reset">撤销修改</string>
+    <string name="dialog_message_reset">确定要撤销修改吗？将会覆盖并清除现有的所有更改。</string>
+    <string name="dialog_positive_reset">确定撤销</string>
+    <string name="dialog_negative_reset">放弃操作</string>
 </resources>

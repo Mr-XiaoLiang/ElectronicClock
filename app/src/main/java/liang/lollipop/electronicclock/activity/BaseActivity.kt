@@ -7,6 +7,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -140,5 +141,9 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     open fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {}
+
+    fun alert(run: AlertDialog.Builder.() -> Unit) {
+        run(AlertDialog.Builder(this))
+    }
 
 }
