@@ -16,8 +16,9 @@ import liang.lollipop.electronicclock.R
 class ActionHolder(view: View): RecyclerView.ViewHolder(view) {
 
     companion object {
-        fun create(layoutInflater: LayoutInflater, parent: ViewGroup): ActionHolder {
-            return ActionHolder(layoutInflater.inflate(R.layout.item_action_btn, parent, false))
+        fun create(layoutInflater: LayoutInflater, parent: ViewGroup, isAction: Boolean = true): ActionHolder {
+            val layoutId = if (isAction) { R.layout.item_action_btn } else { R.layout.item_widget_btn }
+            return ActionHolder(layoutInflater.inflate(layoutId, parent, false))
         }
     }
 

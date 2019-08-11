@@ -13,11 +13,13 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.activity_edit.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.list.ActionInfo
 import liang.lollipop.widget.WidgetHelper
+import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
 
@@ -42,16 +44,37 @@ class EditActivity : BaseActivity() {
             activity.startActivity(intent)
         }
 
-        private const val ACTION_DELETE = -1
-        private const val ACTION_DONE = 0
-        private const val ACTION_BACK = 1
-        private const val ACTION_WIDGET = 2
-        private const val ACTION_PREVIEW = 3
-        private const val ACTION_INVERTED = 4
-        private const val ACTION_AUTO_LIGHT = 5
-        private const val ACTION_RESET = 6
-
         private const val MIN_LOAD_TIME = 800L
+    }
+
+    /**
+     * 操作意图的ID
+     */
+    private object ActionId {
+        /** 删除 **/
+        const val DELETE = -1
+        /** 完成 **/
+        const val DONE = 0
+        /** 返回 **/
+        const val BACK = 1
+        /** 系统小部件 **/
+        const val WIDGET = 2
+        /** 预览 **/
+        const val PREVIEW = 3
+        /** 颜色反转 **/
+        const val INVERTED = 4
+        /** 自动亮度 **/
+        const val AUTO_LIGHT = 5
+        /** 重置 **/
+        const val RESET = 6
+    }
+
+    /**
+     * 小部件的ID
+     */
+    private object WidgetId {
+        /** 数字时钟 **/
+        const val CLOCK = 0
     }
 
     private val logger = Utils.loggerI("EditActivity")
@@ -85,6 +108,8 @@ class EditActivity : BaseActivity() {
 
     private val actionInfoArray = ArrayList<ActionInfo>()
 
+    private val widgetInfoArray = ArrayList<ActionInfo>()
+
     private lateinit var widgetHelper: WidgetHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,15 +121,16 @@ class EditActivity : BaseActivity() {
         initInsetListener(rootGroup)
         initView()
         initActions()
+        initWidgets()
 
         initData()
     }
 
     private fun initView() {
-        // 始终让右侧的列表上下滚动
-        rightList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        // 始终让底部的列表左右滚动
-        bottomList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+//        // 始终让右侧的列表上下滚动
+//        rightList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+//        // 始终让底部的列表左右滚动
+//        bottomList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
         // 退出预览模式的按钮
         exitPreviewBtn.setOnClickListener {
@@ -146,19 +172,32 @@ class EditActivity : BaseActivity() {
      * 初始化控制按钮的列表
      */
     private fun initActions() {
-        actionInfoArray.add(ActionInfo(ACTION_BACK, R.drawable.ic_arrow_back_black_24dp, R.string.action_back))
-        actionInfoArray.add(ActionInfo(ACTION_DONE, R.drawable.ic_done_black_24dp, R.string.action_done))
-        actionInfoArray.add(ActionInfo(ACTION_DELETE, R.drawable.ic_delete_black_24dp, R.string.action_delete))
-        actionInfoArray.add(ActionInfo(ACTION_WIDGET, R.drawable.ic_dashboard_black_24dp, R.string.action_widget))
-        actionInfoArray.add(ActionInfo(ACTION_PREVIEW, R.drawable.ic_visibility_black_24dp, R.string.action_preview))
-        actionInfoArray.add(ActionInfo(ACTION_INVERTED, R.drawable.ic_invert_colors_black_24dp, R.string.action_inverted))
-        actionInfoArray.add(ActionInfo(ACTION_AUTO_LIGHT, R.drawable.ic_brightness_auto_black_24dp, R.string.action_auto_light))
-        actionInfoArray.add(ActionInfo(ACTION_RESET, R.drawable.ic_replay_black_24dp, R.string.action_reset))
+        actionInfoArray.add(ActionInfo(ActionId.BACK, R.drawable.ic_arrow_back_black_24dp, R.string.action_back))
+        actionInfoArray.add(ActionInfo(ActionId.DONE, R.drawable.ic_done_black_24dp, R.string.action_done))
+        actionInfoArray.add(ActionInfo(ActionId.DELETE, R.drawable.ic_delete_black_24dp, R.string.action_delete))
+        actionInfoArray.add(ActionInfo(ActionId.WIDGET, R.drawable.ic_dashboard_black_24dp, R.string.action_widget))
+        actionInfoArray.add(ActionInfo(ActionId.PREVIEW, R.drawable.ic_visibility_black_24dp, R.string.action_preview))
+        actionInfoArray.add(ActionInfo(ActionId.INVERTED, R.drawable.ic_invert_colors_black_24dp, R.string.action_inverted))
+        actionInfoArray.add(ActionInfo(ActionId.AUTO_LIGHT, R.drawable.ic_brightness_auto_black_24dp, R.string.action_auto_light))
+        actionInfoArray.add(ActionInfo(ActionId.RESET, R.drawable.ic_replay_black_24dp, R.string.action_reset))
 
-        val adapter = ActionAdapter(actionInfoArray, layoutInflater) { holder ->
+        val adapter = ActionAdapter(actionInfoArray, layoutInflater, true) { holder ->
             onActionSelected(actionInfoArray[holder.adapterPosition].action)
         }
+        val orientation = if (isPortrait) { RecyclerView.VERTICAL } else { RecyclerView.HORIZONTAL }
+        actionList.layoutManager = LinearLayoutManager(this, orientation, false)
         actionList.adapter = adapter
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun initWidgets() {
+        widgetInfoArray.add(ActionInfo(WidgetId.CLOCK, R.drawable.ic_access_time_black_24dp, R.string.widget_clock))
+        val adapter = ActionAdapter(widgetInfoArray, layoutInflater, false) { holder ->
+            onWidgetSelected(widgetInfoArray[holder.adapterPosition].action)
+        }
+        val orientation = if (isPortrait) { RecyclerView.HORIZONTAL } else { RecyclerView.VERTICAL }
+        widgetList.layoutManager = StaggeredGridLayoutManager(2, orientation)
+        widgetList.adapter = adapter
         adapter.notifyDataSetChanged()
     }
 
@@ -189,15 +228,15 @@ class EditActivity : BaseActivity() {
     private fun onActionSelected(action: Int) {
         when(action) {
             // 返回
-            ACTION_BACK -> {
+            ActionId.BACK -> {
                 onBackPressed()
             }
             // 删除当前选中的小部件
-            ACTION_DELETE -> {
+            ActionId.DELETE -> {
                 widgetHelper.removeSelectedPanel()
             }
             // 完成并保存
-            ACTION_DONE -> {
+            ActionId.DONE -> {
                 widgetHelper.saveToDB { status ->
                     if (status == WidgetHelper.LoadStatus.START) {
                         startLoading()
@@ -207,23 +246,23 @@ class EditActivity : BaseActivity() {
                 }
             }
             // 选择并添加系统小部件
-            ACTION_WIDGET -> {
+            ActionId.WIDGET -> {
                 widgetHelper.selectAppWidget()
             }
             // 启动预览模式
-            ACTION_PREVIEW -> {
+            ActionId.PREVIEW -> {
                 isPreview(true)
             }
             // 反色调整
-            ACTION_INVERTED -> {
+            ActionId.INVERTED -> {
                 widgetHelper.isInverted = !widgetHelper.isInverted
             }
             // 自动亮度
-            ACTION_AUTO_LIGHT -> {
+            ActionId.AUTO_LIGHT -> {
                 widgetHelper.isAutoLight = !widgetHelper.isAutoLight
             }
             // 重置数据
-            ACTION_RESET -> {
+            ActionId.RESET -> {
                 alert {
                     // 设置对话框内容
                     setMessage(R.string.dialog_message_reset)
@@ -239,6 +278,18 @@ class EditActivity : BaseActivity() {
                     }
                     show()
                 }
+            }
+        }
+    }
+
+    /**
+     * 当小部件列表被点击的时候，用于处理事件的方法
+     * 一般情况为添加一个小部件到屏幕
+     */
+    private fun onWidgetSelected(action: Int) {
+        when (action) {
+            WidgetId.CLOCK -> {
+                widgetHelper.addPanel(ClockPanelInfo())
             }
         }
     }
