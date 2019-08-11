@@ -1,7 +1,7 @@
 package liang.lollipop.electronicclock.activity
 
+import android.content.res.Configuration
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_widget.*
 import liang.lollipop.electronicclock.R
@@ -26,9 +26,11 @@ class WidgetActivity : BaseActivity() {
         setContentView(R.layout.activity_widget)
         initInsetListener(rootGroup)
         initView()
+        initData()
     }
 
     private fun initView() {
+        widgetGroup.lockedGrid = true
         widgetHelper = WidgetHelper.with(this, widgetGroup).let {
             it.dragStrokeWidth = resources.dp(20F)
             it.selectedBorderWidth = resources.dp(2F)
@@ -36,19 +38,36 @@ class WidgetActivity : BaseActivity() {
             it.selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
             it.focusColor = ContextCompat.getColor(this, R.color.colorAccent)
             it.pendingLayoutTime = 800L
+            it.isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            it.canDrag = false
             it
         }.onCantLayout {
-            Toast.makeText(this, "出现了${it.size}个无法排版的View", Toast.LENGTH_SHORT).show()
             for (panel in it) {
                 widgetHelper.removePanel(panel)
             }
         }
+    }
 
-        widgetHelper.onSelectWidgetError {
-            Toast.makeText(this, "选择系统小部件时出现异常", Toast.LENGTH_SHORT).show()
+    private fun initData() {
+        widgetHelper.updateByDB { status ->
+            if (status == WidgetHelper.LoadStatus.START) {
+                loadingView.show()
+            } else {
+                loadingView.hide()
+            }
+            if (widgetHelper.panelCount < 1) {
+                onWidgetEmpty()
+            }
         }
+    }
 
-        widgetHelper.addPanel(ClockPanelInfo())
+    private fun onWidgetEmpty() {
+        widgetGroup.post {
+            val clockPanelInfo = ClockPanelInfo()
+            clockPanelInfo.sizeChange(widgetGroup.spanCountX, widgetGroup.spanCountY)
+            clockPanelInfo.offset(0, 0)
+            widgetHelper.addPanel(clockPanelInfo)
+        }
     }
 
     override fun onStart() {

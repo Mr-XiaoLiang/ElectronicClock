@@ -77,12 +77,14 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * 横向的格数
      * 这是通过{#gridCount}计算出来的横向格数
      */
-    private var spanCountX = 0
+    var spanCountX = 0
+        private set
     /**
      * 纵向的格数
      * 这是通过{#gridCount}计算出来的纵向格数
      */
-    private var spanCountY = 0
+    var spanCountY = 0
+        private set
 
     /**
      * 无法进行排列的面板的通知函数
