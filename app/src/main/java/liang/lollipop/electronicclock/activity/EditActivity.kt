@@ -18,6 +18,7 @@ import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.list.ActionInfo
 import liang.lollipop.widget.WidgetHelper
+import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.utils.dp
 
 /**
@@ -52,6 +53,8 @@ class EditActivity : BaseActivity() {
 
         private const val MIN_LOAD_TIME = 800L
     }
+
+    private val logger = Utils.loggerI("EditActivity")
 
     /**
      * 是否是竖屏
@@ -251,6 +254,7 @@ class EditActivity : BaseActivity() {
         bottomAnimator.cancel()
         if (value) {
             exitPreviewBtn.visibility = View.VISIBLE
+            logger("widgetGroup-mini:[${widgetGroup.width}, ${widgetGroup.height}]")
             groupAnimator
                 .scaleX(1F)
                 .scaleY(1F)
@@ -259,6 +263,7 @@ class EditActivity : BaseActivity() {
                         super.onAnimationEnd(animation)
                         groupAnimator.setListener(null)
                         widgetGroup.drawGrid = false
+                        logger("widgetGroup-expand:[${widgetGroup.width}, ${widgetGroup.height}]")
                     }
                 }).start()
             rightAnimator.translationX(rightList.width.toFloat()).start()

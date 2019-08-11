@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Handler
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
+import liang.lollipop.widget.panel.SystemWidgetPanel
 import liang.lollipop.widget.utils.AppWidgetHelper
 import liang.lollipop.widget.utils.DatabaseHelper
 import liang.lollipop.widget.utils.Utils
@@ -250,6 +251,14 @@ class WidgetHelper private constructor(activity: Activity,
             return if (isPortrait) { "PORTRAIT" } else { "LANDSCAPE" }
         }
 
+    /**
+     * 当前面板的数量
+     */
+    val panelCount: Int
+        get() {
+            return panelList.size
+        }
+
     init {
         // 默认设置绘制状态监听器，处理选中项效果绘制
         widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
@@ -484,8 +493,15 @@ class WidgetHelper private constructor(activity: Activity,
             fg = foregroundColor.updateColorByLight()
         }
         panelList.forEach {
-            it.panelInfo.color = fg
-            it.onColorChange(fg)
+            // 如果是SystemWidget，需要单独处理，因为只能改变他们的透明度，
+            // 不能改变颜色，因此始终都需要把状态透明度传进去
+            if (it is SystemWidgetPanel && isInverted) {
+                it.panelInfo.color = bg
+                it.onColorChange(bg)
+            } else {
+                it.panelInfo.color = fg
+                it.onColorChange(fg)
+            }
         }
         widgetGroup.setBackgroundColor(bg)
     }
@@ -504,39 +520,39 @@ class WidgetHelper private constructor(activity: Activity,
         return this
     }
 
-    private fun Int.superimposed(color: Int): Int {
-        val alpha1 = Color.alpha(this).colorWeight()
-        val alpha2 = Color.alpha(color).colorWeight()
-        val alphaBlend = ((alpha1 + alpha2 - alpha1 * alpha2) * 255).toInt()
+//    private fun Int.superimposed(color: Int): Int {
+//        val alpha1 = Color.alpha(this).colorWeight()
+//        val alpha2 = Color.alpha(color).colorWeight()
+//        val alphaBlend = ((alpha1 + alpha2 - alpha1 * alpha2) * 255).toInt()
+//
+//        val red1 = Color.red(this).colorWeight()
+//        val red2 = Color.red(color).colorWeight()
+//        val redBlend = (mixingColor(alpha1, alpha2, red1, red2) * 255).toInt()
+//
+//        val green1 = Color.green(this).colorWeight()
+//        val green2 = Color.green(color).colorWeight()
+//        val greenBlend = (mixingColor(alpha1, alpha2, green1, green2) * 255).toInt()
+//
+//        val blue1 = Color.blue(this).colorWeight()
+//        val blue2 = Color.blue(color).colorWeight()
+//        val blueBlend = (mixingColor(alpha1, alpha2, blue1, blue2) * 255).toInt()
+//        return Color.argb(alphaBlend, redBlend, greenBlend, blueBlend)
+//    }
 
-        val red1 = Color.red(this).colorWeight()
-        val red2 = Color.red(color).colorWeight()
-        val redBlend = (mixingColor(alpha1, alpha2, red1, red2) * 255).toInt()
+//    /**
+//     * 根据透明度混合单一通道的颜色
+//     * @param a1 第一个通道的透明度
+//     * @param a2 第二个通道的透明度
+//     * @param c1 第一个通道颜色值的分量，value / 255
+//     * @param c2 第二个通道颜色值的分量，value / 255
+//     */
+//    private fun mixingColor(a1: Float, a2: Float, c1: Float, c2: Float): Float {
+//        return (c1 * a1 * (1.0F - a2) + c2 * a2) / (a1 + a2 - a1 * a2)
+//    }
 
-        val green1 = Color.green(this).colorWeight()
-        val green2 = Color.green(color).colorWeight()
-        val greenBlend = (mixingColor(alpha1, alpha2, green1, green2) * 255).toInt()
-
-        val blue1 = Color.blue(this).colorWeight()
-        val blue2 = Color.blue(color).colorWeight()
-        val blueBlend = (mixingColor(alpha1, alpha2, blue1, blue2) * 255).toInt()
-        return Color.argb(alphaBlend, redBlend, greenBlend, blueBlend)
-    }
-
-    /**
-     * 根据透明度混合单一通道的颜色
-     * @param a1 第一个通道的透明度
-     * @param a2 第二个通道的透明度
-     * @param c1 第一个通道颜色值的分量，value / 255
-     * @param c2 第二个通道颜色值的分量，value / 255
-     */
-    private fun mixingColor(a1: Float, a2: Float, c1: Float, c2: Float): Float {
-        return (c1 * a1 * (1.0F - a2) + c2 * a2) / (a1 + a2 - a1 * a2)
-    }
-
-    private fun Int.colorWeight(): Float {
-        return this / 255F
-    }
+//    private fun Int.colorWeight(): Float {
+//        return this / 255F
+//    }
 
     private fun postUpdate() {
         handler.postDelayed(updateTask, 1000)
