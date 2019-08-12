@@ -127,10 +127,6 @@ class EditActivity : BaseActivity() {
     }
 
     private fun initView() {
-//        // 始终让右侧的列表上下滚动
-//        rightList.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-//        // 始终让底部的列表左右滚动
-//        bottomList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
 
         // 退出预览模式的按钮
         exitPreviewBtn.setOnClickListener {
