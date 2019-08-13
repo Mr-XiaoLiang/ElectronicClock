@@ -13,4 +13,6 @@
     <string name="dialog_negative_reset">放弃操作</string>
 
     <string name="widget_clock">数字时钟</string>
+    <string name="protrait_preference">竖屏设置</string>
+    <string name="landscape_preference">横屏设置</string>
 </resources>
