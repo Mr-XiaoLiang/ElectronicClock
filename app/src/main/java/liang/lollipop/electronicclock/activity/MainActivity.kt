@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.utils.NumberSelectedDialog
 import liang.lollipop.widget.utils.Utils
 
 
