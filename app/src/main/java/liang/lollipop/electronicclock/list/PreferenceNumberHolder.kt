@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.utils.NumberSelectedDialog
 
 /**
  * @author lollipop
@@ -17,11 +18,22 @@ class PreferenceNumberHolder
 
     companion object {
         fun create(layoutInflater: LayoutInflater,
-                   parent: ViewGroup,
-                   listener: OnSelectedListener<Int>): PreferenceNumberHolder {
+                    parent: ViewGroup,
+                    listener: OnSelectedListener<Int>): PreferenceNumberHolder {
             return PreferenceNumberHolder(
                 layoutInflater.inflate(R.layout.item_preference_text, parent, false), listener)
         }
+
+        fun create(layoutInflater: LayoutInflater,
+                   parent: ViewGroup,
+                   listener: (PreferenceHolder<*, *>, newValue: Int) -> Unit): PreferenceNumberHolder {
+            return create(layoutInflater, parent, object : OnSelectedListener<Int> {
+                override fun onSelected(holder: PreferenceHolder<*, *>, newValue: Int) {
+                    listener(holder, newValue)
+                }
+            })
+        }
+
     }
 
     private val titleView: TextView = view.findViewById(R.id.titleView)
@@ -29,10 +41,16 @@ class PreferenceNumberHolder
     private val valueView: TextView = view.findViewById(R.id.valueView)
     private var info: PreferenceNumber? = null
 
+    init {
+        view.setOnClickListener {
+            info?.let {
+                openNumberSelectDialog(it)
+            }
+        }
+    }
 
     override fun onBind(info: PreferenceNumber) {
         this.info = info
-        // 绑定数据时断开监听器，防止造成死循环
         titleView.text = info.title
         summerView.text = info.summer
         onValueChange(info.value)
@@ -40,6 +58,20 @@ class PreferenceNumberHolder
 
     private fun onValueChange(value: Int) {
         valueView.text = "$value"
+    }
+
+    private fun openNumberSelectDialog(preference: PreferenceNumber) {
+        NumberSelectedDialog.create(itemView.context).let { builder ->
+            builder.min = preference.min
+            builder.max = preference.max
+            builder.title = preference.title
+            builder.onNumberSelected = { dialog, number ->
+                onValueChange(number)
+                onSelectedListener.onSelected(this, number)
+                dialog.dismiss()
+            }
+            builder
+        }.show()
     }
 
 }

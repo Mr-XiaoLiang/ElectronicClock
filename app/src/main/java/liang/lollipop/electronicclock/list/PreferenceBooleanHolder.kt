@@ -18,8 +18,18 @@ class PreferenceBooleanHolder
     PreferenceHolder<Boolean, PreferenceBoolean>(view, listener) {
 
     companion object {
-        fun create(layoutInflater: LayoutInflater, parent: ViewGroup, listener: OnSelectedListener<Boolean>): PreferenceBooleanHolder {
-            return PreferenceBooleanHolder(layoutInflater.inflate(R.layout.item_preference_boolean, parent, false), listener)
+        fun create(layoutInflater: LayoutInflater, parent: ViewGroup,
+                   listener: OnSelectedListener<Boolean>): PreferenceBooleanHolder {
+            return PreferenceBooleanHolder(
+                layoutInflater.inflate(R.layout.item_preference_boolean, parent, false), listener)
+        }
+        fun create(layoutInflater: LayoutInflater, parent: ViewGroup,
+                   listener: (PreferenceHolder<*, *>, newValue: Boolean) -> Unit): PreferenceBooleanHolder {
+            return create(layoutInflater, parent, object : OnSelectedListener<Boolean> {
+                override fun onSelected(holder: PreferenceHolder<*, *>, newValue: Boolean) {
+                    listener(holder, newValue)
+                }
+            })
         }
     }
 
