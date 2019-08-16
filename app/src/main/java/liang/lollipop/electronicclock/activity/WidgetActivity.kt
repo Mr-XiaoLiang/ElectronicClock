@@ -1,10 +1,12 @@
 package liang.lollipop.electronicclock.activity
 
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_widget.*
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.utils.*
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
@@ -21,6 +23,7 @@ class WidgetActivity : BaseActivity() {
     private val logger = Utils.loggerI("WidgetActivity")
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setScreenOrientation()
         fullScreen()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_widget)
@@ -31,6 +34,7 @@ class WidgetActivity : BaseActivity() {
 
     private fun initView() {
         widgetGroup.lockedGrid = true
+        widgetGroup.gridCount = this.gridSize
         widgetHelper = WidgetHelper.with(this, widgetGroup).let {
             it.dragStrokeWidth = resources.dp(20F)
             it.selectedBorderWidth = resources.dp(2F)
@@ -40,11 +44,22 @@ class WidgetActivity : BaseActivity() {
             it.pendingLayoutTime = 800L
             it.isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
             it.canDrag = false
+            it.isAutoInverted = this.isAutoInverted
+            it.isAutoLight = this.isAutoLight
+            it.isInverted = this.isInverted
             it
         }.onCantLayout {
             for (panel in it) {
                 widgetHelper.removePanel(panel)
             }
+        }
+    }
+
+    private fun setScreenOrientation() {
+        requestedOrientation = when (this.clockOrientation) {
+            PreferenceHelper.ORIENTATION_PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            PreferenceHelper.ORIENTATION_LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
         }
     }
 

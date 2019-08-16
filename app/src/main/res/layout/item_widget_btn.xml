@@ -13,7 +13,7 @@
     <ImageView
             android:tint="@android:color/white"
             android:id="@+id/actionIcon"
-            android:src="@drawable/ic_stay_current_landscape_black_24dp"
+            android:src="@drawable/ic_stay_current_landscape_white_24dp"
             android:layout_width="24dp"
             android:layout_height="24dp"/>
 

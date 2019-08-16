@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.utils.NumberSelectedDialog
+import liang.lollipop.electronicclock.utils.PreferenceHelper
 import liang.lollipop.widget.utils.Utils
 
 
@@ -33,6 +34,7 @@ class MainActivity : BottomNavigationActivity() {
                 startActivity(Intent(this, WidgetActivity::class.java))
             }
         }
+        PreferenceHelper.bindPreferenceGroup(preferenceGroup)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
