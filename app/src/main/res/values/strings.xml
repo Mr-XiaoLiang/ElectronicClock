@@ -1,39 +1,39 @@
 <resources>
-    <string name="app_name">Electronic Clock</string>
-    <string name="action_back">返回</string>
-    <string name="action_delete">移除</string>
-    <string name="action_done">完成</string>
-    <string name="action_widget">系统微件</string>
-    <string name="action_preview">预览</string>
-    <string name="action_inverted">反色</string>
-    <string name="action_auto_light">自动亮度</string>
-    <string name="action_reset">撤销修改</string>
-    <string name="dialog_message_reset">确定要撤销修改吗？将会覆盖并清除现有的所有更改。</string>
-    <string name="dialog_positive_reset">确定撤销</string>
-    <string name="dialog_negative_reset">放弃操作</string>
+    <string name="app_name">Electronic clock</string>
+        <string name="action_back">Back</string>
+        <string name="action_delete">Remove</string>
+        <string name="action_done">Complete</string>
+        <string name="action_widget">System Widget</string>
+        <string name="action_preview">Preview</string>
+        <string name="action_inverted">Inverted</string>
+        <string name="action_auto_light">Automatic brightness</string>
+        <string name="action_reset">Undo modification</string>
+        <string name="dialog_message_reset">Are you sure you want to undo the changes? All existing changes will be overwritten and cleared.</string>
+        <string name="dialog_positive_reset">undo</string>
+        <string name="dialog_negative_reset">abandon</string>
 
-    <string name="widget_clock">数字时钟</string>
-    <string name="protrait_preference">竖屏设置</string>
-    <string name="landscape_preference">横屏设置</string>
+        <string name="widget_clock">Digital clock</string>
+        <string name="protrait_preference">Vertical screen settings</string>
+        <string name="landscape_preference">Horizontal screen settings</string>
 
-    <string name="pref_title_auto_light">自动亮度</string>
-    <string name="pref_summer_t_auto_light">已启动自动亮度，将根据光线强度调整页面的对比度</string>
-    <string name="pref_summer_f_auto_light">已关闭自动亮度，将保持页面最大的对比度</string>
+        <string name="pref_title_auto_light">Automatic brightness</string>
+        <string name="pref_summer_t_auto_light">Auto Brightness is activated and the contrast of the page will be adjusted according to the light intensity</string>
+        <string name="pref_summer_f_auto_light">Auto Brightness turned off, which will maintain the maximum contrast of the page</string>
 
-    <string name="pref_title_auto_inverted">自动反色</string>
-    <string name="pref_summer_t_auto_inverted">已启动自动反色，将根据根据时间，自动切换前景色，以避免烧屏</string>
-    <string name="pref_summer_f_auto_inverted">已关闭自动反色，您可以选择手动调整前景颜色</string>
+        <string name="pref_title_auto_inverted">Automatic reverse color </string>
+        <string name="pref_summer_t_auto_inverted">Automatic reverse color has been activated, which will automatically switch the foreground color according to the time to avoid burning the screen</string>
+        <string name="pref_summer_f_auto_inverted">Automatic reverse color is turned off, you can choose to manually adjust the foreground color </string>
 
-    <string name="pref_title_inverted">页面反色</string>
-    <string name="pref_summer_t_inverted">已打开反色，将使用白色背景，黑色前景，这可能增加耗电量</string>
-    <string name="pref_summer_f_inverted">已关闭反色，黑色的背景更加省电，但是可能发生烧屏</string>
+        <string name="pref_title_inverted">Page reverse color</string>
+        <string name="pref_summer_t_inverted">Has turned on the reverse color, will use a white background, black foreground, which may increase power consumption </string>
+        <string name="pref_summer_f_inverted">The reverse color is turned off, the black background is more power-efficient, but burning may occur </string>
 
-    <string name="pref_title_grid_size">页面分割数量</string>
-    <string name="pref_summer_grid_size">分割越多，页面调整的精度越高，但是这也可能增加一些操作难度</string>
+        <string name="pref_title_grid_size">Number of page splits</string>
+        <string name="pref_summer_grid_size">The more the segmentation, the higher the precision of the page adjustment, but this may also increase the operational difficulty </string>
 
-    <string name="pref_title_orientation">时钟屏幕方向</string>
-    <string name="pref_summer_orientation">推荐使用自动模式，将根据时钟的摆放方式自动切换显示方案</string>
-    <string name="pref_orientation_auto">自动旋转</string>
-    <string name="pref_orientation_protrait">锁定竖屏</string>
-    <string name="pref_orientation_landscape">锁定横屏</string>
+        <string name="pref_title_orientation">Clock screen orientation </string>
+        <string name="pref_summer_orientation">Recommended to use the automatic mode, will automatically switch the display scheme according to the way the clock is placed </string>
+        <string name="pref_orientation_auto">Automatic</string>
+        <string name="pref_orientation_protrait">Vertical</string>
+        <string name="pref_orientation_landscape">Horizontal</string>
 </resources>
