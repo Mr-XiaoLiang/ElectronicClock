@@ -37,9 +37,9 @@ class PreferenceBooleanHolder
     private val summerView: TextView = view.findViewById(R.id.summerView)
     private val switchView: SwitchCompat = view.findViewById(R.id.switchView)
     private var info: PreferenceBoolean? = null
-    private val onCheckedChangeListener = { _: CompoundButton, isChecked: Boolean ->
+    private val onCheckedChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         onSwitchChange(isChecked)
-        onSelectedListener.onSelected(this, isChecked)
+        onSelectedListener.onSelected(this@PreferenceBooleanHolder, isChecked)
     }
 
 

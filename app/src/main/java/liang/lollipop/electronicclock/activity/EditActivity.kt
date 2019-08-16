@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.activity_edit.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.list.ActionInfo
+import liang.lollipop.electronicclock.utils.gridSize
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
@@ -138,6 +139,7 @@ class EditActivity : BaseActivity() {
         widgetGroup.gridColor = Color.GRAY
         widgetGroup.scaleX
 
+        widgetGroup.gridCount = this.gridSize
         // 通过辅助类来完成标准小部件容器的事件绑定
         widgetHelper = WidgetHelper.with(this, widgetGroup).let {
             it.dragStrokeWidth = resources.dp(16F)

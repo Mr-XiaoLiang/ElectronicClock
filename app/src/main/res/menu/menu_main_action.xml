@@ -6,13 +6,13 @@
             android:title="@string/protrait_preference"
             android:iconTint="@android:color/white"
             app:showAsAction="ifRoom"
-            android:icon="@drawable/ic_stay_current_portrait_black_24dp"/>
+            android:icon="@drawable/ic_stay_current_portrait_white_24dp"/>
 
     <item
             android:id="@+id/actionLandscapeBtn"
             android:title="@string/landscape_preference"
             android:iconTint="@android:color/white"
             app:showAsAction="ifRoom"
-            android:icon="@drawable/ic_stay_current_landscape_black_24dp"/>
+            android:icon="@drawable/ic_stay_current_landscape_white_24dp"/>
 
 </menu>
