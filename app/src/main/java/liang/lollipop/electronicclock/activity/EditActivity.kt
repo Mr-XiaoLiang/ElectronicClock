@@ -19,6 +19,9 @@ import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.list.ActionInfo
 import liang.lollipop.electronicclock.utils.gridSize
+import liang.lollipop.electronicclock.utils.isAutoInverted
+import liang.lollipop.electronicclock.utils.isAutoLight
+import liang.lollipop.electronicclock.utils.isInverted
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
@@ -148,8 +151,10 @@ class EditActivity : BaseActivity() {
             it.selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
             it.focusColor = ContextCompat.getColor(this, R.color.colorAccent)
             it.pendingLayoutTime = 800L
-            it.isAutoInverted = false
             it.isPortrait = isPortrait
+            it.isAutoInverted = this.isAutoInverted
+            it.isAutoLight = this.isAutoLight
+            it.isInverted = this.isInverted
             it
         }.onCantLayout {
             // 当出现无法排版的面板时

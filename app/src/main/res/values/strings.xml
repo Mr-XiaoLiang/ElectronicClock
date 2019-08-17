@@ -1,39 +1,43 @@
 <resources>
     <string name="app_name">Electronic clock</string>
-        <string name="action_back">Back</string>
-        <string name="action_delete">Remove</string>
-        <string name="action_done">Complete</string>
-        <string name="action_widget">System Widget</string>
-        <string name="action_preview">Preview</string>
-        <string name="action_inverted">Inverted</string>
-        <string name="action_auto_light">Automatic brightness</string>
-        <string name="action_reset">Undo modification</string>
-        <string name="dialog_message_reset">Are you sure you want to undo the changes? All existing changes will be overwritten and cleared.</string>
-        <string name="dialog_positive_reset">undo</string>
-        <string name="dialog_negative_reset">abandon</string>
+    <string name="action_back">Back</string>
+    <string name="action_delete">Remove</string>
+    <string name="action_done">Complete</string>
+    <string name="action_widget">System Widget</string>
+    <string name="action_preview">Preview</string>
+    <string name="action_inverted">Inverted</string>
+    <string name="action_auto_light">Automatic brightness</string>
+    <string name="action_reset">Undo modification</string>
+    <string name="dialog_message_reset">Are you sure you want to undo the changes? All existing changes will be overwritten and cleared.</string>
+    <string name="dialog_positive_reset">undo</string>
+    <string name="dialog_negative_reset">abandon</string>
 
-        <string name="widget_clock">Digital clock</string>
-        <string name="protrait_preference">Vertical screen settings</string>
-        <string name="landscape_preference">Horizontal screen settings</string>
+    <string name="widget_clock">Digital clock</string>
+    <string name="protrait_preference">Vertical screen settings</string>
+    <string name="landscape_preference">Horizontal screen settings</string>
 
-        <string name="pref_title_auto_light">Automatic brightness</string>
-        <string name="pref_summer_t_auto_light">Auto Brightness is activated and the contrast of the page will be adjusted according to the light intensity</string>
-        <string name="pref_summer_f_auto_light">Auto Brightness turned off, which will maintain the maximum contrast of the page</string>
+    <string name="pref_title_auto_light">Automatic brightness</string>
+    <string name="pref_summer_t_auto_light">Auto Brightness is activated and the contrast of the page will be adjusted according to the light intensity</string>
+    <string name="pref_summer_f_auto_light">Auto Brightness turned off, which will maintain the maximum contrast of the page</string>
 
-        <string name="pref_title_auto_inverted">Automatic reverse color </string>
-        <string name="pref_summer_t_auto_inverted">Automatic reverse color has been activated, which will automatically switch the foreground color according to the time to avoid burning the screen</string>
-        <string name="pref_summer_f_auto_inverted">Automatic reverse color is turned off, you can choose to manually adjust the foreground color </string>
+    <string name="pref_title_auto_inverted">Automatic reverse color </string>
+    <string name="pref_summer_t_auto_inverted">Automatic reverse color has been activated, which will automatically switch the foreground color according to the time to avoid burning the screen</string>
+    <string name="pref_summer_f_auto_inverted">Automatic reverse color is turned off, you can choose to manually adjust the foreground color </string>
 
-        <string name="pref_title_inverted">Page reverse color</string>
-        <string name="pref_summer_t_inverted">Has turned on the reverse color, will use a white background, black foreground, which may increase power consumption </string>
-        <string name="pref_summer_f_inverted">The reverse color is turned off, the black background is more power-efficient, but burning may occur </string>
+    <string name="pref_title_inverted">Page reverse color</string>
+    <string name="pref_summer_t_inverted">Has turned on the reverse color, will use a white background, black foreground, which may increase power consumption </string>
+    <string name="pref_summer_f_inverted">The reverse color is turned off, the black background is more power-efficient, but burning may occur </string>
 
-        <string name="pref_title_grid_size">Number of page splits</string>
-        <string name="pref_summer_grid_size">The more the segmentation, the higher the precision of the page adjustment, but this may also increase the operational difficulty </string>
+    <string name="pref_title_grid_size">Number of page splits</string>
+    <string name="pref_summer_grid_size">The more the segmentation, the higher the precision of the page adjustment, but this may also increase the operational difficulty </string>
 
-        <string name="pref_title_orientation">Clock screen orientation </string>
-        <string name="pref_summer_orientation">Recommended to use the automatic mode, will automatically switch the display scheme according to the way the clock is placed </string>
-        <string name="pref_orientation_auto">Automatic</string>
-        <string name="pref_orientation_protrait">Vertical</string>
-        <string name="pref_orientation_landscape">Horizontal</string>
+    <string name="pref_title_orientation">Clock screen orientation </string>
+    <string name="pref_summer_orientation">Recommended to use the automatic mode, will automatically switch the display scheme according to the way the clock is placed </string>
+    <string name="pref_orientation_auto">Automatic</string>
+    <string name="pref_orientation_protrait">Vertical</string>
+    <string name="pref_orientation_landscape">Horizontal</string>
+
+    <string name="guidelines_start_btn">Start the clock after clicking </string>
+    <string name="guidelines_protrait_menu_btn">Click to set the vertical and horizontal clock panels</string>
+    <string name="guidelines_panel_item">Long press to start the adjustment mode, you can change the shape and position </string>
 </resources>
