@@ -49,7 +49,14 @@ object GuidelinesInfo {
     var animationDuration = 300L
 
     fun changeAlpha(color: Int, alpha: Int): Int {
-        return color and 0xFFFFFF or alpha.shl(24)
+        var a = alpha
+        if (a < 0) {
+            a = 0
+        }
+        if (a > 255) {
+            a = 255
+        }
+        return color and 0xFFFFFF or a.shl(24)
     }
 
     fun getSizeBySide(width: Float, height: Float, side: Side): Float {

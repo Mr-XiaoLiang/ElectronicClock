@@ -76,6 +76,11 @@ class GuidelinesBuilder(val target: View) {
      */
     private var guidelinesView: GuidelinesView? = null
 
+    /**
+     * 动画持续时间
+     */
+    var animationDuration = GuidelinesInfo.animationDuration
+
     val targetParent: ViewGroup
         get() {
             val parent = target.parent ?: throw IllegalArgumentException("Target view has no parent")
@@ -118,6 +123,9 @@ class GuidelinesBuilder(val target: View) {
     }
 
     private fun showGuidelines() {
+        panelRadius.isLocked = true
+        paddingSize.isLocked = true
+
         val viewGroup = group ?: throw IllegalArgumentException("Guidelines view has no parent")
         val view = getGuidelinesView()
         bindClickListener(view)
@@ -133,13 +141,17 @@ class GuidelinesBuilder(val target: View) {
 
     private fun bindClickListener(view: GuidelinesView) {
         view.setOnClickListener {
+            view.onAnimationHideEnd = {
+                view.onAnimationHideEnd = null
+
+                nextGuidelines?.let {
+                    it.group = group
+                    it.guidelinesView = view
+                    it.show()
+                }
+            }
             view.hide()
             view.setOnClickListener(null)
-            nextGuidelines?.let {
-                it.group = group
-                it.guidelinesView = view
-                it.show()
-            }
         }
     }
 
@@ -160,10 +172,6 @@ class GuidelinesBuilder(val target: View) {
         nextGuidelines = builder
         builder.previousGuidelines = this
         return builder
-    }
-
-    fun nextByMenu(menu: Menu, actionId: Int): GuidelinesBuilder {
-        return next(menu.findItem(actionId).actionView)
     }
 
     fun show() {

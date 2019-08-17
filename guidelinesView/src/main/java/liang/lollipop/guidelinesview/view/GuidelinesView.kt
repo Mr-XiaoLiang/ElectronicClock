@@ -11,10 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
-import liang.lollipop.guidelinesview.util.Association
-import liang.lollipop.guidelinesview.util.GuidelinesBuilder
-import liang.lollipop.guidelinesview.util.GuidelinesInfo
-import liang.lollipop.guidelinesview.util.Location
+import liang.lollipop.guidelinesview.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -28,6 +25,13 @@ class GuidelinesView(context: Context, attr: AttributeSet?, defStyleAttr: Int, d
     constructor(context: Context, attr: AttributeSet?, defStyleAttr: Int): this(context, attr, defStyleAttr, 0)
     constructor(context: Context, attr: AttributeSet?): this(context, attr, 0)
     constructor(context: Context): this(context, null)
+
+    companion object {
+        private const val MAX_ANIMATION_VALUE = 1F
+        private const val MIN_ANIMATION_VALUE = 0F
+
+        private const val DELAY_REMOVE = 200L
+    }
 
     var builder: GuidelinesBuilder? = null
         set(value) {
@@ -49,12 +53,24 @@ class GuidelinesView(context: Context, attr: AttributeSet?, defStyleAttr: Int, d
 
     private val lastMessageBounds = Rect()
 
-    private var animationProcess = 0F
+    private var animationProcess = MIN_ANIMATION_VALUE
+
+    var onAnimationShowEnd: (() -> Unit)? = null
+
+    var onAnimationHideEnd: (() -> Unit)? = null
 
     private val animator: ValueAnimator by lazy {
         ValueAnimator().apply {
             addUpdateListener(this@GuidelinesView)
         }
+    }
+
+    /**
+     * 显示任务完成后，将会进行自我移除任务
+     * 将自身从View树中移除
+     */
+    private val removeAction = Runnable {
+
     }
 
     init {
@@ -244,14 +260,62 @@ class GuidelinesView(context: Context, attr: AttributeSet?, defStyleAttr: Int, d
     }
 
     fun show() {
-        if (messageView.visibility == View.VISIBLE) {
-            messageView.visibility = View.INVISIBLE
+        removeCallbacks(removeAction)
+
+        val info = builder?:throw RuntimeException("builder not found")
+        animator.cancel()
+        animator.setFloatValues(animationProcess, MAX_ANIMATION_VALUE)
+        animator.duration = (info.animationDuration * 1F
+                * (MAX_ANIMATION_VALUE - animationProcess)
+                / (MAX_ANIMATION_VALUE - MIN_ANIMATION_VALUE)).toLong()
+        animator.lifecycleBinding{
+            onStart {
+                visibility = View.VISIBLE
+                messageView.visibility = View.INVISIBLE
+            }
+            onEnd {
+                removeThis(it)
+                messageView.visibility = View.VISIBLE
+                onAnimationShowEnd?.invoke()
+            }
+            onCancel {
+                removeThis(it)
+            }
         }
-        visibility = View.VISIBLE
+        animator.start()
     }
 
     fun hide() {
-        visibility = View.INVISIBLE
+        if (visibility != View.VISIBLE) {
+            return
+        }
+        val info = builder?:throw RuntimeException("builder not found")
+        animator.cancel()
+        animator.setFloatValues(animationProcess, MIN_ANIMATION_VALUE)
+        animator.duration = (info.animationDuration * 1F
+                * (animationProcess - MIN_ANIMATION_VALUE)
+                / (MAX_ANIMATION_VALUE - MIN_ANIMATION_VALUE)).toLong()
+
+        animator.lifecycleBinding{
+            onStart {
+                messageView.visibility = View.INVISIBLE
+            }
+            onEnd {
+                removeThis(it)
+                visibility = View.INVISIBLE
+                postRemove()
+                onAnimationHideEnd?.invoke()
+            }
+            onCancel {
+                removeThis(it)
+            }
+        }
+        animator.start()
+    }
+
+    private fun postRemove() {
+        // 在动画结束后，延迟等待一段时间，当时间结束后，将自身从View树中移除
+        postDelayed(removeAction, DELAY_REMOVE)
     }
 
 }
