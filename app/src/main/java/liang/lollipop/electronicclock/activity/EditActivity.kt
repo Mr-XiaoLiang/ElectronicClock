@@ -18,10 +18,8 @@ import kotlinx.android.synthetic.main.activity_edit.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.list.ActionInfo
-import liang.lollipop.electronicclock.utils.gridSize
-import liang.lollipop.electronicclock.utils.isAutoInverted
-import liang.lollipop.electronicclock.utils.isAutoLight
-import liang.lollipop.electronicclock.utils.isInverted
+import liang.lollipop.electronicclock.utils.*
+import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
@@ -34,6 +32,8 @@ import liang.lollipop.widget.utils.dp
 class EditActivity : BaseActivity() {
 
     companion object {
+        private const val SHOW_EDIT_GUIDELINES = "EDIT_ACTIVITY_SHOW_EDIT_GUIDELINES"
+
         const val ARG_IS_PORTRAIT = "ARG_IS_PORTRAIT"
 
         fun startByPortrait(activity: Activity) {
@@ -116,6 +116,8 @@ class EditActivity : BaseActivity() {
 
     private lateinit var widgetHelper: WidgetHelper
 
+    private var isShowGuidelines = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setScreenOrientation()
         fullScreen()
@@ -127,11 +129,22 @@ class EditActivity : BaseActivity() {
         initActions()
         initWidgets()
 
+        isShowGuidelines = getPreferences(SHOW_EDIT_GUIDELINES, true)
+        if (isShowGuidelines) {
+            widgetGroup.onPanelAddedListener {
+                if (isShowGuidelines && it.view != null) {
+                    isShowGuidelines = false
+                    Guidelines.target(it.view!!).showIn(this).value(R.string.guidelines_panel_item).onClose {
+                        putPreferences(SHOW_EDIT_GUIDELINES, false)
+                        widgetGroup.onPanelAddedListener(null)
+                    }.show()
+                }
+            }
+        }
         initData()
     }
 
     private fun initView() {
-
         // 退出预览模式的按钮
         exitPreviewBtn.setOnClickListener {
             isPreview(false)
@@ -210,6 +223,9 @@ class EditActivity : BaseActivity() {
                 startLoading()
             } else {
                 stopLoading()
+                if (isShowGuidelines) {
+                    widgetHelper.addPanel(ClockPanelInfo())
+                }
             }
         }
     }

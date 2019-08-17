@@ -39,6 +39,5 @@
     <string name="pref_orientation_landscape">锁定横屏</string>
 
     <string name="guidelines_start_btn">点击后启动时钟</string>
-    <string name="guidelines_protrait_menu_btn">点击后进行竖屏和横屏时钟面板的设置</string>
     <string name="guidelines_panel_item">长按启动调整模式，可以改变形状以及位置</string>
 </resources>

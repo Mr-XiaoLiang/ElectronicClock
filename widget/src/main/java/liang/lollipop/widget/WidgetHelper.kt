@@ -279,6 +279,11 @@ class WidgetHelper private constructor(activity: Activity,
             (it?.view?:widgetGroup).requestLayout()
             onCancelDragListener?.invoke(it)
         }
+
+        // View就绪之后，立即触发颜色
+        widgetGroup.post {
+            onColorChange()
+        }
     }
 
     /**
