@@ -1,1 +1,1 @@
-include ':app', ':electronicclockwear', ':widget'
+include ':app', ':electronicclockwear', ':widget', ':guidelinesView'

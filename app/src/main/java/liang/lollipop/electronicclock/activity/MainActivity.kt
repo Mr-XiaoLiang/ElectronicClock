@@ -1,16 +1,17 @@
 package liang.lollipop.electronicclock.activity
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.widget.ActionMenuView
+import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.activity_bottom_navigation.*
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.utils.NumberSelectedDialog
 import liang.lollipop.electronicclock.utils.PreferenceHelper
+import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.utils.Utils
 
 
@@ -31,10 +32,19 @@ class MainActivity : BottomNavigationActivity() {
         super.onCreate(savedInstanceState)
         showFAB(R.drawable.ic_play_arrow_black_24dp) {
             it.setOnClickListener {
-                startActivity(Intent(this, WidgetActivity::class.java))
+//                startActivity(Intent(this, WidgetActivity::class.java))
+                Guidelines.target(fab).showIn(this).value(R.string.guidelines_start_btn)
+                    .next(appBarLayout).value("这是一个APP bar layout").show()
             }
         }
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
+
+        Guidelines.global {
+            fontColor = Color.WHITE
+            fontSize = 18F
+            panelColor = ContextCompat.getColor(this@MainActivity, R.color.colorPrimary)
+            backgroundColor = changeAlpha(Color.BLACK, 200)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

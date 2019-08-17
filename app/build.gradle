@@ -32,4 +32,5 @@ dependencies {
     implementation project(path: ':widget')
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation project(path: ':guidelinesView')
 }
