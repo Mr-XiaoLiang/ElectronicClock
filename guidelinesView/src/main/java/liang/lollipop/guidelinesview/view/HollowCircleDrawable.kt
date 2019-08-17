@@ -2,6 +2,7 @@ package liang.lollipop.guidelinesview.view
 
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import liang.lollipop.guidelinesview.util.GuidelinesInfo
 
 /**
  * @author lollipop
@@ -57,7 +58,7 @@ class HollowCircleDrawable: Drawable() {
     override fun draw(canvas: Canvas) {
         val layerId = canvas.saveLayer(boundsF, paint)
 
-        paint.color = backgroundColor
+        paint.color = GuidelinesInfo.changeAlpha(backgroundColor, (255 * animationProgress).toInt())
         canvas.drawRect(bounds, paint)
         paint.color = foregroundColor
         canvas.drawCircle(center.x, center.y, radius * animationProgress, paint)
