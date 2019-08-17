@@ -5,14 +5,13 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.widget.ActionMenuView
-import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_bottom_navigation.*
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.utils.PreferenceHelper
+import liang.lollipop.electronicclock.utils.getPreferences
+import liang.lollipop.electronicclock.utils.putPreferences
 import liang.lollipop.guidelinesview.Guidelines
-import liang.lollipop.widget.utils.Utils
 
 
 /**
@@ -22,7 +21,7 @@ import liang.lollipop.widget.utils.Utils
 class MainActivity : BottomNavigationActivity() {
 
     companion object {
-        private val logger = Utils.loggerI("MainActivity")
+        private const val SHOW_START_BTN_GUIDELINES = "MAIN_ACTIVITY_SHOW_START_BTN_GUIDELINES"
     }
 
     override val contentViewId: Int
@@ -30,20 +29,22 @@ class MainActivity : BottomNavigationActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.statusBarColor = Color.BLACK
         showFAB(R.drawable.ic_play_arrow_black_24dp) {
             it.setOnClickListener {
-//                startActivity(Intent(this, WidgetActivity::class.java))
-                Guidelines.target(fab).showIn(this).value(R.string.guidelines_start_btn)
-                    .next(appBarLayout).value("这是一个APP bar layout").show()
+                startActivity(Intent(this, WidgetActivity::class.java))
             }
         }
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
 
-        Guidelines.global {
-            fontColor = Color.WHITE
-            fontSize = 18F
-            panelColor = ContextCompat.getColor(this@MainActivity, R.color.colorPrimary)
-            backgroundColor = changeAlpha(Color.BLACK, 200)
+        showGuidelines()
+    }
+
+    private fun showGuidelines() {
+        if (getPreferences(SHOW_START_BTN_GUIDELINES, true)) {
+            Guidelines.target(fab).showIn(this).value(R.string.guidelines_start_btn).onClose {
+                putPreferences(SHOW_START_BTN_GUIDELINES, false)
+            }.show()
         }
     }
 

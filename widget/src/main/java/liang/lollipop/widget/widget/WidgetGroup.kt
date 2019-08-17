@@ -117,6 +117,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     private var dragEndListener: ((panel: Panel<*>?) -> Unit)? = null
 
     /**
+     * 当面板被添加时的监听器
+     */
+    private var panelAddedListener: ((panel: Panel<*>) -> Unit)? = null
+
+    /**
      * 当被选中的面板改变时触发的监听器
      */
     private var onSelectedPanelChangeListener: ((panel: Panel<*>) -> Unit)? = null
@@ -254,6 +259,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         addView(panel.view)
         setChildLongClick(panel)
         setChildClick(panel)
+        panelAddedListener?.invoke(panel)
         return true
     }
 
@@ -993,6 +999,13 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      */
     fun onDragEndListener(listener: ((panel: Panel<*>?) -> Unit)) {
         this.dragEndListener = listener
+    }
+
+    /**
+     * 面板添加时的监听器
+     */
+    fun onPanelAddedListener(listener: ((Panel<*>) -> Unit)?) {
+        panelAddedListener = listener
     }
 
     private fun MotionEvent.getXById(): Float {

@@ -4,6 +4,9 @@ import android.app.Activity
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.appcompat.widget.ContentFrameLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import liang.lollipop.guidelinesview.view.GuidelinesView
 
@@ -81,6 +84,11 @@ class GuidelinesBuilder(val target: View) {
      */
     var animationDuration = GuidelinesInfo.animationDuration
 
+    /**
+     * 关闭时的监听器
+     */
+    private var closeListener: (() -> Unit)? = null
+
     val targetParent: ViewGroup
         get() {
             val parent = target.parent ?: throw IllegalArgumentException("Target view has no parent")
@@ -92,10 +100,14 @@ class GuidelinesBuilder(val target: View) {
         }
 
     fun showIn(activity: Activity): GuidelinesBuilder {
-        val contentParent = activity.findViewById<ViewGroup>(android.R.id.content)
-        val rootView = if (contentParent.childCount > 0) {
-            contentParent.getChildAt(0) } else { contentParent }
-        if (rootView is ViewGroup) {
+        val contentParent = activity.findViewById<ViewGroup>(android.R.id.content)?:throw RuntimeException("can`t found root view group")
+        group = contentParent
+        return this
+    }
+
+    fun showIn(fragment: Fragment): GuidelinesBuilder {
+        val rootView = fragment.view as? ViewGroup ?: throw RuntimeException("can`t found root view group")
+        if (rootView is FrameLayout || rootView is CoordinatorLayout) {
             group = rootView
         } else {
             throw RuntimeException("can`t found root view group")
@@ -103,13 +115,15 @@ class GuidelinesBuilder(val target: View) {
         return this
     }
 
-    fun showIn(fragment: Fragment): GuidelinesBuilder {
-        val rootView = fragment.view
-        if (rootView!= null && rootView is ViewGroup) {
-            group = rootView
-        } else {
-            throw RuntimeException("can`t found root view group")
-        }
+    fun showInParent(): GuidelinesBuilder {
+        var view = target
+        var viewGroup: ViewGroup
+        do {
+            val parent = view.parent ?: RuntimeException("can`t found view group")
+            viewGroup = parent as ViewGroup
+            view = viewGroup
+        } while (viewGroup !is FrameLayout && viewGroup !is CoordinatorLayout)
+        group = viewGroup
         return this
     }
 
@@ -122,10 +136,17 @@ class GuidelinesBuilder(val target: View) {
         return value(target.context.getString(msgId))
     }
 
+    fun onClose(run: () -> Unit): GuidelinesBuilder {
+        closeListener = run
+        return this
+    }
+
     private fun showGuidelines() {
         panelRadius.isLocked = true
         paddingSize.isLocked = true
-
+        if (group == null) {
+            showInParent()
+        }
         val viewGroup = group ?: throw IllegalArgumentException("Guidelines view has no parent")
         val view = getGuidelinesView()
         bindClickListener(view)
@@ -141,12 +162,18 @@ class GuidelinesBuilder(val target: View) {
 
     private fun bindClickListener(view: GuidelinesView) {
         view.setOnClickListener {
+            closeListener?.invoke()
+
             view.onAnimationHideEnd = {
                 view.onAnimationHideEnd = null
 
                 nextGuidelines?.let {
-                    it.group = group
-                    it.guidelinesView = view
+                    if (it.group == null) {
+                        it.group = group
+                    }
+                    if (it.guidelinesView == null) {
+                        it.guidelinesView = view
+                    }
                     it.show()
                 }
             }

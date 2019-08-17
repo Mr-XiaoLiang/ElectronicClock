@@ -38,6 +38,5 @@
     <string name="pref_orientation_landscape">Horizontal</string>
 
     <string name="guidelines_start_btn">Start the clock after clicking </string>
-    <string name="guidelines_protrait_menu_btn">Click to set the vertical and horizontal clock panels</string>
     <string name="guidelines_panel_item">Long press to start the adjustment mode, you can change the shape and position </string>
 </resources>
