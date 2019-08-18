@@ -1,5 +1,6 @@
 package liang.lollipop.widget.widget
 
+import android.content.Intent
 import android.graphics.Color
 import org.json.JSONObject
 
@@ -40,6 +41,17 @@ open class PanelInfo {
     var id = NO_ID
 
     var color = Color.BLACK
+
+    /**
+     * 用于做初始化的intent
+     * 类似于AppWidget的初始化Activity一样
+     */
+    var initIntent: Intent? = null
+
+    /**
+     * 用于根据数据值初始化数据的方法
+     */
+    open fun initData(data: Intent) {}
 
     fun offset(x: Int, y: Int) {
         this.x = x
