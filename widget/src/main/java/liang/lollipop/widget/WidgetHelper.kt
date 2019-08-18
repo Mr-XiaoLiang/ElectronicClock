@@ -12,6 +12,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Handler
+import android.util.SparseArray
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.panel.SystemWidgetPanel
 import liang.lollipop.widget.utils.AppWidgetHelper
@@ -29,7 +30,7 @@ import liang.lollipop.widget.widget.WidgetGroup
  * @date 2019-07-30 20:41
  * 小部件辅助器
  */
-class WidgetHelper private constructor(activity: Activity,
+class WidgetHelper private constructor(private val activity: Activity,
                                        private val widgetGroup: WidgetGroup,
                                        private val hostId: Int = AppWidgetHelper.DEF_HOST_ID) {
 
@@ -39,7 +40,12 @@ class WidgetHelper private constructor(activity: Activity,
         }
 
         private const val DEF_MAX_LIGHT = 200F
+
+        private const val REQUEST_CODE_PREFIX = 8 shl 13
+        private const val REQUEST_CODE_MARK = 8192
     }
+
+    private var requestCodeProgress = 0
 
     /**
      * 应用上下文
@@ -259,6 +265,11 @@ class WidgetHelper private constructor(activity: Activity,
             return panelList.size
         }
 
+    /**
+     * 用于做延时初始化任务的info集合
+     */
+    private val pendlingInfoList = SparseArray<PanelInfo>()
+
     init {
         // 默认设置绘制状态监听器，处理选中项效果绘制
         widgetGroup.onDrawSelectedPanel { panel, dragMode, canvas ->
@@ -420,7 +431,8 @@ class WidgetHelper private constructor(activity: Activity,
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        return appWidgetHelper.onActivityResult(requestCode, resultCode, data)
+        return appWidgetHelper.onActivityResult(requestCode, resultCode, data) ||
+                onPendingPanelResult(requestCode, resultCode, data)
     }
 
     fun onChildClick(lis: (Panel<*>) -> Unit): WidgetHelper {
@@ -525,40 +537,6 @@ class WidgetHelper private constructor(activity: Activity,
         return this
     }
 
-//    private fun Int.superimposed(color: Int): Int {
-//        val alpha1 = Color.alpha(this).colorWeight()
-//        val alpha2 = Color.alpha(color).colorWeight()
-//        val alphaBlend = ((alpha1 + alpha2 - alpha1 * alpha2) * 255).toInt()
-//
-//        val red1 = Color.red(this).colorWeight()
-//        val red2 = Color.red(color).colorWeight()
-//        val redBlend = (mixingColor(alpha1, alpha2, red1, red2) * 255).toInt()
-//
-//        val green1 = Color.green(this).colorWeight()
-//        val green2 = Color.green(color).colorWeight()
-//        val greenBlend = (mixingColor(alpha1, alpha2, green1, green2) * 255).toInt()
-//
-//        val blue1 = Color.blue(this).colorWeight()
-//        val blue2 = Color.blue(color).colorWeight()
-//        val blueBlend = (mixingColor(alpha1, alpha2, blue1, blue2) * 255).toInt()
-//        return Color.argb(alphaBlend, redBlend, greenBlend, blueBlend)
-//    }
-
-//    /**
-//     * 根据透明度混合单一通道的颜色
-//     * @param a1 第一个通道的透明度
-//     * @param a2 第二个通道的透明度
-//     * @param c1 第一个通道颜色值的分量，value / 255
-//     * @param c2 第二个通道颜色值的分量，value / 255
-//     */
-//    private fun mixingColor(a1: Float, a2: Float, c1: Float, c2: Float): Float {
-//        return (c1 * a1 * (1.0F - a2) + c2 * a2) / (a1 + a2 - a1 * a2)
-//    }
-
-//    private fun Int.colorWeight(): Float {
-//        return this / 255F
-//    }
-
     private fun postUpdate() {
         handler.postDelayed(updateTask, 1000)
     }
@@ -610,17 +588,54 @@ class WidgetHelper private constructor(activity: Activity,
         canvas.drawCircle(tmpBounds.exactCenterX(), tmpBounds.bottom.toFloat(), touchPointRadius, strokePaint)
     }
 
-    fun <I: PanelInfo> addPanel(info: I): Panel<I> {
+    fun <I: PanelInfo> addPanel(info: I, result: ((Panel<I>) -> Unit)? = null) {
+        if (info.id == PanelInfo.NO_ID && info.initIntent != null) {
+            pendingPanel(info)
+            return
+        }
         val panel = panelAdapter.createPanelByInfo(info)
         addPanel(panel)
-        return panel
+        result?.invoke(panel)
     }
 
-    fun addPanel(panel: Panel<*>) {
+    private fun addPanel(panel: Panel<*>) {
         panel.panelInfo.color = foregroundColor
         panelList.add(panel)
         widgetGroup.addPanel(panel)
     }
+
+    private fun pendingPanel(info: PanelInfo) {
+        val requestId = generateRequestId()
+        pendlingInfoList.append(requestId, info)
+        activity.startActivityForResult(info.initIntent, requestId)
+    }
+
+    private fun onPendingPanelResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        val info = pendlingInfoList.get(requestCode)?:return false
+        if (requestCode != Activity.RESULT_OK || data == null) {
+            pendlingInfoList.remove(requestCode)
+            return true
+        }
+        info.initData(data)
+        info.initIntent = null
+        addPanel(info)
+        return true
+    }
+
+    private fun generateRequestId(): Int {
+        if (requestCodeProgress < REQUEST_CODE_MARK) {
+            requestCodeProgress++
+            return requestCodeProgress and REQUEST_CODE_MARK or REQUEST_CODE_PREFIX
+        }
+        for (index in 1 .. REQUEST_CODE_MARK) {
+            val id = index and REQUEST_CODE_MARK or REQUEST_CODE_PREFIX
+            if (pendlingInfoList.get(id) == null) {
+                return id
+            }
+        }
+        throw RuntimeException("cant generate request id")
+    }
+
 
     fun removePanel(panel: Panel<*>) {
         panel.panelInfo.let { info ->
