@@ -48,8 +48,8 @@ class ClockPanel(info: ClockPanelInfo): Panel<ClockPanelInfo>(info) {
         }
     }
 
-    override fun onColorChange(color: Int) {
-        super.onColorChange(color)
+    override fun onColorChange(color: Int, light: Float) {
+        super.onColorChange(color, light)
         view?.let {
             if (it is ClockView) {
                 it.setColor(color)

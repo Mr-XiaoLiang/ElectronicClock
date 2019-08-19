@@ -238,6 +238,11 @@ class WidgetHelper private constructor(private val activity: Activity,
     private val panelAdapter = PanelAdapter(appWidgetHelper)
 
     /**
+     * 页面是否激活了
+     */
+    private var pageIsStart = false
+
+    /**
      * 亮度传感器的监听器
      */
     private val lightSensorListener = object: SensorEventListener {
@@ -471,15 +476,23 @@ class WidgetHelper private constructor(private val activity: Activity,
     }
 
     fun onStart() {
+        pageIsStart = true
         registerLightSensor()
         postUpdate()
         appWidgetHelper.onStart()
+        panelList.forEach {
+            it.onPageStart()
+        }
     }
 
     fun onStop() {
+        pageIsStart = false
         unregisterLightSensor()
         handler.removeCallbacks(updateTask)
         appWidgetHelper.onStop()
+        panelList.forEach {
+            it.onPageStop()
+        }
     }
 
     private fun registerLightSensor() {
@@ -510,15 +523,8 @@ class WidgetHelper private constructor(private val activity: Activity,
             fg = foregroundColor.updateColorByLight()
         }
         panelList.forEach {
-            // 如果是SystemWidget，需要单独处理，因为只能改变他们的透明度，
-            // 不能改变颜色，因此始终都需要把状态透明度传进去
-            if (it is SystemWidgetPanel && isInverted) {
-                it.panelInfo.color = bg
-                it.onColorChange(bg)
-            } else {
-                it.panelInfo.color = fg
-                it.onColorChange(fg)
-            }
+            it.panelInfo.color = fg
+            it.onColorChange(fg, lightValue / lightMaxValue)
         }
         widgetGroup.setBackgroundColor(bg)
     }
@@ -602,6 +608,11 @@ class WidgetHelper private constructor(private val activity: Activity,
         panel.panelInfo.color = foregroundColor
         panelList.add(panel)
         widgetGroup.addPanel(panel)
+        if (pageIsStart) {
+            panel.onPageStart()
+            panel.onUpdate()
+        }
+        onColorChange()
     }
 
     private fun pendingPanel(info: PanelInfo) {
