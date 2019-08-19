@@ -77,12 +77,22 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     /**
      * 当颜色改变时
      */
-    open fun onColorChange(color: Int) {}
+    open fun onColorChange(color: Int, light: Float) {}
 
     /**
      * info改变时，触发
      */
     open fun onInfoChange() {}
+
+    /**
+     * 当页面激活时
+     */
+    open fun onPageStart() {}
+
+    /**
+     * 当页面停止时
+     */
+    open fun onPageStop() {}
 
     fun layout(l: Int, t: Int, r: Int, b: Int) {
         val w = r - l

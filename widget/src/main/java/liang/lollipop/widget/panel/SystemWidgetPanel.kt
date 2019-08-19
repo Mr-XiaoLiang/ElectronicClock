@@ -69,11 +69,9 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
         widgetView.requestLayout()
     }
 
-    override fun onColorChange(color: Int) {
-        super.onColorChange(color)
-        view?.let {
-            it.alpha = Color.alpha(color) / 255F
-        }
+    override fun onColorChange(color: Int, light: Float) {
+        super.onColorChange(color, light)
+        view?.alpha = light
     }
 
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
