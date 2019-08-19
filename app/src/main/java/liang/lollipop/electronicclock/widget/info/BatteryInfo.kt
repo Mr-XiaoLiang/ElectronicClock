@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.widget.info
 
+import android.graphics.Color
 import liang.lollipop.widget.widget.PanelInfo
 
 /**
@@ -35,15 +36,30 @@ class BatteryInfo: PanelInfo() {
 
     /**
      * 四个方向的内缩进
-     * 缩进的尺寸是相应纬度的比例值
+     * 缩进的尺寸是相应维度的比例值
      */
-    val padding = IntArray(4)
+    val padding = FloatArray(4)
 
     /**
      * 是否是垂直放置
      */
     var isVertical = false
 
+    /**
+     * 边框的宽度
+     * 这是一个权重，比例值，
+     * 它的值是相对窄边的长度而言
+     */
+    var borderWidth = 0.05F
 
+    /**
+     * 边框的颜色
+     */
+    var borderColor = Color.BLACK
+
+    /**
+     * 是否开启动画
+     */
+    var isAnimation = true
 
 }
