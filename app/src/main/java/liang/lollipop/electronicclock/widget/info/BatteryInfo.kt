@@ -27,7 +27,7 @@ class BatteryInfo: PanelInfo() {
     /**
      * 圆角尺寸
      */
-    var corner = 0F
+    var corner = 1F
 
     /**
      * 颜色的集合
@@ -61,5 +61,15 @@ class BatteryInfo: PanelInfo() {
      * 是否开启动画
      */
     var isAnimation = true
+
+    /**
+     * 是否是环形的
+     */
+    var isArc = false
+
+    /**
+     * 扇形的宽度，相对于半径而言
+     */
+    var arcWidth = 0.3F
 
 }
