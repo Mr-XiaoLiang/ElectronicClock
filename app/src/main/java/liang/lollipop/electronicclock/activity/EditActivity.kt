@@ -19,6 +19,7 @@ import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.list.ActionInfo
 import liang.lollipop.electronicclock.utils.*
+import liang.lollipop.electronicclock.widget.info.BatteryInfo
 import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
@@ -79,6 +80,8 @@ class EditActivity : BaseActivity() {
     private object WidgetId {
         /** 数字时钟 **/
         const val CLOCK = 0
+        /** 电池 **/
+        const val BATTERY = 1
     }
 
     private val logger = Utils.loggerI("EditActivity")
@@ -157,17 +160,8 @@ class EditActivity : BaseActivity() {
 
         widgetGroup.gridCount = this.gridSize
         // 通过辅助类来完成标准小部件容器的事件绑定
-        widgetHelper = WidgetHelper.with(this, widgetGroup).let {
-            it.dragStrokeWidth = resources.dp(16F)
-            it.selectedBorderWidth = resources.dp(2F)
-            it.touchPointRadius = resources.dp(5F)
-            it.selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
-            it.focusColor = ContextCompat.getColor(this, R.color.colorAccent)
-            it.pendingLayoutTime = 800L
-            it.isPortrait = isPortrait
-            it.isAutoInverted = this.isAutoInverted
-            it.isAutoLight = this.isAutoLight
-            it.isInverted = this.isInverted
+        widgetHelper = PreferenceHelper.createWidgetHelper(this, widgetGroup).let {
+            it.isAutoInverted = false
             it
         }.onCantLayout {
             // 当出现无法排版的面板时
@@ -208,6 +202,9 @@ class EditActivity : BaseActivity() {
 
     private fun initWidgets() {
         widgetInfoArray.add(ActionInfo(WidgetId.CLOCK, R.drawable.ic_access_time_black_24dp, R.string.widget_clock))
+        widgetInfoArray.add(ActionInfo(WidgetId.BATTERY, R.drawable.ic_battery_60_white_24dp, R.string.widget_battery))
+
+
         val adapter = ActionAdapter(widgetInfoArray, layoutInflater, false) { holder ->
             onWidgetSelected(widgetInfoArray[holder.adapterPosition].action)
         }
@@ -309,6 +306,9 @@ class EditActivity : BaseActivity() {
         when (action) {
             WidgetId.CLOCK -> {
                 widgetHelper.addPanel(ClockPanelInfo())
+            }
+            WidgetId.BATTERY -> {
+                widgetHelper.addPanel(BatteryInfo())
             }
         }
     }

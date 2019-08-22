@@ -1,6 +1,8 @@
 package liang.lollipop.electronicclock.widget.info
 
+import android.content.Intent
 import android.graphics.Color
+import liang.lollipop.electronicclock.activity.option.BatteryPanelActivity
 import liang.lollipop.widget.widget.PanelInfo
 
 /**
@@ -12,6 +14,12 @@ class BatteryInfo: PanelInfo() {
 
     companion object {
         private val EMPTY_COLOR_ARRAY = IntArray(0)
+    }
+
+    init {
+        initIntent = Intent().apply {
+            setClassName("liang.lollipop.electronicclock", BatteryPanelActivity::class.java.name)
+        }
     }
 
     /**
@@ -27,7 +35,7 @@ class BatteryInfo: PanelInfo() {
     /**
      * 圆角尺寸
      */
-    var corner = 1F
+    var corner = 0.1F
 
     /**
      * 颜色的集合

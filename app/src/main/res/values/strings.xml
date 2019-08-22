@@ -12,7 +12,6 @@
     <string name="dialog_positive_reset">undo</string>
     <string name="dialog_negative_reset">abandon</string>
 
-    <string name="widget_clock">Digital clock</string>
     <string name="protrait_preference">Vertical screen settings</string>
     <string name="landscape_preference">Horizontal screen settings</string>
 
@@ -39,4 +38,7 @@
 
     <string name="guidelines_start_btn">Start the clock after clicking </string>
     <string name="guidelines_panel_item">Long press to start the adjustment mode, you can change the shape and position </string>
+
+    <string name="widget_clock">Digital clock</string>
+    <string name="widget_battery">Battery info</string>
 </resources>

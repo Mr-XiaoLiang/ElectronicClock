@@ -15,11 +15,14 @@ import kotlin.math.min
  * 电池信息的展示面板
  */
 class BatteryPanel(info: BatteryInfo): Panel<BatteryInfo>(info) {
+
+    private val batteryDrawable = BatteryDrawable(info)
+
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return View(parent.context).apply {
+            background = batteryDrawable
+        }
     }
-
-
 
     private class BatteryDrawable(private var info: BatteryInfo): Drawable() {
 
@@ -140,7 +143,7 @@ class BatteryPanel(info: BatteryInfo): Panel<BatteryInfo>(info) {
                 left = batteryBounds.left
                 bottom = batteryBounds.bottom
                 if (info.isVertical) {
-                    top = batteryBounds.top - batteryBounds.height() * progress
+                    top = batteryBounds.top + batteryBounds.height() * progress
                     right = batteryBounds.right
                 } else {
                     top = batteryBounds.top

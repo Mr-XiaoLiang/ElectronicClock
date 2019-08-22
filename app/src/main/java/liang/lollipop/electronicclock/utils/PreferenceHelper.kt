@@ -1,12 +1,22 @@
 package liang.lollipop.electronicclock.utils
 
+import android.app.Activity
 import android.content.Context
+import android.content.res.Configuration
 import android.preference.PreferenceManager
 import android.view.LayoutInflater
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.*
+import liang.lollipop.electronicclock.widget.info.BatteryInfo
+import liang.lollipop.electronicclock.widget.panel.BatteryPanel
+import liang.lollipop.widget.WidgetHelper
+import liang.lollipop.widget.utils.dp
+import liang.lollipop.widget.widget.Panel
+import liang.lollipop.widget.widget.PanelInfo
+import liang.lollipop.widget.widget.WidgetGroup
 
 /**
  * @author lollipop
@@ -31,6 +41,31 @@ object PreferenceHelper {
 
     fun bindPreferenceGroup(group: RecyclerView): PreferenceHelperImpl {
         return PreferenceHelperImpl(group)
+    }
+
+    fun createWidgetHelper(activity: Activity, widgetGroup: WidgetGroup): WidgetHelper {
+        return WidgetHelper.with(activity, widgetGroup).let {
+            it.dragStrokeWidth = activity.resources.dp(20F)
+            it.selectedBorderWidth = activity.resources.dp(2F)
+            it.touchPointRadius = activity.resources.dp(5F)
+            it.selectedColor = ContextCompat.getColor(activity, R.color.colorPrimary)
+            it.focusColor = ContextCompat.getColor(activity, R.color.colorAccent)
+            it.pendingLayoutTime = 800L
+            it.isPortrait = activity.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            it.canDrag = false
+            it.isAutoInverted = activity.isAutoInverted
+            it.isAutoLight = activity.isAutoLight
+            it.isInverted = activity.isInverted
+            it.panelProviders{ info ->  createPanelByInfo(info) }
+            it
+        }
+    }
+
+    private fun createPanelByInfo(info: PanelInfo): Panel<*>? {
+        return when (info) {
+            is BatteryInfo -> BatteryPanel(info)
+            else -> null
+        }
     }
 
     class PreferenceHelperImpl(private val group: RecyclerView) {

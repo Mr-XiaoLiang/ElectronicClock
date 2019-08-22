@@ -35,20 +35,8 @@ class WidgetActivity : BaseActivity() {
     private fun initView() {
         widgetGroup.lockedGrid = true
         widgetGroup.gridCount = this.gridSize
-        widgetHelper = WidgetHelper.with(this, widgetGroup).let {
-            it.dragStrokeWidth = resources.dp(20F)
-            it.selectedBorderWidth = resources.dp(2F)
-            it.touchPointRadius = resources.dp(5F)
-            it.selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
-            it.focusColor = ContextCompat.getColor(this, R.color.colorAccent)
-            it.pendingLayoutTime = 800L
-            it.isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-            it.canDrag = false
-            it.isAutoInverted = this.isAutoInverted
-            it.isAutoLight = this.isAutoLight
-            it.isInverted = this.isInverted
-            it
-        }.onCantLayout {
+        widgetHelper = PreferenceHelper.createWidgetHelper(this, widgetGroup)
+            .onCantLayout {
             for (panel in it) {
                 widgetHelper.removePanel(panel)
             }
