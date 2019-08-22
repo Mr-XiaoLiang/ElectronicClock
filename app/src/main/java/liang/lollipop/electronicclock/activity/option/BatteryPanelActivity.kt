@@ -13,6 +13,15 @@ class BatteryPanelActivity : BottomNavigationActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setResult(Activity.RESULT_OK, Intent())
+        initView()
     }
+
+    private fun initView() {
+        showFAB(R.drawable.ic_done_black_24dp) {
+            setResult(Activity.RESULT_OK, Intent())
+            onBackPressed()
+        }
+
+    }
+
 }
