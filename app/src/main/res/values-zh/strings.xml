@@ -13,7 +13,6 @@
     <string name="dialog_positive_reset">确定撤销</string>
     <string name="dialog_negative_reset">放弃操作</string>
 
-    <string name="widget_clock">数字时钟</string>
     <string name="protrait_preference">竖屏设置</string>
     <string name="landscape_preference">横屏设置</string>
 
@@ -40,4 +39,7 @@
 
     <string name="guidelines_start_btn">点击后启动时钟</string>
     <string name="guidelines_panel_item">长按启动调整模式，可以改变形状以及位置</string>
+
+    <string name="widget_clock">数字时钟</string>
+    <string name="widget_battery">电池信息</string>
 </resources>

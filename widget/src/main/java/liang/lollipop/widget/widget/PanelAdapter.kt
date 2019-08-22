@@ -14,8 +14,9 @@ import liang.lollipop.widget.utils.AppWidgetHelper
 class PanelAdapter(private val appWidgetHelper: AppWidgetHelper) {
 
     private var onErrorListener: ((info: PanelInfo) -> Unit)? = null
+    private var providers: ((info: PanelInfo) -> Panel<*>?)? = null
 
-    fun <I: PanelInfo> createPanelByInfo(info: I): Panel<I> {
+    fun createPanelByInfo(info: PanelInfo): Panel<*> {
         return when (info) {
             is ClockPanelInfo -> info.createPanel()
             is SystemWidgetPanelInfo -> {
@@ -27,8 +28,10 @@ class PanelAdapter(private val appWidgetHelper: AppWidgetHelper) {
                     EmptyPanel(info)
                 }
             }
-            else -> EmptyPanel(info)
-        } as Panel<I>
+            else -> {
+                providers?.invoke(info)?:EmptyPanel(info)
+            }
+        }
     }
 
     fun updateBySecond(panel: Panel<*>): Boolean {
@@ -36,6 +39,14 @@ class PanelAdapter(private val appWidgetHelper: AppWidgetHelper) {
             return false
         }
         return true
+    }
+
+    fun onError(lis: ((info: PanelInfo) -> Unit)? = null) {
+        this.onErrorListener = lis
+    }
+
+    fun panelProviders(lis: ((info: PanelInfo) -> Panel<*>?)? = null) {
+        this.providers = lis
     }
 
     companion object {

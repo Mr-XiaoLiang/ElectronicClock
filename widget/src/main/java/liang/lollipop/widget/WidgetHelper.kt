@@ -41,8 +41,8 @@ class WidgetHelper private constructor(private val activity: Activity,
 
         private const val DEF_MAX_LIGHT = 200F
 
-        private const val REQUEST_CODE_PREFIX = 8 shl 13
-        private const val REQUEST_CODE_MARK = 8192
+        private const val REQUEST_CODE_PREFIX = 8 shl 12
+        private const val REQUEST_CODE_MARK = 4096
     }
 
     private var requestCodeProgress = 0
@@ -300,6 +300,13 @@ class WidgetHelper private constructor(private val activity: Activity,
         widgetGroup.post {
             onColorChange()
         }
+    }
+
+    /**
+     * 设置外置的面板提供者
+     */
+    fun panelProviders(lis: ((info: PanelInfo) -> Panel<*>?)? = null) {
+        this.panelAdapter.panelProviders(lis)
     }
 
     /**
@@ -594,7 +601,7 @@ class WidgetHelper private constructor(private val activity: Activity,
         canvas.drawCircle(tmpBounds.exactCenterX(), tmpBounds.bottom.toFloat(), touchPointRadius, strokePaint)
     }
 
-    fun <I: PanelInfo> addPanel(info: I, result: ((Panel<I>) -> Unit)? = null) {
+    fun addPanel(info: PanelInfo, result: ((Panel<*>) -> Unit)? = null) {
         if (info.id == PanelInfo.NO_ID && info.initIntent != null) {
             pendingPanel(info)
             return
@@ -623,7 +630,7 @@ class WidgetHelper private constructor(private val activity: Activity,
 
     private fun onPendingPanelResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         val info = pendlingInfoList.get(requestCode)?:return false
-        if (requestCode != Activity.RESULT_OK || data == null) {
+        if (resultCode != Activity.RESULT_OK || data == null) {
             pendlingInfoList.remove(requestCode)
             return true
         }
