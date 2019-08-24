@@ -1,15 +1,14 @@
-package liang.lollipop.electronicclock.activity.option
+package liang.lollipop.electronicclock.activity
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.activity.BottomNavigationActivity
 
-class BatteryPanelActivity : BottomNavigationActivity() {
+class PanelInfoAdjustmentActivity : BottomNavigationActivity() {
 
     override val contentViewId: Int
-        get() = R.layout.activity_battery_panel
+        get() = R.layout.activity_panel_info_adjustment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

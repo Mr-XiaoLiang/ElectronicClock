@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activity.option.BatteryPanelActivity">
+        tools:context=".activity.PanelInfoAdjustmentActivity">
 
     <liang.lollipop.electronicclock.view.WidgetPreviewGroup
             android:id="@+id/previewGroup"
