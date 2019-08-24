@@ -2,7 +2,7 @@ package liang.lollipop.electronicclock.widget.info
 
 import android.content.Intent
 import android.graphics.Color
-import liang.lollipop.electronicclock.activity.option.BatteryPanelActivity
+import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.widget.widget.PanelInfo
 
 /**
@@ -18,7 +18,7 @@ class BatteryInfo: PanelInfo() {
 
     init {
         initIntent = Intent().apply {
-            setClassName("liang.lollipop.electronicclock", BatteryPanelActivity::class.java.name)
+            setClassName("liang.lollipop.electronicclock", PanelInfoAdjustmentActivity::class.java.name)
         }
     }
 
