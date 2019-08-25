@@ -50,6 +50,10 @@ class DatabaseHelper private constructor(context: Context):
                 " from $TABLE " +
                 " WHERE $DIRECTION = ? and $PAGE_NUMBER = ? ;"
 
+        const val SELECT_WIDGET_BY_ID = " select $ALL " +
+                " from $TABLE " +
+                " WHERE $ID = ? ;"
+
         const val CREATE_TABLE = "create table $TABLE ( " +
                 " $ID INTEGER PRIMARY KEY " +
                 " , $TYPE_NAME INTEGER " +
