@@ -17,8 +17,10 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity() {
 
     private fun initView() {
         showFAB(R.drawable.ic_done_black_24dp) {
-            setResult(Activity.RESULT_OK, Intent())
-            onBackPressed()
+            it.setOnClickListener {
+                setResult(Activity.RESULT_OK, Intent())
+                onBackPressed()
+            }
         }
 
     }
