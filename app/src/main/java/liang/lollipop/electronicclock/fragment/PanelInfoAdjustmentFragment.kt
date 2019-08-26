@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import liang.lollipop.widget.utils.DatabaseHelper
+import liang.lollipop.widget.widget.PanelInfo
 
 /**
  * @author lollipop
@@ -46,10 +48,19 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         infoLoadCallback?.onInfoLoadStatusChange(false)
     }
 
+    protected fun onInfoFoundById(info: PanelInfo?) {
+
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if (infoId.isNotEmpty()) {
-
+            startLoading()
+            DatabaseHelper.read(activity!!).findInfoById(infoId) { resultInfo ->
+                onInfoFoundById(resultInfo)
+            }.close()
+        } else {
+            onInfoFoundById(null)
         }
     }
 
