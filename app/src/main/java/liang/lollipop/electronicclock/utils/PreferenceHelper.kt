@@ -13,6 +13,7 @@ import liang.lollipop.electronicclock.list.*
 import liang.lollipop.electronicclock.widget.info.BatteryInfo
 import liang.lollipop.electronicclock.widget.panel.BatteryPanel
 import liang.lollipop.widget.WidgetHelper
+import liang.lollipop.widget.utils.PanelProviders
 import liang.lollipop.widget.utils.dp
 import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.PanelInfo
@@ -39,6 +40,10 @@ object PreferenceHelper {
     const val MIN_GRID_SIZE = 4
     const val MAX_GRID_SIZE = 20
 
+    init {
+        WidgetHelper.panelProviders(LPanelProviders())
+    }
+
     fun bindPreferenceGroup(group: RecyclerView): PreferenceHelperImpl {
         return PreferenceHelperImpl(group)
     }
@@ -56,16 +61,25 @@ object PreferenceHelper {
             it.isAutoInverted = activity.isAutoInverted
             it.isAutoLight = activity.isAutoLight
             it.isInverted = activity.isInverted
-            it.panelProviders{ info ->  createPanelByInfo(info) }
             it
         }
     }
 
-    private fun createPanelByInfo(info: PanelInfo): Panel<*>? {
-        return when (info) {
-            is BatteryInfo -> BatteryPanel(info)
-            else -> null
+    class LPanelProviders: PanelProviders {
+        override fun createPanelByInfo(info: PanelInfo): Panel<*>? {
+            return when (info) {
+                is BatteryInfo -> BatteryPanel(info)
+                else -> null
+            }
         }
+
+        override fun createInfoByName(name: String): PanelInfo? {
+            return when (name) {
+                BatteryInfo::class.java.name -> BatteryInfo()
+                else -> null
+            }
+        }
+
     }
 
     class PreferenceHelperImpl(private val group: RecyclerView) {

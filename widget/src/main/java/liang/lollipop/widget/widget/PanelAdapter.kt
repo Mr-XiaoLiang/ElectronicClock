@@ -5,6 +5,7 @@ import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.panel.EmptyPanel
 import liang.lollipop.widget.panel.SystemWidgetPanel
 import liang.lollipop.widget.utils.AppWidgetHelper
+import liang.lollipop.widget.utils.PanelProviders
 
 /**
  * @author lollipop
@@ -13,8 +14,26 @@ import liang.lollipop.widget.utils.AppWidgetHelper
  */
 class PanelAdapter(private val appWidgetHelper: AppWidgetHelper) {
 
+    companion object {
+
+        var panelProviders: PanelProviders? = null
+
+        fun className(info: PanelInfo): String {
+            return info.javaClass.name
+        }
+
+        fun newInfo(name: String): PanelInfo {
+            return when (name) {
+                ClockPanelInfo::class.java.name -> ClockPanelInfo()
+                SystemWidgetPanelInfo::class.java.name -> SystemWidgetPanelInfo()
+                else -> {
+                    panelProviders?.createInfoByName(name)?:PanelInfo()
+                }
+            }
+        }
+    }
+
     private var onErrorListener: ((info: PanelInfo) -> Unit)? = null
-    private var providers: ((info: PanelInfo) -> Panel<*>?)? = null
 
     fun createPanelByInfo(info: PanelInfo): Panel<*> {
         return when (info) {
@@ -29,7 +48,7 @@ class PanelAdapter(private val appWidgetHelper: AppWidgetHelper) {
                 }
             }
             else -> {
-                providers?.invoke(info)?:EmptyPanel(info)
+                panelProviders?.createPanelByInfo(info)?:EmptyPanel(info)
             }
         }
     }
@@ -43,24 +62,6 @@ class PanelAdapter(private val appWidgetHelper: AppWidgetHelper) {
 
     fun onError(lis: ((info: PanelInfo) -> Unit)? = null) {
         this.onErrorListener = lis
-    }
-
-    fun panelProviders(lis: ((info: PanelInfo) -> Panel<*>?)? = null) {
-        this.providers = lis
-    }
-
-    companion object {
-        fun className(info: PanelInfo): String {
-            return info.javaClass.name
-        }
-
-        fun newInfo(name: String): PanelInfo {
-            return when (name) {
-                ClockPanelInfo::class.java.name -> ClockPanelInfo()
-                SystemWidgetPanelInfo::class.java.name -> SystemWidgetPanelInfo()
-                else -> PanelInfo()
-            }
-        }
     }
 
 }

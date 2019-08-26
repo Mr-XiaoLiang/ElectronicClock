@@ -91,6 +91,17 @@ class DatabaseHelper private constructor(context: Context):
             return this
         }
 
+        fun findInfoById(id: String, result: ((PanelInfo?) -> Unit)): SqlDB {
+            val c = db.rawQuery(WidgetTable.SELECT_WIDGET_BY_ID, arrayOf(id))
+            if (c.moveToFirst()) {
+                result(newInfo(c))
+            } else {
+                result(null)
+            }
+            c.close()
+            return this
+        }
+
         fun install(info: PanelInfo, direction: String, pageNumber: Int = 0,
                     result: ((Long) -> Unit)? = null): SqlDB {
             val value = db.insert(WidgetTable.TABLE, "",
@@ -116,7 +127,7 @@ class DatabaseHelper private constructor(context: Context):
 
         // 开启一次事务
         fun transaction(run: (SqlDB.() -> Unit)) {
-            // 由于批量操作，因此开启事务并且try执行，
+            // 用于批量操作，因此开启事务并且try执行，
             // 由于事务提交本身存在消耗，因此可以提交速度，并且避免损失
             try {
                 db.beginTransaction()

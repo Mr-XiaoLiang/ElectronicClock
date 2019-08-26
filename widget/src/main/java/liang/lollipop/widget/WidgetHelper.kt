@@ -15,10 +15,7 @@ import android.os.Handler
 import android.util.SparseArray
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.panel.SystemWidgetPanel
-import liang.lollipop.widget.utils.AppWidgetHelper
-import liang.lollipop.widget.utils.DatabaseHelper
-import liang.lollipop.widget.utils.Utils
-import liang.lollipop.widget.utils.dp
+import liang.lollipop.widget.utils.*
 import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.PanelAdapter
 import liang.lollipop.widget.widget.PanelInfo
@@ -37,6 +34,14 @@ class WidgetHelper private constructor(private val activity: Activity,
     companion object {
         fun with(context: Activity, group: WidgetGroup): WidgetHelper {
             return WidgetHelper(context, group)
+        }
+
+        /**
+         * 设置外置的面板提供者
+         * 这是一个全局的静态设置方法
+         */
+        fun panelProviders(panelProviders: PanelProviders?) {
+            PanelAdapter.panelProviders = panelProviders
         }
 
         private const val DEF_MAX_LIGHT = 200F
@@ -300,13 +305,6 @@ class WidgetHelper private constructor(private val activity: Activity,
         widgetGroup.post {
             onColorChange()
         }
-    }
-
-    /**
-     * 设置外置的面板提供者
-     */
-    fun panelProviders(lis: ((info: PanelInfo) -> Panel<*>?)? = null) {
-        this.panelAdapter.panelProviders(lis)
     }
 
     /**
