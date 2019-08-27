@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_bottom_navigation.*
@@ -39,9 +40,15 @@ open class BottomNavigationActivity: BaseActivity() {
                 initInsetListener(rootGroup)
                 bindToolBar(appBarLayout)
                 fab.hide()
+                contentGroup.post {
+                    contentGroup.setPadding(0, 0, 0, appBarLayout.height)
+                }
                 if (contentViewId != 0) {
                     layoutInflater.inflate(contentViewId, contentGroup, true)
                 }
+                contentLoading.putColor(Color.WHITE,
+                    ContextCompat.getColor(this, R.color.colorPrimary),
+                    ContextCompat.getColor(this, R.color.colorAccent))
             }
         }
     }
@@ -57,6 +64,14 @@ open class BottomNavigationActivity: BaseActivity() {
         fab.setImageResource(icon)
         fab.show()
         run?.invoke(fab)
+    }
+
+    protected fun startContentLoading() {
+        contentLoading.show()
+    }
+
+    protected fun stopContentLoading() {
+        contentLoading.show()
     }
 
     private fun transparentSystemUI() {
