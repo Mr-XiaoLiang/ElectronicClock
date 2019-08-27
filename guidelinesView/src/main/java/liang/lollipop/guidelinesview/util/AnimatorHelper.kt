@@ -88,13 +88,15 @@ fun AnimatorListenerImpl.onEnd(run: (Animator?) -> Unit) {
     this.endListener = run
 }
 
-fun Animator.lifecycleBinding(listener: (AnimatorListenerImpl.() -> Unit)?) {
-    listener?:return
+fun Animator.lifecycleBinding(listener: (AnimatorListenerImpl.() -> Unit)?): Animator {
+    listener?:return this
     this.addListener(AnimatorListenerImpl().apply { listener.invoke(this) })
+    return this
 }
 
-fun ViewPropertyAnimator.lifecycleBinding(listener: (AnimatorListenerImpl.() -> Unit)) {
+fun ViewPropertyAnimator.lifecycleBinding(listener: (AnimatorListenerImpl.() -> Unit)): ViewPropertyAnimator {
     this.setListener(AnimatorListenerImpl().apply { listener.invoke(this) })
+    return this
 }
 
 fun View.revealOpenWith(anchorView: View, listener: (AnimatorListenerImpl.() -> Unit)? = null) {

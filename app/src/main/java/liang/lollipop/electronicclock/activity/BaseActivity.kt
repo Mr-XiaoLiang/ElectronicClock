@@ -4,6 +4,7 @@ import android.graphics.Rect
 import android.os.Build
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -78,9 +79,7 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     protected fun initInsetListener(rootView: View) {
-        rootView.fitsSystemWindows = true
-        rootView.setOnApplyWindowInsetsListener { _, insets ->
-
+        insetListener(rootView) {insets ->
             val left = insets.systemWindowInsetLeft
             val top = insets.systemWindowInsetTop
             val right = insets.systemWindowInsetRight
@@ -90,7 +89,13 @@ open class BaseActivity: AppCompatActivity() {
             whenDisplayCutout(left, top, right)
             onWindowInsetsChange(left, top, right, bottom)
             updateFragmentInset(left, top, right, bottom)
-            // return
+        }
+    }
+
+    protected fun insetListener(group: View, onInsetChange: (insets: WindowInsets) -> Unit) {
+        group.fitsSystemWindows = true
+        group.setOnApplyWindowInsetsListener { _, insets ->
+            onInsetChange(insets)
             insets.consumeStableInsets()
         }
     }

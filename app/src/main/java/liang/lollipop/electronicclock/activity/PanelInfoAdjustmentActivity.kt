@@ -3,6 +3,7 @@ package liang.lollipop.electronicclock.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import kotlinx.android.synthetic.main.activity_panel_info_adjustment.*
 import liang.lollipop.electronicclock.R
 
 class PanelInfoAdjustmentActivity : BottomNavigationActivity() {
@@ -22,7 +23,7 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity() {
                 onBackPressed()
             }
         }
-
+//        startContentLoading()
     }
 
 }
