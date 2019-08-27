@@ -15,7 +15,13 @@ object Utils {
 
     fun loggerI(tag: String): ((String) -> Unit) {
         return { value ->
-            Log.i("Lollipop-$tag", value)
+            Log.i("Lollipop", "$tag -> $value")
+        }
+    }
+
+    fun loggerE(tag: String): ((String) -> Unit) {
+        return { value ->
+            Log.e("Lollipop", "$tag -> $value")
         }
     }
 

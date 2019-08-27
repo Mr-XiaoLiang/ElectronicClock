@@ -4,7 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import liang.lollipop.electronicclock.utils.doAsync
+import liang.lollipop.electronicclock.utils.uiThread
 import liang.lollipop.widget.utils.DatabaseHelper
+import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.PanelInfo
 
 /**
@@ -16,11 +19,15 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     companion object {
         const val ARG_INFO_ID = "ARG_INFO_ID"
+
+        private const val TAG = "PanelInfoAdjustmentFragment"
     }
 
     private var infoId = ""
 
     private var infoLoadCallback: InfoLoadCallback? = null
+
+    private val logE = Utils.loggerE(TAG)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,9 +63,16 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         super.onActivityCreated(savedInstanceState)
         if (infoId.isNotEmpty()) {
             startLoading()
-            DatabaseHelper.read(activity!!).findInfoById(infoId) { resultInfo ->
-                onInfoFoundById(resultInfo)
-            }.close()
+            doAsync ({ e ->
+                logE("init panel info from database error:" + e.localizedMessage)
+            }) {
+                DatabaseHelper.read(activity!!).findInfoById(infoId) { resultInfo ->
+                    uiThread {
+                        stopLoading()
+                        onInfoFoundById(resultInfo)
+                    }
+                }.close()
+            }
         } else {
             onInfoFoundById(null)
         }
