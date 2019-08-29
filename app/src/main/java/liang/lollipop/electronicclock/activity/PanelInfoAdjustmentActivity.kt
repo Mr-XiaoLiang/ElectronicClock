@@ -5,10 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_panel_info_adjustment.*
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.fragment.BatteryAdjustmentFragment
-import liang.lollipop.electronicclock.fragment.EmptyAdjustmentFragment
 import liang.lollipop.electronicclock.fragment.PanelInfoAdjustmentFragment
-import liang.lollipop.electronicclock.widget.info.BatteryInfo
+import liang.lollipop.electronicclock.utils.PanelInfoAdjustmentHelper
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
 
@@ -34,10 +32,7 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         private const val TAG_FRAGMENT = "TAG_FRAGMENT"
 
         fun getIntent(info: PanelInfo): Intent {
-            val typeInt = when (info) {
-                is BatteryInfo -> PanelType.Battery.value
-                else -> PanelType.Empty.value
-            }
+            val typeInt = PanelInfoAdjustmentHelper.getTypeByInfo(info)
             return Intent().apply {
                 setClassName("liang.lollipop.electronicclock", PanelInfoAdjustmentActivity::class.java.name)
                 putExtra(ARG_PANEL_TYPE, typeInt)
@@ -50,11 +45,6 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         }
     }
 
-    enum class PanelType(val value: Int) {
-        Empty(0),
-        Battery(1)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         infoId = intent.getIntExtra(ARG_PANEL_ID, PanelInfo.NO_ID)
@@ -63,7 +53,7 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
 
     private fun initView() {
         val transaction = supportFragmentManager.beginTransaction()
-        val fragment = createFragmentByType(intent.getIntExtra(ARG_PANEL_TYPE, PanelType.Empty.value))
+        val fragment = PanelInfoAdjustmentHelper.createFragmentForIntent(intent, ARG_PANEL_TYPE, infoId)
         adjustmentFragment = fragment
         transaction.add(R.id.adjustmentFragmentGroup, fragment, TAG_FRAGMENT)
         transaction.commit()
@@ -99,17 +89,6 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
 
     override fun setPanelSize(spanX: Int, spanY: Int) {
         previewGroup.changeSize(spanX, spanY)
-    }
-
-    private fun createFragmentByType(typeId: Int): PanelInfoAdjustmentFragment {
-        return when (typeId) {
-            PanelType.Battery.value -> {
-                BatteryAdjustmentFragment.getInstance(infoId)
-            }
-            else -> {
-                EmptyAdjustmentFragment.getInstance()
-            }
-        }
     }
 
 }
