@@ -22,17 +22,14 @@ class WidgetPreviewGroup(context: Context, attr: AttributeSet?, defStyleAttr: In
     constructor(context: Context, attr: AttributeSet?): this(context, attr, 0)
     constructor(context: Context): this(context, null)
 
-    var spanX = 1
-        set(value) {
-            field = value
-            requestLayout()
-        }
+    private var spanX = 1
+    private var spanY = 1
 
-    var spanY = 1
-        set(value) {
-            field = value
-            requestLayout()
-        }
+    fun changeSize(x: Int, y: Int) {
+        spanX = x
+        spanY = y
+        requestLayout()
+    }
 
     private fun getChildSize(width: Int, height: Int): IntArray {
         val gridSize = min(width / spanX, height / spanY)

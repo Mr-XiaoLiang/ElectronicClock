@@ -12,7 +12,9 @@ import liang.lollipop.electronicclock.widget.info.BatteryInfo
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
 
-class PanelInfoAdjustmentActivity : BottomNavigationActivity(), PanelInfoAdjustmentFragment.InfoLoadCallback {
+class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
+    PanelInfoAdjustmentFragment.InfoLoadCallback,
+    PanelInfoAdjustmentFragment.PanelSizeChangeCallback {
 
     override val contentViewId: Int
         get() = R.layout.activity_panel_info_adjustment
@@ -89,6 +91,14 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(), PanelInfoAdjustm
     override fun onPanelInitComplete() {
         val panelView = adjustmentFragment?.getPanelView()?:return
         previewGroup.addView(panelView)
+    }
+
+    override fun getSizeChangeCallback(): PanelInfoAdjustmentFragment.PanelSizeChangeCallback {
+        return this
+    }
+
+    override fun setPanelSize(spanX: Int, spanY: Int) {
+        previewGroup.changeSize(spanX, spanY)
     }
 
     private fun createFragmentByType(typeId: Int): PanelInfoAdjustmentFragment {
