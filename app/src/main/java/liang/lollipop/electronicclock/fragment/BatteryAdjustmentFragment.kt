@@ -2,8 +2,11 @@ package liang.lollipop.electronicclock.fragment
 
 import android.os.Bundle
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
+import liang.lollipop.electronicclock.R
 import liang.lollipop.widget.widget.PanelInfo
 
 /**
@@ -22,6 +25,11 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
             }
         }
 
+    }
+
+    override fun onCreateView(inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_adjustment_battery, container, false)
     }
 
     override fun getPanelView(): View {
