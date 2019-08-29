@@ -100,6 +100,11 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
     interface InfoLoadCallback {
         fun onInfoLoadStatusChange(isLoading: Boolean)
         fun onPanelInitComplete()
+        fun getSizeChangeCallback(): PanelSizeChangeCallback
+    }
+
+    interface PanelSizeChangeCallback {
+        fun setPanelSize(spanX: Int, spanY: Int)
     }
 
 }
