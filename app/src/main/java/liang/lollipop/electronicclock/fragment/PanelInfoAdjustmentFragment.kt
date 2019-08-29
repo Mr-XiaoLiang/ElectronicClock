@@ -42,6 +42,11 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
     abstract fun getPanelView(): View
 
     /**
+     * 返回当前调整的结果
+     */
+    abstract fun getPanelInfo(): PanelInfo
+
+    /**
      * 开始加载
      */
     protected fun startLoading() {
@@ -55,8 +60,13 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         infoLoadCallback?.onInfoLoadStatusChange(false)
     }
 
-    protected fun onInfoFoundById(info: PanelInfo?) {
+    protected abstract fun onInfoFoundById(info: PanelInfo?)
 
+    /**
+     * 当面板初始化完成时，调用方法出发完成事件
+     */
+    protected fun panelInitComplete() {
+        infoLoadCallback?.onPanelInitComplete()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -89,6 +99,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     interface InfoLoadCallback {
         fun onInfoLoadStatusChange(isLoading: Boolean)
+        fun onPanelInitComplete()
     }
 
 }

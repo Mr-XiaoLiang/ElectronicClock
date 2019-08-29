@@ -162,6 +162,7 @@ class EditActivity : BaseActivity() {
         // 通过辅助类来完成标准小部件容器的事件绑定
         widgetHelper = PreferenceHelper.createWidgetHelper(this, widgetGroup).let {
             it.isAutoInverted = false
+            it.canDrag = true
             it
         }.onCantLayout {
             // 当出现无法排版的面板时
