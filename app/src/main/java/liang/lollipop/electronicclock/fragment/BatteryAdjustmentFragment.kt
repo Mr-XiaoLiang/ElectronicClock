@@ -20,7 +20,9 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
         fun getInstance(id: Int): BatteryAdjustmentFragment {
             return BatteryAdjustmentFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_INFO_ID, "$id")
+                    if (id != PanelInfo.NO_ID) {
+                        putString(ARG_INFO_ID, "$id")
+                    }
                 }
             }
         }
