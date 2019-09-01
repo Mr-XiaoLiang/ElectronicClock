@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="AutoSeekBar">
+        <attr name="barColor" format="color" />
+        <attr name="selectedBarColor" format="color" />
+        <attr name="max" format="float"/>
+        <attr name="min" format="float"/>
+        <attr name="progress" format="float"/>
+    </declare-styleable>
+
+</resources>
