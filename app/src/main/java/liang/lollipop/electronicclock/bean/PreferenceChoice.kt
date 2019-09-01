@@ -1,4 +1,4 @@
-package liang.lollipop.electronicclock.list
+package liang.lollipop.electronicclock.bean
 
 /**
  * @author lollipop
@@ -7,7 +7,8 @@ package liang.lollipop.electronicclock.list
  */
 class PreferenceChoice : PreferenceInfo<Int>() {
 
-    override var value: Int = VALUE_NEUTRAL
+    override var value: Int =
+        VALUE_NEUTRAL
 
     var positiveIcon = 0
     var negativeIcon = 0

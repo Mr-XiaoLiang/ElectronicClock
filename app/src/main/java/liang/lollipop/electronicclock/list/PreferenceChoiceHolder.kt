@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.utils.NumberSelectedDialog
+import liang.lollipop.electronicclock.bean.PreferenceChoice
 
 /**
  * @author lollipop

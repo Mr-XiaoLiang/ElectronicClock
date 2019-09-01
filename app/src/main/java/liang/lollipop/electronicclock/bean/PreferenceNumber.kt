@@ -1,4 +1,6 @@
-package liang.lollipop.electronicclock.list
+package liang.lollipop.electronicclock.bean
+
+import liang.lollipop.electronicclock.bean.PreferenceInfo
 
 /**
  * @author lollipop
