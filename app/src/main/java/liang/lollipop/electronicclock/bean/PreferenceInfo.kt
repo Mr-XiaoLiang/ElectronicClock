@@ -1,4 +1,4 @@
-package liang.lollipop.electronicclock.list
+package liang.lollipop.electronicclock.bean
 
 /**
  * @author lollipop

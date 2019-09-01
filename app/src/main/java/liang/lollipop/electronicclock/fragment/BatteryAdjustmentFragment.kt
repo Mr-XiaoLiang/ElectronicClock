@@ -31,7 +31,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
 
     override fun onCreateView(inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_adjustment_battery, container, false)
+        return inflater.inflate(R.layout.fragment_adjustment_info, container, false)
     }
 
     override fun getPanelView(): View {

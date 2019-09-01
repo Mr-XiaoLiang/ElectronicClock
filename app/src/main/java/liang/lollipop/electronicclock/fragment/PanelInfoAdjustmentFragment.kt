@@ -2,8 +2,12 @@ package liang.lollipop.electronicclock.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.bean.AdjustmentBoolean
 import liang.lollipop.electronicclock.utils.doAsync
 import liang.lollipop.electronicclock.utils.uiThread
 import liang.lollipop.widget.utils.DatabaseHelper
@@ -33,6 +37,18 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             infoId = it.getString(ARG_INFO_ID)?:""
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_adjustment_info, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        AdjustmentBoolean{
+            value = true
         }
     }
 

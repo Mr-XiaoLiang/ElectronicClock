@@ -3,6 +3,10 @@ package liang.lollipop.electronicclock.list
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import liang.lollipop.electronicclock.bean.PreferenceBoolean
+import liang.lollipop.electronicclock.bean.PreferenceChoice
+import liang.lollipop.electronicclock.bean.PreferenceInfo
+import liang.lollipop.electronicclock.bean.PreferenceNumber
 import java.lang.RuntimeException
 
 /**
@@ -11,8 +15,8 @@ import java.lang.RuntimeException
  * 偏好设置的Adapter
  */
 class PreferenceAdapter (private val data: ArrayList<PreferenceInfo<*>>,
-                        private val layoutInflater: LayoutInflater,
-                        private val onPreferenceChanged: (info: PreferenceInfo<*>, newValue: Any) -> Unit)
+                         private val layoutInflater: LayoutInflater,
+                         private val onPreferenceChanged: (info: PreferenceInfo<*>, newValue: Any) -> Unit)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private companion object {

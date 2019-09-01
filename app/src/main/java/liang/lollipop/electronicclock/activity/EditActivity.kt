@@ -10,21 +10,19 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.activity_edit.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
-import liang.lollipop.electronicclock.list.ActionInfo
+import liang.lollipop.electronicclock.bean.ActionInfo
 import liang.lollipop.electronicclock.utils.*
 import liang.lollipop.electronicclock.widget.info.BatteryInfo
 import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
-import liang.lollipop.widget.utils.dp
 
 /**
  * 编辑用的Activity
@@ -183,14 +181,62 @@ class EditActivity : BaseActivity() {
      * 初始化控制按钮的列表
      */
     private fun initActions() {
-        actionInfoArray.add(ActionInfo(ActionId.BACK, R.drawable.ic_arrow_back_black_24dp, R.string.action_back))
-        actionInfoArray.add(ActionInfo(ActionId.DONE, R.drawable.ic_done_black_24dp, R.string.action_done))
-        actionInfoArray.add(ActionInfo(ActionId.DELETE, R.drawable.ic_delete_black_24dp, R.string.action_delete))
-        actionInfoArray.add(ActionInfo(ActionId.WIDGET, R.drawable.ic_dashboard_black_24dp, R.string.action_widget))
-        actionInfoArray.add(ActionInfo(ActionId.PREVIEW, R.drawable.ic_visibility_black_24dp, R.string.action_preview))
-        actionInfoArray.add(ActionInfo(ActionId.INVERTED, R.drawable.ic_invert_colors_black_24dp, R.string.action_inverted))
-        actionInfoArray.add(ActionInfo(ActionId.AUTO_LIGHT, R.drawable.ic_brightness_auto_black_24dp, R.string.action_auto_light))
-        actionInfoArray.add(ActionInfo(ActionId.RESET, R.drawable.ic_replay_black_24dp, R.string.action_reset))
+        actionInfoArray.add(
+            ActionInfo(
+                ActionId.BACK,
+                R.drawable.ic_arrow_back_black_24dp,
+                R.string.action_back
+            )
+        )
+        actionInfoArray.add(
+            ActionInfo(
+                ActionId.DONE,
+                R.drawable.ic_done_black_24dp,
+                R.string.action_done
+            )
+        )
+        actionInfoArray.add(
+            ActionInfo(
+                ActionId.DELETE,
+                R.drawable.ic_delete_black_24dp,
+                R.string.action_delete
+            )
+        )
+        actionInfoArray.add(
+            ActionInfo(
+                ActionId.WIDGET,
+                R.drawable.ic_dashboard_black_24dp,
+                R.string.action_widget
+            )
+        )
+        actionInfoArray.add(
+            ActionInfo(
+                ActionId.PREVIEW,
+                R.drawable.ic_visibility_black_24dp,
+                R.string.action_preview
+            )
+        )
+        actionInfoArray.add(
+            ActionInfo(
+                ActionId.INVERTED,
+                R.drawable.ic_invert_colors_black_24dp,
+                R.string.action_inverted
+            )
+        )
+        actionInfoArray.add(
+            ActionInfo(
+                ActionId.AUTO_LIGHT,
+                R.drawable.ic_brightness_auto_black_24dp,
+                R.string.action_auto_light
+            )
+        )
+        actionInfoArray.add(
+            ActionInfo(
+                ActionId.RESET,
+                R.drawable.ic_replay_black_24dp,
+                R.string.action_reset
+            )
+        )
 
         val adapter = ActionAdapter(actionInfoArray, layoutInflater, true) { holder ->
             onActionSelected(actionInfoArray[holder.adapterPosition].action)
@@ -202,8 +248,20 @@ class EditActivity : BaseActivity() {
     }
 
     private fun initWidgets() {
-        widgetInfoArray.add(ActionInfo(WidgetId.CLOCK, R.drawable.ic_access_time_black_24dp, R.string.widget_clock))
-        widgetInfoArray.add(ActionInfo(WidgetId.BATTERY, R.drawable.ic_battery_60_white_24dp, R.string.widget_battery))
+        widgetInfoArray.add(
+            ActionInfo(
+                WidgetId.CLOCK,
+                R.drawable.ic_access_time_black_24dp,
+                R.string.widget_clock
+            )
+        )
+        widgetInfoArray.add(
+            ActionInfo(
+                WidgetId.BATTERY,
+                R.drawable.ic_battery_60_white_24dp,
+                R.string.widget_battery
+            )
+        )
 
 
         val adapter = ActionAdapter(widgetInfoArray, layoutInflater, false) { holder ->

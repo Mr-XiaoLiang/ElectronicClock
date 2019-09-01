@@ -70,31 +70,6 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         }
     }
 
-//    class NumberAdapter(private val max: Int,
-//                        private val layoutInflater: LayoutInflater): RecyclerView.Adapter<NumberHolder>() {
-//        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NumberHolder {
-//            return NumberHolder(TextView(layoutInflater.context))
-//        }
-//
-//        override fun getItemCount(): Int {
-//            return max
-//        }
-//
-//        override fun onBindViewHolder(holder: NumberHolder, position: Int) {
-//            holder.onBind(position)
-//        }
-//
-//
-//    }
-//
-//    class NumberHolder(view: View): RecyclerView.ViewHolder(view) {
-//        fun onBind(num: Int) {
-//            if (itemView is TextView) {
-//                itemView.text = "$num"
-//            }
-//        }
-//    }
-
     override fun onInfoLoadStatusChange(isLoading: Boolean) {
         if (isLoading) {
             startContentLoading()

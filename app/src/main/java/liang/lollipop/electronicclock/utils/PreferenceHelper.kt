@@ -9,6 +9,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.bean.PreferenceBoolean
+import liang.lollipop.electronicclock.bean.PreferenceChoice
+import liang.lollipop.electronicclock.bean.PreferenceInfo
+import liang.lollipop.electronicclock.bean.PreferenceNumber
 import liang.lollipop.electronicclock.list.*
 import liang.lollipop.electronicclock.widget.info.BatteryInfo
 import liang.lollipop.electronicclock.widget.panel.BatteryPanel

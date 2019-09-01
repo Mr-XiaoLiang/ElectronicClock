@@ -7,6 +7,7 @@ import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.bean.PreferenceBoolean
 
 /**
  * @author lollipop
