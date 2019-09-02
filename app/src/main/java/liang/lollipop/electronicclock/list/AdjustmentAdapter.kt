@@ -11,6 +11,8 @@ import liang.lollipop.electronicclock.bean.AdjustmentInfo
  */
 class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo<*>>,
                         private val inflater: LayoutInflater): RecyclerView.Adapter<AdjustmentHolder<*>>() {
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdjustmentHolder<*> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -20,5 +22,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo<*>>,
     }
 
     override fun onBindViewHolder(holder: AdjustmentHolder<*>, position: Int) {
+//        holder.onBind()
     }
+
 }
