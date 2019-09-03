@@ -25,6 +25,7 @@
             android:layout_height="48dp"/>
 
     <liang.lollipop.electronicclock.view.AutoSeekBar
+            android:id="@+id/spanYSeekBar"
             app:layout_constraintTop_toTopOf="@id/previewGroup"
             app:layout_constraintBottom_toTopOf="@id/sizeChangeBtn"
             android:layout_marginTop="20dp"
@@ -35,11 +36,11 @@
             android:layout_marginRight="5dp"
             app:barColor="@color/colorBackground"
             app:selectedBarColor="@color/colorPrimaryDark"
-
             android:layout_width="20dp"
             android:layout_height="0px"/>
 
     <liang.lollipop.electronicclock.view.AutoSeekBar
+            android:id="@+id/spanXSeekBar"
             app:layout_constraintBottom_toBottomOf="@id/sizeChangeBtn"
             app:layout_constraintTop_toTopOf="@id/sizeChangeBtn"
             android:layout_marginTop="5dp"

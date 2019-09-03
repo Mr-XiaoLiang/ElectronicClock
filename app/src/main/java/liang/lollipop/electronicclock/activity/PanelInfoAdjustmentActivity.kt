@@ -3,10 +3,14 @@ package liang.lollipop.electronicclock.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import kotlinx.android.synthetic.main.activity_panel_info_adjustment.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.fragment.PanelInfoAdjustmentFragment
 import liang.lollipop.electronicclock.utils.PanelInfoAdjustmentHelper
+import liang.lollipop.guidelinesview.util.lifecycleBinding
+import liang.lollipop.guidelinesview.util.onEnd
+import liang.lollipop.guidelinesview.util.onStart
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
 
@@ -20,6 +24,8 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
     private var infoId = PanelInfo.NO_ID
 
     private var adjustmentFragment: PanelInfoAdjustmentFragment? = null
+
+    private var isSeekBarShown = true
 
     companion object {
 
@@ -67,6 +73,59 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
                 setResult(Activity.RESULT_OK, result)
                 onBackPressed()
             }
+        }
+        bindSeekBarAnimation()
+
+    }
+
+    private fun bindSeekBarAnimation() {
+        sizeChangeBtn.setOnClickListener {
+            if (isSeekBarShown) {
+                spanXSeekBar.animate()
+                    .translationY(spanXSeekBar.height.toFloat())
+                    .alpha(0F)
+                    .lifecycleBinding {
+                        onEnd {
+                            spanXSeekBar.visibility = View.INVISIBLE
+                            removeThis(it)
+                        }
+                    }.start()
+
+                spanYSeekBar.animate()
+                    .translationX(spanYSeekBar.width * -1F)
+                    .alpha(0F)
+                    .lifecycleBinding {
+                        onEnd {
+                            spanYSeekBar.visibility = View.INVISIBLE
+                            removeThis(it)
+                        }
+                    }.start()
+            } else {
+                spanXSeekBar.animate()
+                    .translationY(0F)
+                    .alpha(1F)
+                    .lifecycleBinding {
+                        onStart {
+                            spanXSeekBar.visibility = View.VISIBLE
+                        }
+                        onEnd {
+                            removeThis(it)
+                        }
+                    }.start()
+
+                spanYSeekBar.animate()
+                    .translationX(0F)
+                    .alpha(1F)
+                    .lifecycleBinding {
+                        onStart {
+                            spanYSeekBar.visibility = View.VISIBLE
+                        }
+                        onEnd {
+                            removeThis(it)
+                        }
+                    }.start()
+            }
+            isSeekBarShown = !isSeekBarShown
         }
     }
 
