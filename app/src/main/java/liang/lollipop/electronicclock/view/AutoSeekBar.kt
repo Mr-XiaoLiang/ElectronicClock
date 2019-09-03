@@ -110,7 +110,12 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
     fun setProgress(value: Float, callListener: Boolean = true) {
         seekBarDrawable.progress = value.isRtl()
         if (callListener) {
-            onProgressChangeListener?.onProgressChange(this, value)
+            val v = if (min > 0) {
+                value + min
+            } else {
+                value
+            }
+            onProgressChangeListener?.onProgressChange(this, v)
         }
     }
 
@@ -232,8 +237,8 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
             // 那么需要计算选中长度与原点左侧长度的比值，再乘以原点左侧的负数数值
             (origin - point) / (origin - start) * min
         } else {
-            // 如果大于或者等于原点，那么肯定是正数
-            // 并且是在正数区，需要用结束位置减去起点位置
+            // 如果大于或者等于原点，那么肯定是在同一侧
+            // 需要用结束位置减去起点位置
             (point - origin) / (end - origin) * (max - max(0F, min))
         }
         invalidate()
@@ -315,12 +320,17 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
 
         val startWeight: Float
             get() {
-                return if (min < 0 && max > 0) {
+                return if (isViaZero) {
                     // 如果途径了 0，那么以 0 作为起点
                     (0 - min) / (max - min)
                 } else {
                     0F
                 }
+            }
+
+        val isViaZero: Boolean
+            get() {
+                return min < 0 && max > 0
             }
 
         private val drawBounds = RectF()
@@ -339,7 +349,7 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
             borderBounds.set(bounds)
 
             val allProgress = max - min
-            val progressWeight = progress / allProgress
+            val progressWeight = (progress) / allProgress
             val start = if (progressWeight < 0) {
                 startWeight + progressWeight
             } else {

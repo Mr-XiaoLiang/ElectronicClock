@@ -11,6 +11,12 @@ import liang.lollipop.electronicclock.bean.AdjustmentInfo
  */
 abstract class AdjustmentHolder<T: AdjustmentInfo<*>>(view: View): RecyclerView.ViewHolder(view) {
 
+    var onValueChangeListener: OnValueChangeListener? = null
+
     abstract fun onBind(info: T)
+
+    interface OnValueChangeListener {
+        fun onValueChange(holder: AdjustmentHolder<*>, newValue: Any)
+    }
 
 }

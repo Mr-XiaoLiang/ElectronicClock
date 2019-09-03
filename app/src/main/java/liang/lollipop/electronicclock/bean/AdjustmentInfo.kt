@@ -9,5 +9,13 @@ open class AdjustmentInfo<T>(var value: T) {
     var title = ""
     var summary = ""
     var key = ""
+    var enable = true
+
+    open fun copy(info: AdjustmentInfo<*>) {
+        title = info.title
+        summary = info.summary
+        key = info.key
+        enable = info.enable
+    }
 
 }

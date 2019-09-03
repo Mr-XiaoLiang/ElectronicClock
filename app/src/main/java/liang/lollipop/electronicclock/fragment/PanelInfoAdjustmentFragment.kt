@@ -6,8 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.fragment_adjustment_info.*
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.bean.AdjustmentBoolean
+import liang.lollipop.electronicclock.bean.AdjustmentInfo
+import liang.lollipop.electronicclock.list.AdjustmentAdapter
 import liang.lollipop.electronicclock.utils.doAsync
 import liang.lollipop.electronicclock.utils.uiThread
 import liang.lollipop.widget.utils.DatabaseHelper
@@ -33,6 +37,10 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     private val logE = Utils.loggerE(TAG)
 
+    private val adjustmentInfoList = ArrayList<AdjustmentInfo<*>>()
+
+    private var adapter: AdjustmentAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -47,10 +55,46 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        AdjustmentBoolean{
-            value = true
+        recyclerView.layoutManager = LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
+        adapter = AdjustmentAdapter(adjustmentInfoList, LayoutInflater.from(context)) { info, newValue ->
+            onInfoChange(info, newValue)
+        }
+        recyclerView.adapter = adapter
+        notifyDataSetChanged()
+    }
+
+    protected fun notifyDataSetChanged() {
+        adapter?.notifyDataSetChanged()
+    }
+
+    protected fun addAdjustmentInfo(vararg infos: AdjustmentInfo<*>) {
+        adjustmentInfoList.clear()
+        adjustmentInfoList.addAll(infos)
+        notifyDataSetChanged()
+    }
+
+    protected fun notifyInfoChange(newInfo: AdjustmentInfo<*>, ifAdd: Boolean = true) {
+        var index = adjustmentInfoList.indexOf(newInfo)
+        if (index < 0) {
+            for (i in 0 until adjustmentInfoList.size) {
+                val info = adjustmentInfoList[i]
+                if (info.key == newInfo.key) {
+                    info.copy(newInfo)
+                    index = i
+                    break
+                }
+            }
+        }
+        if (ifAdd && index < 0) {
+            adjustmentInfoList.add(newInfo)
+            index = adjustmentInfoList.size - 1
+        }
+        if (index >= 0 && index < adjustmentInfoList.size) {
+            adapter?.notifyItemChanged(index)
         }
     }
+
+    abstract fun onInfoChange(info: AdjustmentInfo<*>, newValue: Any)
 
     /**
      * 向外部提供Panel的View

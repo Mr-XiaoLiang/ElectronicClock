@@ -10,4 +10,17 @@ class AdjustmentBoolean(run: AdjustmentBoolean.() -> Unit):
     init {
         run(this)
     }
+
+    var summaryOfTrue = ""
+    var summaryOfFalse = ""
+
+    override fun copy(info: AdjustmentInfo<*>) {
+        super.copy(info)
+        if (info is AdjustmentBoolean) {
+            value = info.value
+            summaryOfFalse = info.summaryOfFalse
+            summaryOfTrue = info.summaryOfTrue
+        }
+    }
+
 }

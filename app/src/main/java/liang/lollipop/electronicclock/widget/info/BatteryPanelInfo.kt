@@ -13,7 +13,7 @@ import org.json.JSONObject
  * @date 2019-08-19 22:14
  * 电池的描述信息
  */
-class BatteryInfo: PanelInfo() {
+class BatteryPanelInfo: PanelInfo() {
 
     companion object {
         private val EMPTY_COLOR_ARRAY = IntArray(0)
