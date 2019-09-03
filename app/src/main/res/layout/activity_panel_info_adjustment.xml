@@ -14,26 +14,39 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"/>
 
+    <ImageView
+            android:id="@+id/sizeChangeBtn"
+            app:layout_constraintBottom_toBottomOf="@id/previewGroup"
+            app:layout_constraintLeft_toLeftOf="@id/previewGroup"
+            android:tint="@android:color/white"
+            android:src="@drawable/ic_crop_black_24dp"
+            android:padding="12dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"/>
+
     <liang.lollipop.electronicclock.view.AutoSeekBar
             app:layout_constraintTop_toTopOf="@id/previewGroup"
-            app:layout_constraintBottom_toBottomOf="@id/previewGroup"
+            app:layout_constraintBottom_toTopOf="@id/sizeChangeBtn"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            app:layout_constraintLeft_toLeftOf="@id/previewGroup"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintLeft_toLeftOf="@id/sizeChangeBtn"
+            app:layout_constraintRight_toRightOf="@id/sizeChangeBtn"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             app:barColor="@color/colorBackground"
             app:selectedBarColor="@color/colorPrimaryDark"
+
             android:layout_width="20dp"
             android:layout_height="0px"/>
 
     <liang.lollipop.electronicclock.view.AutoSeekBar
-            app:layout_constraintBottom_toBottomOf="@id/previewGroup"
+            app:layout_constraintBottom_toBottomOf="@id/sizeChangeBtn"
+            app:layout_constraintTop_toTopOf="@id/sizeChangeBtn"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            app:layout_constraintLeft_toLeftOf="@id/previewGroup"
+            app:layout_constraintLeft_toRightOf="@id/sizeChangeBtn"
             app:layout_constraintRight_toRightOf="@id/previewGroup"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="0dp"
             android:layout_marginRight="20dp"
             app:barColor="@color/colorBackground"
             app:selectedBarColor="@color/colorPrimaryDark"
