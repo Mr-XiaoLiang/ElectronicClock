@@ -1,12 +1,10 @@
 package liang.lollipop.electronicclock.fragment
 
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
-import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.bean.AdjustmentInfo
+import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
+import liang.lollipop.electronicclock.widget.panel.BatteryPanel
 import liang.lollipop.widget.widget.PanelInfo
 
 /**
@@ -14,9 +12,7 @@ import liang.lollipop.widget.widget.PanelInfo
  * 用于调整电池小部件的参数
  */
 class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
-
     companion object {
-
         fun getInstance(id: Int): BatteryAdjustmentFragment {
             return BatteryAdjustmentFragment().apply {
                 arguments = Bundle().apply {
@@ -26,26 +22,25 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 }
             }
         }
-
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_adjustment_info, container, false)
-    }
+    private val batteryInfo = BatteryPanelInfo()
+    private val batteryPanel = BatteryPanel(batteryInfo)
 
     override fun getPanelView(): View {
-        return TextView(context).apply {
-            gravity = Gravity.CENTER
-            text = "?"
-        }
+        return batteryPanel.createView(context!!)
     }
 
     override fun onInfoFoundById(info: PanelInfo?) {
+
         panelInitComplete()
     }
 
     override fun getPanelInfo(): PanelInfo {
         return PanelInfo()
     }
+
+    override fun onInfoChange(info: AdjustmentInfo<*>, newValue: Any) {
+    }
+
 }

@@ -1,11 +1,12 @@
 package liang.lollipop.electronicclock.widget.panel
 
+import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import liang.lollipop.electronicclock.widget.info.BatteryInfo
+import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
 import liang.lollipop.widget.widget.Panel
 import kotlin.math.min
 
@@ -14,17 +15,25 @@ import kotlin.math.min
  * @date 2019-08-19 22:15
  * 电池信息的展示面板
  */
-class BatteryPanel(info: BatteryInfo): Panel<BatteryInfo>(info) {
+class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
 
     private val batteryDrawable = BatteryDrawable(info)
 
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
-        return View(parent.context).apply {
+        return createView(layoutInflater.context)
+    }
+
+    fun createView(context: Context): View {
+        return View(context).apply {
             background = batteryDrawable
         }
     }
 
-    private class BatteryDrawable(private var info: BatteryInfo): Drawable() {
+    override fun onInfoChange() {
+        batteryDrawable.onInfoChange(panelInfo)
+    }
+
+    private class BatteryDrawable(private var info: BatteryPanelInfo): Drawable() {
 
         private val batteryBounds = RectF()
 
@@ -49,7 +58,7 @@ class BatteryPanel(info: BatteryInfo): Panel<BatteryInfo>(info) {
 
         private var shader: Shader? = null
 
-        fun onInfoChange(newInfo: BatteryInfo) {
+        fun onInfoChange(newInfo: BatteryPanelInfo) {
             info = newInfo
             relayout()
         }

@@ -1,11 +1,9 @@
 package liang.lollipop.electronicclock.fragment
 
-import android.os.Bundle
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
+import liang.lollipop.electronicclock.bean.AdjustmentInfo
 import liang.lollipop.widget.widget.PanelInfo
 
 /**
@@ -35,8 +33,6 @@ class EmptyAdjustmentFragment: PanelInfoAdjustmentFragment() {
         return PanelInfo()
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return View(inflater.context)
+    override fun onInfoChange(info: AdjustmentInfo<*>, newValue: Any) {
     }
 }

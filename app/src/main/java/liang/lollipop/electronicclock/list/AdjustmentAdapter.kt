@@ -3,26 +3,60 @@ package liang.lollipop.electronicclock.list
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import liang.lollipop.electronicclock.bean.AdjustmentBoolean
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
+import liang.lollipop.electronicclock.bean.AdjustmentInteger
 
 /**
  * @author lollipop
  * @date 2019-09-01 20:21
  */
 class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo<*>>,
-                        private val inflater: LayoutInflater): RecyclerView.Adapter<AdjustmentHolder<*>>() {
+                        private val inflater: LayoutInflater,
+                        private val onValueChange: (info: AdjustmentInfo<*>, newValue: Any) -> Unit): RecyclerView.Adapter<AdjustmentHolder<*>>(),
+    AdjustmentHolder.OnValueChangeListener {
 
+    companion object {
+        private const val TYPE_SWITCH = 0
+        private const val TYPE_SEEKBAR = 1
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdjustmentHolder<*> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val holder =  when (viewType) {
+            TYPE_SWITCH -> AdjustmentBooleanHolder.create(inflater, parent)
+            TYPE_SEEKBAR -> AdjustmentSeekBarHolder.create(inflater, parent)
+            else -> throw RuntimeException("unknown the viewType:$viewType")
+        }
+        holder.onValueChangeListener = this
+        return holder
+    }
+
+    override fun onValueChange(holder: AdjustmentHolder<*>, newValue: Any) {
+        onValueChange(data[holder.adapterPosition], newValue)
     }
 
     override fun getItemCount(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return data.size
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (data[position]) {
+            is AdjustmentBoolean -> TYPE_SWITCH
+            is AdjustmentInteger -> TYPE_SEEKBAR
+            else -> throw RuntimeException("unknown the AdjustmentInfo type")
+        }
     }
 
     override fun onBindViewHolder(holder: AdjustmentHolder<*>, position: Int) {
-//        holder.onBind()
+        val info = data[position]
+        when(holder) {
+            is AdjustmentBooleanHolder -> if (info is AdjustmentBoolean) {
+                holder.onBind(info)
+            }
+            is AdjustmentSeekBarHolder -> if (info is AdjustmentInteger) {
+                holder.onBind(info)
+            }
+        }
     }
 
 }

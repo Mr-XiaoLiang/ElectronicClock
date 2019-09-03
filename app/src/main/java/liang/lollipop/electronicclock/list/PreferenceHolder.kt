@@ -9,8 +9,7 @@ import liang.lollipop.electronicclock.bean.PreferenceInfo
  * @date 2019-08-15 22:13
  * Boolean类型的偏好设置holder
  */
-abstract class PreferenceHolder<V, T: PreferenceInfo<V>>(view: View,
-                                                                                             protected val onSelectedListener: OnSelectedListener<V>): RecyclerView.ViewHolder(view) {
+abstract class PreferenceHolder<V, T: PreferenceInfo<V>>(view: View, protected val onSelectedListener: OnSelectedListener<V>): RecyclerView.ViewHolder(view) {
 
     abstract fun onBind(info: T)
 

@@ -18,7 +18,7 @@ import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.bean.ActionInfo
 import liang.lollipop.electronicclock.utils.*
-import liang.lollipop.electronicclock.widget.info.BatteryInfo
+import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
 import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
@@ -367,7 +367,7 @@ class EditActivity : BaseActivity() {
                 widgetHelper.addPanel(ClockPanelInfo())
             }
             WidgetId.BATTERY -> {
-                widgetHelper.addPanel(BatteryInfo())
+                widgetHelper.addPanel(BatteryPanelInfo())
             }
         }
     }

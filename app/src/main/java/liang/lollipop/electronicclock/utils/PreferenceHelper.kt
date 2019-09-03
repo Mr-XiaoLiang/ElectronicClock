@@ -14,7 +14,7 @@ import liang.lollipop.electronicclock.bean.PreferenceChoice
 import liang.lollipop.electronicclock.bean.PreferenceInfo
 import liang.lollipop.electronicclock.bean.PreferenceNumber
 import liang.lollipop.electronicclock.list.*
-import liang.lollipop.electronicclock.widget.info.BatteryInfo
+import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
 import liang.lollipop.electronicclock.widget.panel.BatteryPanel
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.utils.PanelProviders
@@ -72,14 +72,14 @@ object PreferenceHelper {
     class LPanelProviders: PanelProviders {
         override fun createPanelByInfo(info: PanelInfo): Panel<*>? {
             return when (info) {
-                is BatteryInfo -> BatteryPanel(info)
+                is BatteryPanelInfo -> BatteryPanel(info)
                 else -> null
             }
         }
 
         override fun createInfoByName(name: String): PanelInfo? {
             return when (name) {
-                BatteryInfo::class.java.name -> BatteryInfo()
+                BatteryPanelInfo::class.java.name -> BatteryPanelInfo()
                 else -> null
             }
         }
@@ -261,19 +261,19 @@ fun Context.putPreferences(vararg infos: Part<*>) {
     for (info in infos) {
         when(info.value) {
             is String -> {
-                edit.putString(info.name, info.value as String)
+                edit.putString(info.name, info.value)
             }
             is Float -> {
-                edit.putFloat(info.name, info.value as Float)
+                edit.putFloat(info.name, info.value)
             }
             is Long -> {
-                edit.putLong(info.name, info.value as Long)
+                edit.putLong(info.name, info.value)
             }
             is Int -> {
-                edit.putInt(info.name, info.value as Int)
+                edit.putInt(info.name, info.value)
             }
             is Boolean -> {
-                edit.putBoolean(info.name, info.value as Boolean)
+                edit.putBoolean(info.name, info.value)
             }
             else -> {
                 edit.putString(info.name, info.value.toString())

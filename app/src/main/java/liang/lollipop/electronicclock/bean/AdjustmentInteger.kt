@@ -14,4 +14,13 @@ class AdjustmentInteger(run: AdjustmentInteger.() -> Unit):
     var min = 0
     var max = 100
 
+    override fun copy(info: AdjustmentInfo<*>) {
+        super.copy(info)
+        if (info is AdjustmentInteger) {
+            value = info.value
+            max = info.max
+            min = info.min
+        }
+    }
+
 }

@@ -42,6 +42,7 @@
     <string name="widget_clock">Digital clock</string>
     <string name="widget_battery">Battery info</string>
 
-    <string name="width_size">Width\n%1$s</string>
-    <string name="height_size">Height\n%1$s</string>
+    <string name="enter">Confirm</string>
+    <string name="cancel">Cancel</string>
+
 </resources>
