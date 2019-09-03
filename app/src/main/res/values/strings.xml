@@ -45,4 +45,9 @@
     <string name="enter">Confirm</string>
     <string name="cancel">Cancel</string>
 
+    <string name="title_show_bg">显示背景色</string>
+    <string name="summary_show_bg">将会展示元素背景</string>
+    <string name="summary_hide_bg">将不会展示元素的背景</string>
+    <string name="title_show_border">显示元素边框</string>
+
 </resources>
