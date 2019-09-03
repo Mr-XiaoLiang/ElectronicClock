@@ -18,17 +18,17 @@ class BatteryPanelInfo: PanelInfo() {
     companion object {
         private val EMPTY_COLOR_ARRAY = IntArray(0)
 
-        private const val IS_SHOW_BG = "IS_SHOW_BG"
-        private const val IS_SHOW_BORDER = "IS_SHOW_BORDER"
-        private const val CORNER = "CORNER"
-        private const val COLOR_ARRAY = "COLOR_ARRAY"
-        private const val PADDING = "PADDING"
-        private const val IS_VERTICAL = "IS_VERTICAL"
-        private const val BORDER_WIDTH = "BORDER_WIDTH"
-        private const val BORDER_COLOR = "BORDER_COLOR"
-        private const val IS_ANIMATION = "IS_ANIMATION"
-        private const val IS_ARC = "IS_ARC"
-        private const val ARC_WIDTH = "ARC_WIDTH"
+        const val IS_SHOW_BG = "IS_SHOW_BG"
+        const val IS_SHOW_BORDER = "IS_SHOW_BORDER"
+        const val CORNER = "CORNER"
+        const val COLOR_ARRAY = "COLOR_ARRAY"
+        const val PADDING = "PADDING"
+        const val IS_VERTICAL = "IS_VERTICAL"
+        const val BORDER_WIDTH = "BORDER_WIDTH"
+        const val BORDER_COLOR = "BORDER_COLOR"
+        const val IS_ANIMATION = "IS_ANIMATION"
+        const val IS_ARC = "IS_ARC"
+        const val ARC_WIDTH = "ARC_WIDTH"
     }
 
     init {

@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_adjustment_info.*
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.bean.AdjustmentBoolean
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
+import liang.lollipop.electronicclock.bean.AdjustmentInteger
 import liang.lollipop.electronicclock.list.AdjustmentAdapter
 import liang.lollipop.electronicclock.utils.doAsync
 import liang.lollipop.electronicclock.utils.uiThread
@@ -165,6 +167,14 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     interface PanelSizeChangeCallback {
         fun setPanelSize(spanX: Int, spanY: Int)
+    }
+
+    fun switch(run: AdjustmentBoolean.() -> Unit): AdjustmentBoolean {
+        return AdjustmentBoolean(run)
+    }
+
+    fun seekBar(run: AdjustmentInteger.() -> Unit): AdjustmentInteger {
+        return AdjustmentInteger(run)
     }
 
 }
