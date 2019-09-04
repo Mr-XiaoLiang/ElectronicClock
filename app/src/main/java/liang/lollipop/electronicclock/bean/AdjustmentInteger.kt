@@ -7,12 +7,13 @@ package liang.lollipop.electronicclock.bean
  */
 class AdjustmentInteger(run: AdjustmentInteger.() -> Unit):
     AdjustmentInfo<Int>(0) {
-    init {
-        run(this)
-    }
 
     var min = 0
     var max = 100
+
+    init {
+        run(this)
+    }
 
     override fun copy(info: AdjustmentInfo<*>) {
         super.copy(info)
