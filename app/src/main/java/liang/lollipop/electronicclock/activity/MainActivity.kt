@@ -41,7 +41,6 @@ class MainActivity : BottomNavigationActivity() {
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
 
         showGuidelines()
-
     }
 
     private fun showGuidelines() {
