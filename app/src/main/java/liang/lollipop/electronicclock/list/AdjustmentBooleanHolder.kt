@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.list
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,9 +47,11 @@ class AdjustmentBooleanHolder(view: View): AdjustmentHolder<AdjustmentBoolean>(v
 
     private fun onSwitchChange(value: Boolean) {
         switchView.isChecked = value
+        summaryView.text = "bindInfo is null"
         bindInfo?.let {
             summaryView.text = if (value) { it.summaryOfTrue } else { it.summaryOfFalse }
         }
+        Log.d("Lollipop", "bindInfo is ${bindInfo?.summaryOfTrue}")
     }
 
 }

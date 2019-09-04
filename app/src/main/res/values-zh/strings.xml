@@ -49,4 +49,8 @@
     <string name="summary_show_bg">将会展示元素背景</string>
     <string name="summary_hide_bg">将不会展示元素的背景</string>
     <string name="title_show_border">显示元素边框</string>
+    <string name="summary_show_border">将会展示元素的边框</string>
+    <string name="summary_hide_border">将不会展示元素的边框</string>
+    <string name="title_corner">圆角尺寸</string>
+    <string name="summary_corner">元素角落的圆角大小</string>
 </resources>

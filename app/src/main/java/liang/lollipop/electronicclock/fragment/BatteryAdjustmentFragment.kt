@@ -50,9 +50,17 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
             switch {
                 key = BatteryPanelInfo.IS_SHOW_BORDER
                 title = getString(R.string.title_show_border)
-                summaryOfTrue = getString(R.string.summary_show_bg)
-                summaryOfFalse = getString(R.string.summary_hide_bg)
-                value = batteryInfo.isShowBg
+                summaryOfTrue = getString(R.string.summary_show_border)
+                summaryOfFalse = getString(R.string.summary_hide_border)
+                value = batteryInfo.isShowBorder
+            },
+            seekBar {
+                key = BatteryPanelInfo.CORNER
+                title = getString(R.string.title_corner)
+                summary = getString(R.string.summary_corner)
+                min = 0
+                max = 100
+                value = (batteryInfo.corner * 100).toInt()
             }
         )
     }

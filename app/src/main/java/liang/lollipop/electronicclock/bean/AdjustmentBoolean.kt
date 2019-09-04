@@ -7,12 +7,13 @@ package liang.lollipop.electronicclock.bean
  */
 class AdjustmentBoolean(run: AdjustmentBoolean.() -> Unit):
     AdjustmentInfo<Boolean>(false) {
-    init {
-        run(this)
-    }
 
     var summaryOfTrue = ""
     var summaryOfFalse = ""
+
+    init {
+        run(this)
+    }
 
     override fun copy(info: AdjustmentInfo<*>) {
         super.copy(info)
