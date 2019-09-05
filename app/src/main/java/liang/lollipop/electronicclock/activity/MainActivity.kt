@@ -9,10 +9,7 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_bottom_navigation.*
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.utils.PreferenceHelper
-import liang.lollipop.electronicclock.utils.SeekBarDialog
-import liang.lollipop.electronicclock.utils.getPreferences
-import liang.lollipop.electronicclock.utils.putPreferences
+import liang.lollipop.electronicclock.utils.*
 import liang.lollipop.guidelinesview.Guidelines
 
 
@@ -41,6 +38,8 @@ class MainActivity : BottomNavigationActivity() {
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
 
         showGuidelines()
+
+        ColorPaletteDialog.create(this).show()
     }
 
     private fun showGuidelines() {
