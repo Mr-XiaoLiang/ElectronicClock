@@ -18,6 +18,7 @@ import liang.lollipop.guidelinesview.util.lifecycleBinding
 import liang.lollipop.guidelinesview.util.onCancel
 import liang.lollipop.guidelinesview.util.onEnd
 import liang.lollipop.guidelinesview.util.onStart
+import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -157,7 +158,9 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
     }
 
     private fun onColorChange() {
-        selectedColorView.setStatusColor(merge())
+        val color = merge()
+        selectedColorView.setStatusColor(color)
+        colorValueView.text = color.colorValue()
     }
 
     private fun merge(alpha: Int = colorAlpha, rgb: Int = colorRGB): Int {
@@ -173,6 +176,23 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
             return max
         }
         return this
+    }
+
+    private fun Int.colorValue(): String {
+        var result = "#"
+        result += Color.alpha(this).toHexString()
+        result += Color.red(this).toHexString()
+        result += Color.green(this).toHexString()
+        result += Color.blue(this).toHexString()
+        return result
+    }
+
+    private fun Int.toHexString(digit: Int = 2): String {
+        val builder = StringBuilder(Integer.toHexString(this))
+        while (builder.length < digit) {
+            builder.insert(0, "0")
+        }
+        return builder.toString().toUpperCase()
     }
 
     private class ColorAdapter(
