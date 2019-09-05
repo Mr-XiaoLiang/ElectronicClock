@@ -39,7 +39,9 @@ class MainActivity : BottomNavigationActivity() {
 
         showGuidelines()
 
-        ColorPaletteDialog.create(this).show()
+        ColorPaletteDialog.create(this) {
+
+        } .show()
     }
 
     private fun showGuidelines() {

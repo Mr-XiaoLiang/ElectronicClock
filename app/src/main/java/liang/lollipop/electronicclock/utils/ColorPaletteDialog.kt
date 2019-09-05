@@ -4,24 +4,35 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
+import android.view.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.dialog_color_palette.*
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.list.base.LItemTouchCallback
+import liang.lollipop.electronicclock.list.base.LItemTouchHelper
 import liang.lollipop.electronicclock.view.HuePaletteView
 import liang.lollipop.electronicclock.view.SatValPaletteView
 import liang.lollipop.electronicclock.view.TransparencyPaletteView
+import liang.lollipop.guidelinesview.util.lifecycleBinding
+import liang.lollipop.guidelinesview.util.onCancel
+import liang.lollipop.guidelinesview.util.onEnd
+import liang.lollipop.guidelinesview.util.onStart
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
- * 颜色的调色板
+ * 调色板的对话框
  * @author Lollipop
  */
 class ColorPaletteDialog private constructor(context: Context) : Dialog(context),
-    HuePaletteView.HueCallback, SatValPaletteView.HSVCallback, TransparencyPaletteView.TransparencyCallback{
+    HuePaletteView.HueCallback, SatValPaletteView.HSVCallback,
+    TransparencyPaletteView.TransparencyCallback,
+    LItemTouchCallback.OnItemTouchCallbackListener {
 
     companion object {
-        fun create(context: Context): ColorPaletteDialog {
-            return ColorPaletteDialog(context)
+        fun create(context: Context, run: ColorPaletteDialog.() -> Unit): ColorPaletteDialog {
+            return ColorPaletteDialog(context).apply(run)
         }
     }
 
@@ -31,6 +42,30 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
     private var colorRGB = Color.RED
 
     private var colorAlpha = 255
+
+    private var colorAdapter: ColorAdapter? = null
+
+    var callback: Callback? = null
+
+    fun putColors(vararg colors: Int) {
+        colorArray.clear()
+        colors.forEach { colorArray.add(it) }
+        colorAdapter?.notifyDataSetChanged()
+    }
+
+    fun putColors(colors: ArrayList<Int>) {
+        colorArray.clear()
+        colorArray.addAll(colors)
+        colorAdapter?.notifyDataSetChanged()
+    }
+
+    fun onColorConfirmed(run: (colorArray: ArrayList<Int>) -> Unit) {
+        callback = object : Callback {
+            override fun onColorConfirmed(colorArray: ArrayList<Int>) {
+                run(colorArray)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +83,62 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
         satValPalette.hsvCallback = this
         transparencyPalette.transparencyCallback = this
 
-        selected(Color.RED)
+        addBtn.setOnClickListener {
+            addColorToList()
+        }
+
+        positiveBtn.setOnClickListener {
+            callback?.onColorConfirmed(colorArray)
+            dismiss()
+        }
+
+        negativeBtn.setOnClickListener {
+            dismiss()
+        }
+
+        colorListView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        colorAdapter = ColorAdapter(colorArray, LayoutInflater.from(context)) { colorHolder ->
+            onColorDeleteBtnClick(colorHolder)
+        }
+        colorListView.adapter = colorAdapter
+        colorAdapter?.notifyDataSetChanged()
+
+        LItemTouchHelper.bindTo(colorListView, this) { canDrag = true }
+
+        val initColor = if (colorArray.isEmpty()) {
+            Color.RED
+        } else {
+            colorArray[colorArray.size - 1]
+        }
+        selected(initColor)
     }
 
-    fun selected(color: Int) {
-        Color.colorToHSV(color,hsvTemp)
+    private fun addColorToList() {
+        val color = merge()
+        colorArray.add(color)
+        colorAdapter?.notifyItemInserted(colorArray.size - 1)
+    }
+
+    private fun onColorDeleteBtnClick(colorHolder: ColorHolder) {
+        val index = colorHolder.adapterPosition
+        colorArray.removeAt(index)
+        colorAdapter?.notifyItemRemoved(index)
+    }
+
+    override fun onSwiped(adapterPosition: Int) {
+        // nothing
+    }
+
+    override fun onMove(srcPosition: Int, targetPosition: Int): Boolean {
+        Collections.swap(colorArray,srcPosition,targetPosition)
+        colorAdapter?.notifyItemMoved(srcPosition, targetPosition)
+        return true
+    }
+
+    private fun selected(color: Int) {
+        Color.colorToHSV(color, hsvTemp)
         huePalette.parser(hsvTemp[0])
-        satValPalette.parser(hsvTemp[1],hsvTemp[2])
+        satValPalette.parser(hsvTemp[1], hsvTemp[2])
         transparencyPalette.parser(Color.alpha(color))
     }
 
@@ -89,6 +173,81 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
             return max
         }
         return this
+    }
+
+    private class ColorAdapter(
+        private val data: ArrayList<Int>,
+        private val inflater: LayoutInflater,
+        private val onDelete: (ColorHolder) -> Unit
+    ) : RecyclerView.Adapter<ColorHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorHolder {
+            return ColorHolder(inflater.inflate(R.layout.item_color, parent, false)).apply {
+                onDeleteBtnClickListener = onDelete
+            }
+        }
+
+        override fun getItemCount(): Int = data.size
+
+        override fun onBindViewHolder(holder: ColorHolder, position: Int) {
+            holder.onBind(data[position])
+        }
+    }
+
+    private class ColorHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+
+        private val colorView: View = view.findViewById(R.id.colorView)
+        private val deleteView: View = view.findViewById(R.id.deleteBtn)
+
+        companion object {
+            private const val DELETE_DURATION = 3 * 1000L
+        }
+
+        init {
+            view.setOnClickListener(this)
+            deleteView.setOnClickListener(this)
+        }
+
+        var onDeleteBtnClickListener: ((ColorHolder) -> Unit)? = null
+
+        fun onBind(color: Int) {
+            colorView.setBackgroundColor(color)
+            deleteView.visibility = View.INVISIBLE
+            deleteView.alpha = 1F
+            deleteView.animate().cancel()
+        }
+
+        override fun onClick(v: View?) {
+            when (v) {
+                itemView -> {
+                    deleteView.animate().cancel()
+                    deleteView.alpha = 1F
+                    deleteView.animate()
+                        .alpha(0F)
+                        .setDuration(DELETE_DURATION)
+                        .lifecycleBinding {
+                            onStart {
+                                deleteView.visibility = View.VISIBLE
+                            }
+                            onEnd {
+                                deleteView.visibility = View.INVISIBLE
+                                removeThis(it)
+                            }
+                            onCancel {
+                                removeThis(it)
+                            }
+                        }.start()
+                }
+                deleteView -> {
+                    onDeleteBtnClickListener?.invoke(this)
+                }
+            }
+        }
+
+    }
+
+    interface Callback {
+        fun onColorConfirmed(colorArray: ArrayList<Int>)
     }
 
 }
