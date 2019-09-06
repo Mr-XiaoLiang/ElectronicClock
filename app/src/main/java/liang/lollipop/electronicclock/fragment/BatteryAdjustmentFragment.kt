@@ -61,6 +61,13 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 min = 0
                 max = 100
                 value = (batteryInfo.corner * 100).toInt()
+            },
+            colors {
+                key = BatteryPanelInfo.COLOR_ARRAY
+                title = getString(R.string.title_color_array)
+                summary = getString(R.string.summary_color_array)
+                maxSize = 100
+                reset(batteryInfo.colorArray)
             }
         )
     }

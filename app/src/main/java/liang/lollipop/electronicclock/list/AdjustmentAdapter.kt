@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import liang.lollipop.electronicclock.bean.AdjustmentBoolean
+import liang.lollipop.electronicclock.bean.AdjustmentColor
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
 import liang.lollipop.electronicclock.bean.AdjustmentInteger
 
@@ -19,12 +20,14 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
     companion object {
         private const val TYPE_SWITCH = 0
         private const val TYPE_SEEKBAR = 1
+        private const val TYPE_COLOR = 2
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdjustmentHolder<*> {
         val holder =  when (viewType) {
             TYPE_SWITCH -> AdjustmentBooleanHolder.create(inflater, parent)
             TYPE_SEEKBAR -> AdjustmentSeekBarHolder.create(inflater, parent)
+            TYPE_COLOR -> AdjustmentColorHolder.create(inflater, parent)
             else -> throw RuntimeException("unknown the viewType:$viewType")
         }
         holder.onValueChangeListener = this
@@ -43,6 +46,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
         return when (data[position]) {
             is AdjustmentBoolean -> TYPE_SWITCH
             is AdjustmentInteger -> TYPE_SEEKBAR
+            is AdjustmentColor -> TYPE_COLOR
             else -> throw RuntimeException("unknown the AdjustmentInfo type")
         }
     }
@@ -54,6 +58,9 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
                 holder.onBind(info)
             }
             is AdjustmentSeekBarHolder -> if (info is AdjustmentInteger) {
+                holder.onBind(info)
+            }
+            is AdjustmentColorHolder -> if (info is AdjustmentColor) {
                 holder.onBind(info)
             }
         }

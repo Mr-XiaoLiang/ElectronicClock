@@ -48,6 +48,7 @@ class SeekBarDialog private constructor(context: Context): Dialog(context), Auto
         val layoutParams = window?.attributes?:return
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
         window?.attributes = layoutParams
+        window?.setWindowAnimations(R.style.dialogAnim)
     }
 
     private fun initView() {

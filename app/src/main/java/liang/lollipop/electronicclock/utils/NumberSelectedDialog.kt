@@ -52,6 +52,7 @@ class NumberSelectedDialog(private val builder: Builder): Dialog(builder.context
         val layoutParams = window?.attributes ?: return
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
         window?.attributes = layoutParams
+        window?.setWindowAnimations(R.style.dialogAnim)
     }
 
     private fun onNumberSelected(number: Int) {

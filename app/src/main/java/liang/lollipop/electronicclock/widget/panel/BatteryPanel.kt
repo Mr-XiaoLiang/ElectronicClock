@@ -74,9 +74,14 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
             batteryBounds.right -= padding[2] * bounds.width()
             batteryBounds.bottom -= padding[3] * bounds.height()
 
+            val colorArray = IntArray(info.colorArray.size)
+            for (i in 0 until  info.colorArray.size) {
+                colorArray[i] = info.colorArray[i]
+            }
+
             if (info.colorArray.size > 1) {
                 shader = if (info.isArc) {
-                    SweepGradient(batteryBounds.centerX(), batteryBounds.centerY(), info.colorArray, null)
+                    SweepGradient(batteryBounds.centerX(), batteryBounds.centerY(), colorArray, null)
                 } else {
                     val sX: Float
                     val sY: Float
@@ -93,7 +98,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
                         eX = batteryBounds.right
                         eY = sY
                     }
-                    LinearGradient(sX, sY, eX, eY, info.colorArray, null, Shader.TileMode.CLAMP)
+                    LinearGradient(sX, sY, eX, eY, colorArray, null, Shader.TileMode.CLAMP)
                 }
             } else {
                 shader = null
