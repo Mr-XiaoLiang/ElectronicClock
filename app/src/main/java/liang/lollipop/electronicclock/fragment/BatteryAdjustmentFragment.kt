@@ -69,7 +69,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
         return batteryInfo
     }
 
-    override fun onInfoChange(info: AdjustmentInfo<*>, newValue: Any) {
+    override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
     }
 
 }

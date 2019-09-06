@@ -18,7 +18,6 @@ import liang.lollipop.guidelinesview.util.lifecycleBinding
 import liang.lollipop.guidelinesview.util.onCancel
 import liang.lollipop.guidelinesview.util.onEnd
 import liang.lollipop.guidelinesview.util.onStart
-import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -35,6 +34,8 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
         fun create(context: Context, run: ColorPaletteDialog.() -> Unit): ColorPaletteDialog {
             return ColorPaletteDialog(context).apply(run)
         }
+
+        private const val ERROR_DURATION = 3000L
     }
 
     private val colorArray = ArrayList<Int>()
@@ -45,6 +46,10 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
     private var colorAlpha = 255
 
     private var colorAdapter: ColorAdapter? = null
+
+    var minSize = -1
+
+    var maxSize = -1
 
     var callback: Callback? = null
 
@@ -60,12 +65,13 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
         colorAdapter?.notifyDataSetChanged()
     }
 
-    fun onColorConfirmed(run: (colorArray: ArrayList<Int>) -> Unit) {
+    fun onColorConfirmed(run: (colorArray: ArrayList<Int>) -> Unit): ColorPaletteDialog {
         callback = object : Callback {
             override fun onColorConfirmed(colorArray: ArrayList<Int>) {
                 run(colorArray)
             }
         }
+        return this
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,8 +95,7 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
         }
 
         positiveBtn.setOnClickListener {
-            callback?.onColorConfirmed(colorArray)
-            dismiss()
+            submit()
         }
 
         negativeBtn.setOnClickListener {
@@ -114,16 +119,55 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
         selected(initColor)
     }
 
+    private fun submit() {
+        if (maxSize > 0 && colorArray.size > maxSize) {
+            showError(R.string.err_color_too_more)
+            return
+        }
+        if (minSize > 0 && colorArray.size < minSize) {
+            showError(R.string.err_color_too_low)
+            return
+        }
+        callback?.onColorConfirmed(colorArray)
+        dismiss()
+    }
+
     private fun addColorToList() {
+        if (maxSize > 0 && colorArray.size >= maxSize) {
+            showError(R.string.err_color_cant_be_more)
+            return
+        }
         val color = merge()
         colorArray.add(color)
         colorAdapter?.notifyItemInserted(colorArray.size - 1)
     }
 
     private fun onColorDeleteBtnClick(colorHolder: ColorHolder) {
+        if (minSize > 0 && colorArray.size <= minSize) {
+            showError(R.string.err_color_cant_be_low)
+            return
+        }
         val index = colorHolder.adapterPosition
         colorArray.removeAt(index)
         colorAdapter?.notifyItemRemoved(index)
+    }
+
+    private fun showError(value: Int) {
+        errorView.animate().cancel()
+        errorView.alpha = 1F
+        errorView.setText(value)
+        errorView.animate()
+            .alpha(0F)
+            .setDuration(ERROR_DURATION)
+            .lifecycleBinding {
+                onEnd {
+                    errorView.text = ""
+                    removeThis(it)
+                }
+                onCancel {
+                    removeThis(it)
+                }
+            }.start()
     }
 
     override fun onSwiped(adapterPosition: Int) {
@@ -131,7 +175,7 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
     }
 
     override fun onMove(srcPosition: Int, targetPosition: Int): Boolean {
-        Collections.swap(colorArray,srcPosition,targetPosition)
+        Collections.swap(colorArray, srcPosition, targetPosition)
         colorAdapter?.notifyItemMoved(srcPosition, targetPosition)
         return true
     }
@@ -192,7 +236,7 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
         while (builder.length < digit) {
             builder.insert(0, "0")
         }
-        return builder.toString().toUpperCase()
+        return builder.toString().toUpperCase(Locale.US)
     }
 
     private class ColorAdapter(

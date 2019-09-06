@@ -39,7 +39,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     private val logE = Utils.loggerE(TAG)
 
-    private val adjustmentInfoList = ArrayList<AdjustmentInfo<*>>()
+    private val adjustmentInfoList = ArrayList<AdjustmentInfo>()
 
     private var adapter: AdjustmentAdapter? = null
 
@@ -69,13 +69,13 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         adapter?.notifyDataSetChanged()
     }
 
-    protected fun addAdjustmentInfo(vararg infos: AdjustmentInfo<*>) {
+    protected fun addAdjustmentInfo(vararg infos: AdjustmentInfo) {
         adjustmentInfoList.clear()
         adjustmentInfoList.addAll(infos)
         notifyDataSetChanged()
     }
 
-    protected fun notifyInfoChange(newInfo: AdjustmentInfo<*>, ifAdd: Boolean = true) {
+    protected fun notifyInfoChange(newInfo: AdjustmentInfo, ifAdd: Boolean = true) {
         var index = adjustmentInfoList.indexOf(newInfo)
         if (index < 0) {
             for (i in 0 until adjustmentInfoList.size) {
@@ -96,7 +96,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         }
     }
 
-    abstract fun onInfoChange(info: AdjustmentInfo<*>, newValue: Any)
+    abstract fun onInfoChange(info: AdjustmentInfo, newValue: Any)
 
     /**
      * 向外部提供Panel的View

@@ -11,9 +11,9 @@ import liang.lollipop.electronicclock.bean.AdjustmentInteger
  * @author lollipop
  * @date 2019-09-01 20:21
  */
-class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo<*>>,
+class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
                         private val inflater: LayoutInflater,
-                        private val onValueChange: (info: AdjustmentInfo<*>, newValue: Any) -> Unit): RecyclerView.Adapter<AdjustmentHolder<*>>(),
+                        private val onValueChange: (info: AdjustmentInfo, newValue: Any) -> Unit): RecyclerView.Adapter<AdjustmentHolder<*>>(),
     AdjustmentHolder.OnValueChangeListener {
 
     companion object {

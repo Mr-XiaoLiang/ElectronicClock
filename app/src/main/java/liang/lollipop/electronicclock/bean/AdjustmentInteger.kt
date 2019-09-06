@@ -6,7 +6,9 @@ package liang.lollipop.electronicclock.bean
  * 调整Boolean类型
  */
 class AdjustmentInteger(run: AdjustmentInteger.() -> Unit):
-    AdjustmentInfo<Int>(0) {
+    AdjustmentInfo() {
+
+    var value = 0
 
     var min = 0
     var max = 100
@@ -15,7 +17,7 @@ class AdjustmentInteger(run: AdjustmentInteger.() -> Unit):
         run(this)
     }
 
-    override fun copy(info: AdjustmentInfo<*>) {
+    override fun copy(info: AdjustmentInfo) {
         super.copy(info)
         if (info is AdjustmentInteger) {
             value = info.value

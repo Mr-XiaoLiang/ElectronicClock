@@ -9,7 +9,7 @@ import liang.lollipop.electronicclock.bean.AdjustmentInfo
  * @date 2019-09-01 20:21
  * 调整项的接口
  */
-abstract class AdjustmentHolder<T: AdjustmentInfo<*>>(view: View): RecyclerView.ViewHolder(view) {
+abstract class AdjustmentHolder<T: AdjustmentInfo>(view: View): RecyclerView.ViewHolder(view) {
 
     var onValueChangeListener: OnValueChangeListener? = null
 

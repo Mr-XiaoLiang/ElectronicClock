@@ -34,6 +34,7 @@ class AdjustmentBooleanHolder(view: View): AdjustmentHolder<AdjustmentBoolean>(v
 
     private val checkedChangeListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         onSwitchChange(isChecked)
+        bindInfo?.value = isChecked
         onValueChangeListener?.onValueChange(this@AdjustmentBooleanHolder, isChecked)
     }
 

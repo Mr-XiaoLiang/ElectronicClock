@@ -91,4 +91,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+    <TextView
+            android:id="@+id/errorView"
+            app:layout_constraintTop_toTopOf="@id/positiveBtn"
+            app:layout_constraintBottom_toBottomOf="@id/positiveBtn"
+            app:layout_constraintLeft_toLeftOf="@id/colorListView"
+            app:layout_constraintRight_toLeftOf="@id/negativeBtn"
+            android:textSize="16sp"
+            android:textColor="@android:color/holo_red_light"
+            android:layout_marginRight="10dp"
+            android:layout_width="0px"
+            android:layout_height="0px"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

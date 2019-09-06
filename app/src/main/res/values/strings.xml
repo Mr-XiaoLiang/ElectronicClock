@@ -54,4 +54,9 @@
     <string name="title_corner">圆角尺寸</string>
     <string name="summary_corner">元素角落的圆角大小</string>
 
+    <string name="err_color_cant_be_low">颜色数量不能再减少了</string>
+    <string name="err_color_cant_be_more">颜色数量不能再增加了</string>
+
+    <string name="err_color_too_low">颜色数量太少了</string>
+    <string name="err_color_too_more">颜色数量太多</string>
 </resources>
