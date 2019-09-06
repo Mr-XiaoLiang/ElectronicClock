@@ -16,8 +16,6 @@ import org.json.JSONObject
 class BatteryPanelInfo: PanelInfo() {
 
     companion object {
-        private val EMPTY_COLOR_ARRAY = IntArray(0)
-
         const val IS_SHOW_BG = "IS_SHOW_BG"
         const val IS_SHOW_BORDER = "IS_SHOW_BORDER"
         const val CORNER = "CORNER"
@@ -53,7 +51,7 @@ class BatteryPanelInfo: PanelInfo() {
     /**
      * 颜色的集合
      */
-    var colorArray = EMPTY_COLOR_ARRAY
+    val colorArray = ArrayList<Int>()
 
     /**
      * 四个方向的内缩进
@@ -100,22 +98,20 @@ class BatteryPanelInfo: PanelInfo() {
         isShowBorder = jsonObj.optBoolean(IS_SHOW_BORDER, true)
         corner = jsonObj.optDouble(CORNER, 0.1).toFloat()
         val colorJsonArray = jsonObj.optJSONArray(COLOR_ARRAY)
+        colorArray.clear()
         if (colorJsonArray != null && colorJsonArray.length() > 0) {
-            colorArray = IntArray(colorJsonArray.length())
             for (i in 0 until colorArray.size) {
-                colorArray[i] = colorJsonArray.optInt(i, Color.BLACK)
+                colorArray.add(colorJsonArray.optInt(i, Color.BLACK))
             }
-        } else {
-            colorArray = EMPTY_COLOR_ARRAY
         }
 
         val paddingJsonArray = jsonObj.optJSONArray(PADDING)
         if (paddingJsonArray != null && paddingJsonArray.length() == 4) {
-            for (i in 0 until padding.size) {
+            for (i in padding.indices) {
                 padding[i] = paddingJsonArray.optDouble(i, 0.0).toFloat()
             }
         } else {
-            for (i in 0 until padding.size) {
+            for (i in padding.indices) {
                 padding[i] = 0F
             }
         }

@@ -59,4 +59,6 @@
 
     <string name="err_color_too_low">颜色数量太少了</string>
     <string name="err_color_too_more">颜色数量太多</string>
+    <string name="title_color_array">颜色</string>
+    <string name="summary_color_array">选择元素的颜色</string>
 </resources>
