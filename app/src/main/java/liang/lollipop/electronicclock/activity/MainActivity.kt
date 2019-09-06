@@ -38,10 +38,6 @@ class MainActivity : BottomNavigationActivity() {
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
 
         showGuidelines()
-
-        ColorPaletteDialog.create(this) {
-
-        } .show()
     }
 
     private fun showGuidelines() {
