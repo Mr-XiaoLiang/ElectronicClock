@@ -22,7 +22,9 @@ class ColorWheelView(context: Context, attr: AttributeSet?,
 
     init {
         colorWheelDrawable.callback = this
-        setColors(intArrayOf(Color.GRAY, Color.BLUE, Color.CYAN, Color.RED, Color.WHITE, Color.GREEN, Color.LTGRAY))
+        if (isInEditMode) {
+            setColors(intArrayOf(Color.GRAY, Color.BLUE, Color.CYAN, Color.RED, Color.WHITE, Color.GREEN, Color.LTGRAY))
+        }
     }
 
     override fun onDraw(canvas: Canvas?) {
