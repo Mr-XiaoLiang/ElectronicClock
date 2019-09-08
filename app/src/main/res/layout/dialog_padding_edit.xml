@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorBackground"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical">
+
+    <liang.lollipop.electronicclock.view.PaddingView
+            android:id="@+id/paddingView"
+            android:layout_width="0px"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintDimensionRatio="3:2"
+            android:layout_height="0px"/>
+
+    <ImageView
+            android:id="@+id/leftIcon"
+            android:src="@drawable/ic_border_left_black_24dp"
+            android:tint="@android:color/white"
+            app:layout_constraintTop_toTopOf="@id/leftInput"
+            app:layout_constraintBottom_toBottomOf="@id/leftInput"
+            app:layout_constraintLeft_toLeftOf="@id/leftInput"
+            android:layout_marginLeft="4dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/leftInput"
+            app:layout_constraintLeft_toLeftOf="@id/paddingView"
+            app:layout_constraintTop_toBottomOf="@id/paddingView"
+            app:layout_constraintRight_toLeftOf="@id/rightInput"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:paddingLeft="36dp"
+            android:text="0.00"
+            android:textSize="16sp"
+            android:layout_width="0px"
+            android:inputType="numberDecimal"
+            android:layout_height="wrap_content"/>
+
+    <ImageView
+            android:id="@+id/rightIcon"
+            android:src="@drawable/ic_border_right_black_24dp"
+            android:tint="@android:color/white"
+            app:layout_constraintTop_toTopOf="@id/rightInput"
+            app:layout_constraintBottom_toBottomOf="@id/rightInput"
+            app:layout_constraintLeft_toLeftOf="@id/rightInput"
+            android:layout_marginLeft="4dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/rightInput"
+            app:layout_constraintLeft_toRightOf="@id/leftInput"
+            app:layout_constraintRight_toRightOf="@id/paddingView"
+            app:layout_constraintTop_toTopOf="@id/leftInput"
+            android:inputType="numberDecimal"
+            android:paddingLeft="36dp"
+            android:text="0.00"
+            android:textSize="16sp"
+            android:layout_marginLeft="10dp"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"/>
+
+    <ImageView
+            android:id="@+id/topIcon"
+            android:src="@drawable/ic_border_top_black_24dp"
+            android:tint="@android:color/white"
+            app:layout_constraintTop_toTopOf="@id/topInput"
+            app:layout_constraintBottom_toBottomOf="@id/topInput"
+            app:layout_constraintLeft_toLeftOf="@id/leftIcon"
+            app:layout_constraintRight_toRightOf="@id/leftIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/topInput"
+            app:layout_constraintLeft_toLeftOf="@id/leftInput"
+            app:layout_constraintTop_toBottomOf="@id/leftInput"
+            app:layout_constraintRight_toRightOf="@id/leftInput"
+            android:text="0.00"
+            android:textSize="16sp"
+            android:paddingLeft="36dp"
+            android:inputType="numberDecimal"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"/>
+
+    <ImageView
+            android:id="@+id/bottomIcon"
+            android:src="@drawable/ic_border_bottom_black_24dp"
+            android:tint="@android:color/white"
+            app:layout_constraintTop_toTopOf="@id/bottomInput"
+            app:layout_constraintBottom_toBottomOf="@id/bottomInput"
+            app:layout_constraintLeft_toLeftOf="@id/rightIcon"
+            app:layout_constraintRight_toRightOf="@id/rightIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/bottomInput"
+            app:layout_constraintLeft_toLeftOf="@id/rightInput"
+            app:layout_constraintTop_toBottomOf="@id/rightInput"
+            app:layout_constraintRight_toRightOf="@id/rightInput"
+            android:text="0.00"
+            android:paddingLeft="36dp"
+            android:textSize="16sp"
+            android:layout_width="0px"
+            android:inputType="numberDecimal"
+            android:layout_height="wrap_content"/>
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/positiveBtn"
+            app:layout_constraintRight_toRightOf="@id/paddingView"
+            app:layout_constraintTop_toBottomOf="@id/bottomInput"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/enter"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/negativeBtn"
+            app:layout_constraintRight_toLeftOf="@id/positiveBtn"
+            app:layout_constraintTop_toTopOf="@id/positiveBtn"
+            android:layout_marginRight="10dp"
+            android:text="@string/cancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Dialog.Flush"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
