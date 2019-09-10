@@ -32,6 +32,8 @@ class PaddingView(context: Context, attr: AttributeSet?,
 
     private val redundancy = PointF()
 
+    private var touchWidth = 10F
+
     init {
         paddingDrawable.callback = this
     }
@@ -108,7 +110,7 @@ class PaddingView(context: Context, attr: AttributeSet?,
                 return true
             }
         }
-        return super.onTouchEvent(event)
+        return true
     }
 
     private fun onTouchMove(event: MotionEvent): Boolean {
@@ -169,23 +171,24 @@ class PaddingView(context: Context, attr: AttributeSet?,
     private fun checkTouchDown(event: MotionEvent): Boolean {
         val x = event.getXById()
         val y = event.getYById()
-        if (x < bounds.left + borderWidth && x > bounds.left - borderWidth
-            && y > bounds.top + borderWidth && y < bounds.bottom - borderWidth) {
+        val touchRadius = (touchWidth + borderWidth) / 2
+        if (x < bounds.left + touchRadius && x > bounds.left - touchRadius
+            && y > bounds.top + touchRadius && y < bounds.bottom - touchRadius) {
             target = TouchTarget.Left
             return true
         }
-        if (x > bounds.left + borderWidth && x < bounds.right - borderWidth
-            && y < bounds.top + borderWidth && y > bounds.top - borderWidth) {
+        if (x > bounds.left + touchRadius && x < bounds.right - touchRadius
+            && y < bounds.top + touchRadius && y > bounds.top - touchRadius) {
             target = TouchTarget.Top
             return true
         }
-        if (x < bounds.right + borderWidth && x > bounds.right - borderWidth
-            && y > bounds.top + borderWidth && y < bounds.bottom - borderWidth) {
+        if (x < bounds.right + touchRadius && x > bounds.right - touchRadius
+            && y > bounds.top + touchRadius && y < bounds.bottom - touchRadius) {
             target = TouchTarget.Right
             return true
         }
-        if (x > bounds.left + borderWidth && x < bounds.right - borderWidth
-            && y < bounds.bottom + borderWidth && y > bounds.bottom - borderWidth) {
+        if (x > bounds.left + touchRadius && x < bounds.right - touchRadius
+            && y < bounds.bottom + touchRadius && y > bounds.bottom - touchRadius) {
             target = TouchTarget.Bottom
             return true
         }
@@ -217,6 +220,13 @@ class PaddingView(context: Context, attr: AttributeSet?,
 
     private fun MotionEvent.getYById(): Float {
         return this.getY(this.findPointerIndex(activeId))
+    }
+
+    fun touchWidthDp(value: Float) {
+        touchWidth = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            value,
+            resources.displayMetrics)
     }
 
     fun borderWidthDp(value: Float) {

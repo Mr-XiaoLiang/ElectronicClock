@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
+import kotlinx.android.synthetic.main.dialog_padding_edit.*
 import liang.lollipop.electronicclock.R
 
 /**
@@ -34,7 +35,9 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
     }
 
     private fun initView() {
-
+        paddingView.touchWidthDp(20F)
+        paddingView.pointRadiusDp(5F)
+        paddingView.borderWidthDp(2F)
     }
 
 }
