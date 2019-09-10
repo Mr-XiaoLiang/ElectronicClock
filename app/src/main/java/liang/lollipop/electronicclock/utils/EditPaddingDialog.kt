@@ -44,6 +44,8 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
             defaultTint = ColorStateList.valueOf(value)
         }
 
+    var borderColor = Color.WHITE
+
     var callback: Callback? = null
 
     private val decimalFormat = DecimalFormat("0.00")
@@ -76,6 +78,7 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
         paddingView.touchWidthDp(touchWidthDp)
         paddingView.pointRadiusDp(pointRadiusDp)
         paddingView.borderWidthDp(borderWidthDp)
+        paddingView.color = borderColor
 
         positiveBtn.setOnClickListener {
             submit()
