@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.RectF
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Window
@@ -14,7 +13,6 @@ import com.google.android.material.textfield.TextInputEditText
 import kotlinx.android.synthetic.main.dialog_padding_edit.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.view.PaddingView
-import java.lang.Exception
 import java.text.DecimalFormat
 
 /**
@@ -46,6 +44,8 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
             defaultTint = ColorStateList.valueOf(value)
         }
 
+    var callback: Callback? = null
+
     private val decimalFormat = DecimalFormat("0.00")
 
     private var selectedTint: ColorStateList = ColorStateList.valueOf(selectedIconColor)
@@ -76,6 +76,14 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
         paddingView.touchWidthDp(touchWidthDp)
         paddingView.pointRadiusDp(pointRadiusDp)
         paddingView.borderWidthDp(borderWidthDp)
+
+        positiveBtn.setOnClickListener {
+            submit()
+        }
+
+        negativeBtn.setOnClickListener {
+            dismiss()
+        }
 
         paddingView.onDragEndListener = {
             onDragEnd()
@@ -118,6 +126,18 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
         }
 
         onDragEnd()
+    }
+
+    private fun submit() {
+        callback?.let {
+            val padding = FloatArray(4)
+            padding[0] = paddingView.paddingLeft * 1F / paddingView.width
+            padding[1] = paddingView.paddingTop * 1F / paddingView.height
+            padding[2] = paddingView.paddingRight * 1F / paddingView.width
+            padding[3] = paddingView.paddingBottom * 1F / paddingView.height
+            it.onPaddingConfirmed(padding)
+        }
+        dismiss()
     }
 
     private fun onDragEnd() {
@@ -211,6 +231,10 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
         } catch (e: Exception) {
             0F
         }
+    }
+
+    interface Callback {
+        fun onPaddingConfirmed(paddings: FloatArray)
     }
 
 }
