@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
@@ -20,9 +21,24 @@ class PaddingView(context: Context, attr: AttributeSet?,
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null)
 
+    companion object {
+        private const val TAG = "PaddingView"
+    }
+
     private val paddingDrawable = PaddingDrawable()
 
     private var target = TouchTarget.None
+        set(value) {
+            val lastType = field
+            field = value
+            if (lastType != value) {
+                if (value == TouchTarget.None) {
+                    onDragEnd()
+                } else {
+                    onDragStart(value)
+                }
+            }
+        }
 
     private var activeId = 0
 
@@ -34,17 +50,50 @@ class PaddingView(context: Context, attr: AttributeSet?,
 
     private var touchWidth = 10F
 
+    var onDragStartListener: ((target: TouchTarget) -> Unit)? = null
+    var onDragEndListener: (() -> Unit)? = null
+    var onDragMoveListener: ((target: TouchTarget, left: Float, top: Float, right: Float, bottom: Float) -> Unit)? = null
+
+    fun putPaddingValue(left: Float, top: Float, right: Float, bottom: Float) {
+        post {
+            val l = (left * width).toInt()
+            val t = (top * height).toInt()
+            val r = (right * width).toInt()
+            val b = (bottom * height).toInt()
+            setPadding(l, t, r, b)
+        }
+    }
+
+    fun setPadding(target: TouchTarget, value: Float) {
+        post {
+            when (target) {
+                TouchTarget.Left -> {
+                    setPadding((value * width).toInt(), paddingTop, paddingRight, paddingBottom)
+                }
+                TouchTarget.Top -> {
+                    setPadding(paddingLeft, (value * height).toInt(), paddingRight, paddingBottom)
+                }
+                TouchTarget.Right -> {
+                    setPadding(paddingLeft, paddingTop, (value * width).toInt(), paddingBottom)
+                }
+                TouchTarget.Bottom -> {
+                    setPadding(paddingLeft, paddingTop, paddingRight, (value * height).toInt())
+                }
+            }
+        }
+    }
+
     init {
         paddingDrawable.callback = this
     }
 
-    private enum class TouchTarget {
-        Left,
-        Top,
-        Right,
-        Bottom,
-        Full,
-        None
+    enum class TouchTarget(val value: String) {
+        Left("Left"),
+        Top("Top"),
+        Right("Right"),
+        Bottom("Bottom"),
+        Full("Full"),
+        None("None")
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -60,6 +109,11 @@ class PaddingView(context: Context, attr: AttributeSet?,
         val right = width - paddingRight
         val bottom = height - paddingBottom
         paddingDrawable.setBounds(left, top, right, bottom)
+    }
+
+    override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
+        super.setPadding(left, top, right, bottom)
+        paddingDrawable.setBounds(left, top, width - right, height - bottom)
     }
 
     override fun invalidateDrawable(drawable: Drawable) {
@@ -110,7 +164,8 @@ class PaddingView(context: Context, attr: AttributeSet?,
                 return true
             }
         }
-        return true
+        invalidate()
+        return super.onTouchEvent(event)
     }
 
     private fun onTouchMove(event: MotionEvent): Boolean {
@@ -127,11 +182,11 @@ class PaddingView(context: Context, attr: AttributeSet?,
             }
             TouchTarget.Right -> {
                 val newRight = x.toInt().range(bounds.left, width)
-                setPadding(paddingLeft, paddingTop, newRight, paddingBottom)
+                setPadding(paddingLeft, paddingTop, width - newRight, paddingBottom)
             }
             TouchTarget.Bottom -> {
                 val newBottom = y.toInt().range(bounds.top, height)
-                setPadding(paddingLeft, paddingTop, paddingRight, newBottom)
+                setPadding(paddingLeft, paddingTop, paddingRight, height - newBottom)
             }
             TouchTarget.Full -> {
                 var offsetX = x - lastTouchLocation.x + redundancy.x
@@ -139,20 +194,20 @@ class PaddingView(context: Context, attr: AttributeSet?,
                 if (offsetX + paddingLeft < 0) {
                     offsetX = 0F - paddingLeft
                 }
-                if (offsetX + paddingRight > width) {
-                    offsetX = width * 1F - paddingRight
+                if (width - paddingRight + offsetX > width ) {
+                    offsetX = 1F * paddingRight
                 }
                 if (offsetY + paddingTop < 0) {
                     offsetY = 0F - paddingTop
                 }
-                if (offsetY + paddingBottom > height) {
-                    offsetY = height * 1F - paddingBottom
+                if (height - paddingBottom + offsetY > height) {
+                    offsetY = 1F * paddingBottom
                 }
                 val diffX = offsetX.toInt()
                 val diffY = offsetY.toInt()
                 redundancy.set(offsetX - diffX, offsetY - diffY)
                 setPadding(paddingLeft + diffX, paddingTop + diffY,
-                    paddingRight + diffX, paddingBottom + diffY)
+                    paddingRight - diffX, paddingBottom - diffY)
             }
             else -> {
                 // 当发现事件目标丢失，那么放弃事件
@@ -160,6 +215,7 @@ class PaddingView(context: Context, attr: AttributeSet?,
             }
         }
         lastTouchLocation.set(x, y)
+        onDragMove()
         return true
     }
 
@@ -169,6 +225,7 @@ class PaddingView(context: Context, attr: AttributeSet?,
      * 当返回false的时候，表示激活失败
      */
     private fun checkTouchDown(event: MotionEvent): Boolean {
+        redundancy.set(0F, 0F)
         val x = event.getXById()
         val y = event.getYById()
         val touchRadius = (touchWidth + borderWidth) / 2
@@ -197,6 +254,25 @@ class PaddingView(context: Context, attr: AttributeSet?,
             return true
         }
         return false
+    }
+
+    private fun onDragStart(target: TouchTarget){
+        Log.d(TAG, "onDragStart: ${target.value}")
+        onDragStartListener?.invoke(target)
+    }
+
+    private fun onDragEnd(){
+        Log.d(TAG, "onDragEnd")
+        onDragEndListener?.invoke()
+    }
+
+    private fun onDragMove() {
+        Log.d(TAG, "onDragMove")
+        val left = paddingLeft * 1F / width
+        val top = paddingTop * 1F / height
+        val right = paddingRight * 1F / width
+        val bottom = paddingBottom * 1F / height
+        onDragMoveListener?.invoke(target, left, top, right, bottom)
     }
 
     private val bounds: Rect
