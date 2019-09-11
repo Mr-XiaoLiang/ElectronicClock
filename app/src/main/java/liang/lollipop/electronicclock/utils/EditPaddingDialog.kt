@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.telecom.Call
 import android.view.KeyEvent
 import android.view.Window
 import android.view.WindowManager
@@ -54,6 +55,19 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
     private var defaultTint: ColorStateList = ColorStateList.valueOf(defaultIconColor)
 
     private val tmpPadding = FloatArray(4)
+
+    fun onPaddingConfirmed(run: (FloatArray) -> Unit) : EditPaddingDialog {
+        callback = object : Callback {
+            override fun onPaddingConfirmed(paddings: FloatArray) {
+                run(paddings)
+            }
+        }
+        return this
+    }
+
+    fun putPaddingValue(p: FloatArray) {
+        putPaddingValue(p[0], p[1], p[2], p[3])
+    }
 
     fun putPaddingValue(left: Float, top: Float, right: Float, bottom: Float) {
         tmpPadding[0] = left
@@ -128,6 +142,7 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
             paddingView.setPadding(PaddingView.TouchTarget.Bottom, value)
         }
 
+        onDragMove(PaddingView.TouchTarget.Full, tmpPadding[0], tmpPadding[1], tmpPadding[2], tmpPadding[3])
         onDragEnd()
     }
 

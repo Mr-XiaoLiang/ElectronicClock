@@ -38,6 +38,9 @@ class AdjustmentSeekBarHolder(view: View): AdjustmentHolder<AdjustmentInteger>(v
     init {
         view.setOnClickListener {
             bindInfo?.let { info ->
+                if (!info.enable) {
+                    return@setOnClickListener
+                }
                 SeekBarDialog.getInstance(view.context) {
                     title = info.title
                     value = info.value
@@ -52,6 +55,7 @@ class AdjustmentSeekBarHolder(view: View): AdjustmentHolder<AdjustmentInteger>(v
 
     override fun onBind(info: AdjustmentInteger) {
         bindInfo = info
+        setViewEnable(info.enable, titleView, valueView, summaryView)
         titleView.text = info.title
         summaryView.text = info.summary
         valueView.text = "${info.value}"

@@ -68,6 +68,57 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 summary = getString(R.string.summary_color_array)
                 maxSize = 100
                 reset(batteryInfo.colorArray)
+            },
+            paddings {
+                key = BatteryPanelInfo.PADDING
+                title = getString(R.string.title_paddings)
+                reset(batteryInfo.padding)
+            },
+            switch {
+                key = BatteryPanelInfo.IS_ARC
+                title = getString(R.string.title_arc_mode)
+                summaryOfTrue = getString(R.string.summary_arc_true)
+                summaryOfFalse = getString(R.string.summary_arc_false)
+                value = batteryInfo.isArc
+            },
+            seekBar {
+                key = BatteryPanelInfo.ARC_WIDTH
+                relevantKey = BatteryPanelInfo.IS_ARC
+                title = getString(R.string.title_arc_width)
+                summary = getString(R.string.summary_arc_width)
+                min = 0
+                max = 100
+                value = (batteryInfo.arcWidth * 100).toInt()
+            },
+            seekBar {
+                key = BatteryPanelInfo.BORDER_WIDTH
+                title = getString(R.string.title_border_width)
+                summary = getString(R.string.summary_border_width)
+                min = 0
+                max = 100
+                value = (batteryInfo.borderWidth * 100).toInt()
+            },
+            colors {
+                key = BatteryPanelInfo.BORDER_COLOR
+                title = getString(R.string.title_border_color)
+                summary = getString(R.string.summary_border_color)
+                reset(batteryInfo.borderColor)
+            },
+            switch {
+                key = BatteryPanelInfo.IS_VERTICAL
+                relevantKey = BatteryPanelInfo.IS_ARC
+                relevantEnable = false
+                title = getString(R.string.title_is_vertical)
+                summaryOfTrue = getString(R.string.summary_vertical)
+                summaryOfFalse = getString(R.string.summary_horizontal)
+                value = batteryInfo.isVertical
+            },
+            switch {
+                key = BatteryPanelInfo.IS_ANIMATION
+                title = getString(R.string.title_is_animation)
+                summaryOfTrue = getString(R.string.summary_animation_enable)
+                summaryOfFalse = getString(R.string.summary_animation_disable)
+                value = batteryInfo.isAnimation
             }
         )
     }

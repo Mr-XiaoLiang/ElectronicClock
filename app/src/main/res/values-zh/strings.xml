@@ -61,4 +61,22 @@
     <string name="err_color_too_more">颜色数量太多</string>
     <string name="title_color_array">颜色</string>
     <string name="summary_color_array">选择元素的颜色</string>
+
+    <string name="title_paddings">元素内补白</string>
+    <string name="summary_paddings">左:%1$.2f%% 上:%2$.2f%% 右:%3$.2f%% 下:%4$.2f%%</string>
+    <string name="title_arc_mode">环形显示</string>
+    <string name="summary_arc_true">使用扇形表示</string>
+    <string name="summary_arc_false">不使用扇形表示</string>
+    <string name="title_arc_width">扇形宽度</string>
+    <string name="summary_arc_width">扇形线条的宽度</string>
+    <string name="title_border_width">边框宽度</string>
+    <string name="summary_border_width">元素的边框宽度</string>
+    <string name="title_border_color">边框颜色</string>
+    <string name="summary_border_color">元素边框的颜色</string>
+    <string name="title_is_vertical">垂直放置元素</string>
+    <string name="summary_vertical">元素将会垂直排列</string>
+    <string name="summary_horizontal">元素将会水平排列</string>
+    <string name="title_is_animation">是否启用动画</string>
+    <string name="summary_animation_enable">动画已开启</string>
+    <string name="summary_animation_disable">动画已关闭</string>
 </resources>
