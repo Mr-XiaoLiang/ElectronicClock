@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_adjustment_info.*
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.bean.AdjustmentBoolean
-import liang.lollipop.electronicclock.bean.AdjustmentColor
-import liang.lollipop.electronicclock.bean.AdjustmentInfo
-import liang.lollipop.electronicclock.bean.AdjustmentInteger
+import liang.lollipop.electronicclock.bean.*
 import liang.lollipop.electronicclock.list.AdjustmentAdapter
 import liang.lollipop.electronicclock.utils.doAsync
 import liang.lollipop.electronicclock.utils.uiThread
@@ -44,6 +42,8 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     private var adapter: AdjustmentAdapter? = null
 
+    private val tmpInfoList = ArrayList<AdjustmentInfo>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -60,7 +60,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.layoutManager = LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
         adapter = AdjustmentAdapter(adjustmentInfoList, LayoutInflater.from(context)) { info, newValue ->
-            onInfoChange(info, newValue)
+            infoChange(info, newValue)
         }
         recyclerView.adapter = adapter
         notifyDataSetChanged()
@@ -73,7 +73,19 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
     protected fun addAdjustmentInfo(vararg infos: AdjustmentInfo) {
         adjustmentInfoList.clear()
         adjustmentInfoList.addAll(infos)
+        inspectAdjustmentInfo()
         notifyDataSetChanged()
+    }
+
+    private fun inspectAdjustmentInfo() {
+        for (info in adjustmentInfoList) {
+            if (info.relevantKey.isNotEmpty()) {
+                val relevantInfo = findInfoByKey(info.relevantKey)?:continue
+                if (relevantInfo is AdjustmentBoolean) {
+                    info.enable = info.relevantEnable == relevantInfo.value
+                }
+            }
+        }
     }
 
     protected fun notifyInfoChange(newInfo: AdjustmentInfo, ifAdd: Boolean = true) {
@@ -95,6 +107,41 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         if (index >= 0 && index < adjustmentInfoList.size) {
             adapter?.notifyItemChanged(index)
         }
+    }
+
+    fun findInfoByKey(key: String) : AdjustmentInfo? {
+        if (TextUtils.isEmpty(key)) {
+            return null
+        }
+        for (info in adjustmentInfoList) {
+            if (info.key == key) {
+                return info
+            }
+        }
+        return null
+    }
+
+    private fun findRelevantInfoByKey(key: String, infoList: ArrayList<AdjustmentInfo>) {
+        infoList.clear()
+        if (TextUtils.isEmpty(key)) {
+            return
+        }
+        for (info in adjustmentInfoList) {
+            if (info.relevantKey == key) {
+                infoList.add(info)
+            }
+        }
+    }
+
+    private fun infoChange(info: AdjustmentInfo, newValue: Any) {
+        if (newValue is Boolean) {
+            findRelevantInfoByKey(info.key, tmpInfoList)
+            for (i in tmpInfoList) {
+                i.enable = newValue == i.relevantEnable
+                notifyInfoChange(i, false)
+            }
+        }
+        onInfoChange(info, newValue)
     }
 
     abstract fun onInfoChange(info: AdjustmentInfo, newValue: Any)
@@ -180,6 +227,10 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     fun colors(run: AdjustmentColor.() -> Unit): AdjustmentColor {
         return AdjustmentColor(run)
+    }
+
+    fun paddings(run: AdjustmentPadding.() -> Unit): AdjustmentPadding {
+        return AdjustmentPadding(run)
     }
 
 }

@@ -22,6 +22,13 @@ class AdjustmentColor(run: AdjustmentColor.() -> Unit):
         colors.addAll(c)
     }
 
+    fun reset(c: Int) {
+        colors.clear()
+        colors.add(c)
+        maxSize = 1
+        minSize = 1
+    }
+
     override fun copy(info: AdjustmentInfo) {
         super.copy(info)
         if (info is AdjustmentColor) {

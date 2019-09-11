@@ -11,6 +11,9 @@ open class AdjustmentInfo {
     var key = ""
     var enable = true
 
+    var relevantKey = ""
+    var relevantEnable = true
+
     open fun copy(info: AdjustmentInfo) {
         title = info.title
         summary = info.summary

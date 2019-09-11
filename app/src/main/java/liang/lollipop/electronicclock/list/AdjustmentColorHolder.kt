@@ -32,6 +32,9 @@ class AdjustmentColorHolder(view: View): AdjustmentHolder<AdjustmentColor>(view)
     init {
         view.setOnClickListener{ clickView ->
             bindInfo?.let { info ->
+                if (!info.enable) {
+                    return@setOnClickListener
+                }
                 ColorPaletteDialog.create(clickView.context) {
                     maxSize = info.maxSize
                     minSize = info.minSize
@@ -47,6 +50,7 @@ class AdjustmentColorHolder(view: View): AdjustmentHolder<AdjustmentColor>(view)
 
     override fun onBind(info: AdjustmentColor) {
         bindInfo = info
+        setViewEnable(info.enable, titleView, colorWheelView, summaryView)
         titleView.text = info.title
         summaryView.text = info.summary
         colorWheelView.setColors(info.colors)

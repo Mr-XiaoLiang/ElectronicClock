@@ -38,8 +38,6 @@ class MainActivity : BottomNavigationActivity() {
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
 
         showGuidelines()
-
-        EditPaddingDialog.create(this).show()
     }
 
     private fun showGuidelines() {

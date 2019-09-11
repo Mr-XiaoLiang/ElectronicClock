@@ -3,10 +3,7 @@ package liang.lollipop.electronicclock.list
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import liang.lollipop.electronicclock.bean.AdjustmentBoolean
-import liang.lollipop.electronicclock.bean.AdjustmentColor
-import liang.lollipop.electronicclock.bean.AdjustmentInfo
-import liang.lollipop.electronicclock.bean.AdjustmentInteger
+import liang.lollipop.electronicclock.bean.*
 
 /**
  * @author lollipop
@@ -21,6 +18,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
         private const val TYPE_SWITCH = 0
         private const val TYPE_SEEKBAR = 1
         private const val TYPE_COLOR = 2
+        private const val TYPE_PADDING = 3
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdjustmentHolder<*> {
@@ -28,6 +26,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
             TYPE_SWITCH -> AdjustmentBooleanHolder.create(inflater, parent)
             TYPE_SEEKBAR -> AdjustmentSeekBarHolder.create(inflater, parent)
             TYPE_COLOR -> AdjustmentColorHolder.create(inflater, parent)
+            TYPE_PADDING -> AdjustmentPaddingHolder.create(inflater, parent)
             else -> throw RuntimeException("unknown the viewType:$viewType")
         }
         holder.onValueChangeListener = this
@@ -47,6 +46,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
             is AdjustmentBoolean -> TYPE_SWITCH
             is AdjustmentInteger -> TYPE_SEEKBAR
             is AdjustmentColor -> TYPE_COLOR
+            is AdjustmentPadding -> TYPE_PADDING
             else -> throw RuntimeException("unknown the AdjustmentInfo type")
         }
     }
@@ -61,6 +61,9 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
                 holder.onBind(info)
             }
             is AdjustmentColorHolder -> if (info is AdjustmentColor) {
+                holder.onBind(info)
+            }
+            is AdjustmentPaddingHolder -> if (info is AdjustmentPadding) {
                 holder.onBind(info)
             }
         }

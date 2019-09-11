@@ -40,6 +40,7 @@ class AdjustmentBooleanHolder(view: View): AdjustmentHolder<AdjustmentBoolean>(v
 
     override fun onBind(info: AdjustmentBoolean) {
         bindInfo = info
+        setViewEnable(info.enable, titleView, switchView, summaryView)
         titleView.text = info.title
         switchView.setOnCheckedChangeListener(null)
         onSwitchChange(info.value)
@@ -48,7 +49,6 @@ class AdjustmentBooleanHolder(view: View): AdjustmentHolder<AdjustmentBoolean>(v
 
     private fun onSwitchChange(value: Boolean) {
         switchView.isChecked = value
-        summaryView.text = "bindInfo is null"
         bindInfo?.let {
             summaryView.text = if (value) { it.summaryOfTrue } else { it.summaryOfFalse }
         }
