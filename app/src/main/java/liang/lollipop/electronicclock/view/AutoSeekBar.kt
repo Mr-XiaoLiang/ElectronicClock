@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewConfiguration
 import liang.lollipop.electronicclock.R
 import kotlin.math.abs
-import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -110,11 +109,7 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
     fun setProgress(value: Float, callListener: Boolean = true) {
         seekBarDrawable.progress = value.isRtl()
         if (callListener) {
-            val v = if (min > 0) {
-                value + min
-            } else {
-                value
-            }
+            val v = value + min
             onProgressChangeListener?.onProgressChange(this, v)
         }
     }
@@ -222,25 +217,17 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
             start = paddingTop.toFloat()
             end = (height - paddingBottom).toFloat()
             allLength = end - start
-            origin = allLength * seekBarDrawable.startWeight + paddingTop
+            origin = paddingTop.toFloat()
             point = event.getYById().range(start, end)
         } else {
             // 如果是水平的，那么计算宽度
             start = paddingLeft.toFloat()
             end = (width - paddingRight).toFloat()
             allLength = end - start
-            origin = allLength * seekBarDrawable.startWeight + paddingLeft
+            origin = paddingLeft.toFloat()
             point =  event.getXById().range(start, end)
         }
-        progress = if (point < origin) {
-            // 如果在小于原点，那么说明是负数
-            // 那么需要计算选中长度与原点左侧长度的比值，再乘以原点左侧的负数数值
-            (origin - point) / (origin - start) * min
-        } else {
-            // 如果大于或者等于原点，那么肯定是在同一侧
-            // 需要用结束位置减去起点位置
-            (point - origin) / (end - origin) * (max - max(0F, min))
-        }
+        progress = (point - origin) / allLength * (max - min) + min
         invalidate()
     }
 
@@ -318,21 +305,6 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
                 return min(bounds.width(), bounds.height()) * 0.5F
             }
 
-        val startWeight: Float
-            get() {
-                return if (isViaZero) {
-                    // 如果途径了 0，那么以 0 作为起点
-                    (0 - min) / (max - min)
-                } else {
-                    0F
-                }
-            }
-
-        val isViaZero: Boolean
-            get() {
-                return min < 0 && max > 0
-            }
-
         private val drawBounds = RectF()
 
         private val borderBounds = RectF()
@@ -349,12 +321,7 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
             borderBounds.set(bounds)
 
             val allProgress = max - min
-            val progressWeight = (progress) / allProgress
-            val start = if (progressWeight < 0) {
-                startWeight + progressWeight
-            } else {
-                startWeight
-            }
+            val progressWeight = (progress - min) / allProgress
 
             val length = abs(progressWeight)
 
@@ -364,14 +331,14 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
             val height = bounds.height() - r * 2
             if (width > height) {
                 // 宽度大于高度，视为横向
-                val left = bounds.left + start * width
+                val left = bounds.left.toFloat()
                 drawBounds.set(left, bounds.top.toFloat(), length * width + left, bounds.bottom.toFloat())
                 drawBounds.offset(r, 0F)
                 drawBounds.left -= r
                 drawBounds.right += r
             } else {
                 // 否则视为纵向
-                val top = bounds.top + start * height
+                val top = bounds.top.toFloat()
                 drawBounds.set(bounds.left.toFloat(), top, bounds.right.toFloat(), height * length + top)
                 drawBounds.offset(0F, r)
                 drawBounds.top -= r

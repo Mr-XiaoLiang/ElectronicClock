@@ -8,15 +8,19 @@ import kotlinx.android.synthetic.main.activity_panel_info_adjustment.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.fragment.PanelInfoAdjustmentFragment
 import liang.lollipop.electronicclock.utils.PanelInfoAdjustmentHelper
+import liang.lollipop.electronicclock.utils.gridSize
+import liang.lollipop.electronicclock.view.AutoSeekBar
 import liang.lollipop.guidelinesview.util.lifecycleBinding
 import liang.lollipop.guidelinesview.util.onEnd
 import liang.lollipop.guidelinesview.util.onStart
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
+import kotlin.math.max
 
 class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
     PanelInfoAdjustmentFragment.InfoLoadCallback,
-    PanelInfoAdjustmentFragment.PanelSizeChangeCallback {
+    PanelInfoAdjustmentFragment.PanelSizeChangeCallback,
+    AutoSeekBar.OnProgressChangeListener{
 
     override val contentViewId: Int
         get() = R.layout.activity_panel_info_adjustment
@@ -75,7 +79,14 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
             }
         }
         bindSeekBarAnimation()
+        spanXSeekBar.min = 1F
+        spanYSeekBar.min = 1F
+        spanXSeekBar.max = gridSize.toFloat()
+        spanYSeekBar.max = spanXSeekBar.max
+        spanXSeekBar.onProgressChangeListener = this
+        spanYSeekBar.onProgressChangeListener = this
 
+        setPanelSize(1, 1)
     }
 
     private fun bindSeekBarAnimation() {
@@ -129,6 +140,14 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         }
     }
 
+    override fun onProgressChange(view: AutoSeekBar, progress: Float) {
+        when (view) {
+            spanXSeekBar, spanYSeekBar -> {
+                onPanelSizeChange(spanXSeekBar.progress.toInt(), spanYSeekBar.progress.toInt())
+            }
+        }
+    }
+
     override fun onInfoLoadStatusChange(isLoading: Boolean) {
         if (isLoading) {
             startContentLoading()
@@ -147,7 +166,16 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
     }
 
     override fun setPanelSize(spanX: Int, spanY: Int) {
-        previewGroup.changeSize(spanX, spanY)
+        spanXSeekBar.setProgress(spanX.toFloat(), false)
+        spanYSeekBar.setProgress(spanY.toFloat(), false)
+        onPanelSizeChange(spanX, spanY)
+    }
+
+    private fun onPanelSizeChange(spanX: Int, spanY: Int) {
+        val x = max(spanX, 1)
+        val y = max(spanY, 1)
+        previewGroup.changeSize(x, y)
+        sizeValueView.text = "$x * $y"
     }
 
 }

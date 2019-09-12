@@ -47,7 +47,7 @@ class NumberSelectedDialog(private val builder: Builder): Dialog(builder.context
 
         titleView.text = builder.title
 
-        window?.setBackgroundDrawableResource(android.R.color.transparent)
+//        window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         val layoutParams = window?.attributes ?: return
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT

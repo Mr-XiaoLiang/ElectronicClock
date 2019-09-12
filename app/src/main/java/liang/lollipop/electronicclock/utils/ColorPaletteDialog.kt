@@ -136,7 +136,6 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
     private fun addColorToList() {
         if (maxSize > 0 && colorArray.size >= maxSize) {
             showError(R.string.err_color_cant_be_more)
-            return
         }
         val color = merge()
         colorArray.add(color)
@@ -146,7 +145,6 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
     private fun onColorDeleteBtnClick(colorHolder: ColorHolder) {
         if (minSize > 0 && colorArray.size <= minSize) {
             showError(R.string.err_color_cant_be_low)
-            return
         }
         val index = colorHolder.adapterPosition
         colorArray.removeAt(index)

@@ -233,4 +233,26 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         return AdjustmentPadding(run)
     }
 
+    protected fun Any.optBoolean(def: Boolean): Boolean {
+        if (this is Boolean) {
+            return this
+        }
+        return def
+    }
+
+    protected fun Any.optInt(def: Int): Int {
+        if (this is Int) {
+            return this
+        }
+        return def
+    }
+
+    protected fun Any.optUnpackingToFloat(def: Float): Float {
+        return optInt((def * 100).toInt()) * 0.01F
+    }
+
+    protected fun Float.packingToInt(): Int {
+        return (this * 100).toInt()
+    }
+
 }

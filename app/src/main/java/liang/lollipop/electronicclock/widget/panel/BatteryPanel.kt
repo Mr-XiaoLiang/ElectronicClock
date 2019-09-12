@@ -3,6 +3,7 @@ package liang.lollipop.electronicclock.widget.panel
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,15 +49,22 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
         private val paint = Paint().apply {
             isAntiAlias = true
             isDither = true
+            strokeCap = Paint.Cap.ROUND
         }
 
-        var progress = 1F
+        var progress = 0.7F
             set(value) {
                 field = value
                 invalidateSelf()
             }
 
         private var shader: Shader? = null
+
+        private val borderPath = Path()
+
+        private val tmpPath = Path()
+
+        private var corner = 0F
 
         fun onInfoChange(newInfo: BatteryPanelInfo) {
             info = newInfo
@@ -74,12 +82,37 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
             batteryBounds.right -= padding[2] * bounds.width()
             batteryBounds.bottom -= padding[3] * bounds.height()
 
-            val colorArray = IntArray(info.colorArray.size)
-            for (i in 0 until  info.colorArray.size) {
-                colorArray[i] = info.colorArray[i]
+            corner = min(batteryBounds.width(), batteryBounds.height()) / 2 * info.corner
+
+            borderPath.reset()
+            val r = min(batteryBounds.width(), batteryBounds.height()) / 2
+            var borderWidth = r * info.borderWidth
+            if (borderWidth > r / 2) {
+                borderWidth = r / 2
+            }
+            if (info.isArc) {
+                borderPath.addCircle(batteryBounds.centerX(), batteryBounds.centerY(), r, Path.Direction.CW)
+
+                tmpPath.reset()
+                tmpPath.addCircle(batteryBounds.centerX(), batteryBounds.centerY(), r - borderWidth, Path.Direction.CW)
+
+                borderPath.op(tmpPath, Path.Op.DIFFERENCE)
+            } else {
+                borderPath.addRoundRect(batteryBounds, corner, corner, Path.Direction.CW)
+
+                tmpPath.reset()
+                tmpPath.addRoundRect(batteryBounds.left + borderWidth, batteryBounds.top + borderWidth,
+                    batteryBounds.right - borderWidth, batteryBounds.bottom - borderWidth,
+                    corner, corner, Path.Direction.CW)
+
+                borderPath.op(tmpPath, Path.Op.DIFFERENCE)
             }
 
             if (info.colorArray.size > 1) {
+                val colorArray = IntArray(info.colorArray.size + 1)
+                for (i in colorArray.indices) {
+                    colorArray[i] = info.colorArray[i % info.colorArray.size]
+                }
                 shader = if (info.isArc) {
                     SweepGradient(batteryBounds.centerX(), batteryBounds.centerY(), colorArray, null)
                 } else {
@@ -102,7 +135,11 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
                 }
             } else {
                 shader = null
+                if (info.colorArray.size > 0) {
+                    defColor = info.colorArray[0]
+                }
             }
+            invalidateSelf()
         }
 
         override fun onBoundsChange(bounds: Rect?) {
@@ -111,45 +148,50 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
         }
 
         override fun draw(canvas: Canvas) {
-            paint.alpha = drawAlpha
             // 绘制背景
             if (info.isShowBg) {
-                paint.alpha = (drawAlpha * 0.5F).toInt()
-                drawProgress(canvas)
-                paint.alpha = drawAlpha
+                drawProgress(canvas, 1F, (drawAlpha * 0.2F).toInt())
             }
             // 电池本体
-            drawProgress(canvas)
+            drawProgress(canvas, progress)
             // 绘制边框
             if (info.isShowBorder) {
                 drawBorder(canvas)
             }
         }
 
-        private fun drawProgress(canvas: Canvas) {
+        private fun drawProgress(canvas: Canvas, pro: Float, alpha: Int = drawAlpha) {
             paint.color = defColor
             paint.shader = shader
+            paint.alpha = alpha
             val left: Float
             val top: Float
             val right: Float
             val bottom: Float
             // 环形模式
+            var borderInset = 0F
+            val r = min(batteryBounds.width(), batteryBounds.height()) / 2
+            if (info.isShowBorder) {
+                borderInset = r * info.borderWidth
+                if (borderInset > r / 2) {
+                    borderInset = r / 2
+                }
+            }
             if (info.isArc) {
-                val r = min(batteryBounds.width(), batteryBounds.height()) / 2
                 var strokeWidth = r * info.arcWidth
                 if (strokeWidth > r / 2) {
                     strokeWidth = r / 2
                 }
 
-                left = batteryBounds.centerX() - r - strokeWidth
-                top = batteryBounds.centerY() - r - strokeWidth
-                right = batteryBounds.centerX() + r + strokeWidth
-                bottom = batteryBounds.centerY() + r + strokeWidth
+                left = batteryBounds.centerX() - r + strokeWidth / 2 + borderInset
+                top = batteryBounds.centerY() - r + strokeWidth / 2 + borderInset
+                right = batteryBounds.centerX() + r - strokeWidth / 2 - borderInset
+                bottom = batteryBounds.centerY() + r - strokeWidth / 2 - borderInset
 
                 paint.style = Paint.Style.STROKE
                 paint.strokeWidth = strokeWidth
                 canvas.drawArc(left, top, right, bottom,
-                    -90F, 360 * progress, false, paint)
+                    -90F, 360 * pro, false, paint)
                 paint.style = Paint.Style.FILL_AND_STROKE
                 paint.strokeWidth = 0F
             } else {
@@ -157,47 +199,25 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
                 left = batteryBounds.left
                 bottom = batteryBounds.bottom
                 if (info.isVertical) {
-                    top = batteryBounds.top + batteryBounds.height() * progress
+                    top = batteryBounds.top + batteryBounds.height() * (1 - pro)
                     right = batteryBounds.right
                 } else {
                     top = batteryBounds.top
-                    right = batteryBounds.left + batteryBounds.width() * progress
+                    right = batteryBounds.left + batteryBounds.width() * pro
                 }
-                val corner = min(batteryBounds.width(), batteryBounds.height()) / 2 * info.corner
-
                 paint.style = Paint.Style.FILL_AND_STROKE
                 paint.strokeWidth = 0F
-                canvas.drawRoundRect(left, top, right, bottom, corner, corner, paint)
+                canvas.drawRoundRect(left + borderInset, top + borderInset,
+                    right - borderInset, bottom - borderInset,
+                    corner, corner, paint)
             }
             paint.shader = null
         }
 
         private fun drawBorder(canvas: Canvas) {
             paint.color = info.borderColor
-            if (info.isArc) {
-                val r = min(batteryBounds.width(), batteryBounds.height()) / 2
-                var strokeWidth = r * info.borderWidth
-                if (strokeWidth > r / 2) {
-                    strokeWidth = r / 2
-                }
-
-                paint.style = Paint.Style.STROKE
-                paint.strokeWidth = strokeWidth
-                canvas.drawCircle(batteryBounds.centerX(), batteryBounds.centerY(), r - strokeWidth / 2, paint)
-                paint.style = Paint.Style.FILL_AND_STROKE
-                paint.strokeWidth = 0F
-            } else {
-                val strokeWidth = min(batteryBounds.width(), batteryBounds.height()) * info.borderWidth
-                paint.style = Paint.Style.STROKE
-                paint.strokeWidth = strokeWidth
-                val retract = strokeWidth / 2
-                val left = batteryBounds.left + retract
-                val top = batteryBounds.top + retract
-                val right = batteryBounds.right - retract
-                val bottom = batteryBounds.bottom - retract
-                val corner = min(right - left, bottom - top) / 2 * info.corner
-                canvas.drawRoundRect(left, top, right, bottom, corner, corner, paint)
-            }
+            paint.alpha = drawAlpha
+            canvas.drawPath(borderPath, paint)
         }
 
         override fun setAlpha(alpha: Int) {
