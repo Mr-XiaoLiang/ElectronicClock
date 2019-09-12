@@ -52,7 +52,6 @@ class AdjustmentBooleanHolder(view: View): AdjustmentHolder<AdjustmentBoolean>(v
         bindInfo?.let {
             summaryView.text = if (value) { it.summaryOfTrue } else { it.summaryOfFalse }
         }
-        Log.d("Lollipop", "bindInfo is ${bindInfo?.summaryOfTrue}")
     }
 
 }

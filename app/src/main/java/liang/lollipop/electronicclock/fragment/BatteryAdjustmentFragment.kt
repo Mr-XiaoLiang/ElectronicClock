@@ -1,6 +1,7 @@
 package liang.lollipop.electronicclock.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
@@ -26,7 +27,9 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
     }
 
     private val batteryInfo = BatteryPanelInfo()
-    private val batteryPanel = BatteryPanel(batteryInfo)
+    private val batteryPanel = BatteryPanel(batteryInfo).apply {
+
+    }
 
     override fun getPanelView(): View {
         return batteryPanel.createView(context!!)
@@ -36,6 +39,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
         info?.let { batteryInfo.copy(it) }
         putAdjustmentInfo()
         panelInitComplete()
+
     }
 
     private fun putAdjustmentInfo() {
@@ -60,7 +64,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 summary = getString(R.string.summary_corner)
                 min = 0
                 max = 100
-                value = (batteryInfo.corner * 100).toInt()
+                value = batteryInfo.corner.packingToInt()
             },
             colors {
                 key = BatteryPanelInfo.COLOR_ARRAY
@@ -88,7 +92,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 summary = getString(R.string.summary_arc_width)
                 min = 0
                 max = 100
-                value = (batteryInfo.arcWidth * 100).toInt()
+                value = batteryInfo.arcWidth.packingToInt()
             },
             seekBar {
                 key = BatteryPanelInfo.BORDER_WIDTH
@@ -96,7 +100,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 summary = getString(R.string.summary_border_width)
                 min = 0
                 max = 100
-                value = (batteryInfo.borderWidth * 100).toInt()
+                value = batteryInfo.borderWidth.packingToInt()
             },
             colors {
                 key = BatteryPanelInfo.BORDER_COLOR
@@ -128,6 +132,64 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
     }
 
     override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
+        Log.d("Lollipop", "onInfoChange(${info.key})")
+        when (info.key) {
+            BatteryPanelInfo.IS_SHOW_BG     -> {
+                batteryInfo.isShowBg = newValue.optBoolean(batteryInfo.isShowBg)
+            }
+            BatteryPanelInfo.IS_SHOW_BORDER -> {
+                batteryInfo.isShowBorder = newValue.optBoolean(batteryInfo.isShowBorder)
+            }
+            BatteryPanelInfo.CORNER         -> {
+                batteryInfo.corner =newValue.optUnpackingToFloat(batteryInfo.corner)
+            }
+            BatteryPanelInfo.COLOR_ARRAY    -> {
+                if (newValue is IntArray) {
+                    batteryInfo.colorArray.clear()
+                    newValue.forEach { color ->
+                        batteryInfo.colorArray.add(color)
+                    }
+                } else if (newValue is ArrayList<*>) {
+                    batteryInfo.colorArray.clear()
+                    newValue.forEach { color ->
+                        if (color is Int) {
+                            batteryInfo.colorArray.add(color)
+                        }
+                    }
+                }
+            }
+            BatteryPanelInfo.PADDING        -> {
+                if (newValue is FloatArray) {
+                    batteryInfo.padding[0] = newValue[0]
+                    batteryInfo.padding[1] = newValue[1]
+                    batteryInfo.padding[2] = newValue[2]
+                    batteryInfo.padding[3] = newValue[3]
+                }
+            }
+            BatteryPanelInfo.IS_VERTICAL    -> {
+                batteryInfo.isVertical = newValue.optBoolean(batteryInfo.isVertical)
+            }
+            BatteryPanelInfo.BORDER_WIDTH   -> {
+                batteryInfo.borderWidth =newValue.optUnpackingToFloat(batteryInfo.borderWidth)
+            }
+            BatteryPanelInfo.BORDER_COLOR   -> {
+                if (newValue is IntArray && newValue.size > 0) {
+                    batteryInfo.borderColor = newValue[0]
+                } else if (newValue is ArrayList<*> && newValue.size > 0) {
+                    batteryInfo.borderColor = newValue[0] as? Int ?: batteryInfo.borderColor
+                }
+            }
+            BatteryPanelInfo.IS_ANIMATION   -> {
+                batteryInfo.isAnimation = newValue.optBoolean(batteryInfo.isAnimation)
+            }
+            BatteryPanelInfo.IS_ARC         -> {
+                batteryInfo.isArc = newValue.optBoolean(batteryInfo.isArc)
+            }
+            BatteryPanelInfo.ARC_WIDTH      -> {
+                batteryInfo.arcWidth =newValue.optUnpackingToFloat(batteryInfo.arcWidth)
+            }
+        }
+        batteryPanel.onInfoChange()
     }
 
 }
