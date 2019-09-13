@@ -8,12 +8,14 @@ import liang.lollipop.electronicclock.bean.AdjustmentInfo
 import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
 import liang.lollipop.electronicclock.widget.panel.BatteryPanel
 import liang.lollipop.widget.widget.PanelInfo
+import org.json.JSONObject
 
 /**
  * 电池的调整面板
  * 用于调整电池小部件的参数
  */
 class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
+
     companion object {
         fun getInstance(id: Int): BatteryAdjustmentFragment {
             return BatteryAdjustmentFragment().apply {
@@ -35,11 +37,14 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
         return batteryPanel.createView(context!!)
     }
 
+    override fun initInfoByValue(info: String) {
+        batteryInfo.parse(JSONObject(info))
+    }
+
     override fun onInfoFoundById(info: PanelInfo?) {
         info?.let { batteryInfo.copy(it) }
         putAdjustmentInfo()
         panelInitComplete()
-
     }
 
     private fun putAdjustmentInfo() {

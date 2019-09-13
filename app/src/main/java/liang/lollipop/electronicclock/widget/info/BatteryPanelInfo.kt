@@ -29,10 +29,6 @@ class BatteryPanelInfo: PanelInfo() {
         const val ARC_WIDTH = "ARC_WIDTH"
     }
 
-    init {
-        initIntent = PanelInfoAdjustmentActivity.getIntent(this)
-    }
-
     /**
      * 是否显示边界
      */
@@ -91,6 +87,10 @@ class BatteryPanelInfo: PanelInfo() {
      */
     var arcWidth = 0.3F
 
+    init {
+        initIntent = PanelInfoAdjustmentActivity.getIntent(this)
+    }
+
     override fun parse(jsonObj: JSONObject) {
         super.parse(jsonObj)
 
@@ -100,7 +100,7 @@ class BatteryPanelInfo: PanelInfo() {
         val colorJsonArray = jsonObj.optJSONArray(COLOR_ARRAY)
         colorArray.clear()
         if (colorJsonArray != null && colorJsonArray.length() > 0) {
-            for (i in 0 until colorArray.size) {
+            for (i in 0 until colorJsonArray.length()) {
                 colorArray.add(colorJsonArray.optInt(i, Color.BLACK))
             }
         }

@@ -3,7 +3,7 @@
     <string name="app_name">电子钟</string>
     <string name="action_back">返回</string>
     <string name="action_delete">移除</string>
-    <string name="action_done">完成</string>
+    <string name="action_done">保存</string>
     <string name="action_widget">系统微件</string>
     <string name="action_preview">预览</string>
     <string name="action_inverted">反色</string>
@@ -79,4 +79,6 @@
     <string name="title_is_animation">是否启用动画</string>
     <string name="summary_animation_enable">动画已开启</string>
     <string name="summary_animation_disable">动画已关闭</string>
+
+    <string name="alert_save_first">请先保存</string>
 </resources>

@@ -29,10 +29,13 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
     companion object {
         const val ARG_INFO_ID = "ARG_INFO_ID"
 
+        const val ARG_INFO_VALUE = "ARG_INFO_VALUE"
+
         private const val TAG = "PanelInfoAdjustmentFragment"
     }
 
     private var infoId = ""
+    private var infoValue = ""
 
     private var infoLoadCallback: InfoLoadCallback? = null
 
@@ -48,6 +51,13 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             infoId = it.getString(ARG_INFO_ID)?:""
+            infoValue = it.getString(ARG_INFO_VALUE)?:""
+        }
+    }
+
+    fun putInfoValue(value: String) {
+        arguments = (arguments?:Bundle()).apply {
+            putString(ARG_INFO_VALUE, value)
         }
     }
 
@@ -172,6 +182,8 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     protected abstract fun onInfoFoundById(info: PanelInfo?)
 
+    protected abstract fun initInfoByValue(info: String)
+
     /**
      * 当面板初始化完成时，调用方法出发完成事件
      */
@@ -181,6 +193,9 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        if (infoValue.isNotEmpty()) {
+            initInfoByValue(infoValue)
+        }
         if (infoId.isNotEmpty()) {
             startLoading()
             doAsync ({ e ->

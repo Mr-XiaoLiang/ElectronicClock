@@ -14,33 +14,53 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"/>
 
+    <ImageView
+            android:background="@drawable/bg_black"
+            android:id="@+id/invertedBtn"
+            app:layout_constraintTop_toTopOf="@id/previewGroup"
+            app:layout_constraintRight_toRightOf="@id/previewGroup"
+            android:layout_margin="10dp"
+            android:tint="@android:color/white"
+            android:src="@drawable/ic_invert_colors_black_24dp"
+            android:padding="6dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"/>
+
     <TextView
             android:id="@+id/sizeValueView"
-            app:layout_constraintRight_toRightOf="@id/previewGroup"
-            app:layout_constraintTop_toTopOf="@id/previewGroup"
-            android:layout_margin="20dp"
+            app:layout_constraintRight_toLeftOf="@id/invertedBtn"
+            app:layout_constraintTop_toTopOf="@id/invertedBtn"
+            app:layout_constraintBottom_toBottomOf="@id/invertedBtn"
+            android:layout_marginRight="20dp"
             android:textColor="@android:color/white"
             android:text="@string/app_name"
             android:textSize="22sp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:background="@drawable/bg_black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
     <ImageView
+            android:background="@drawable/bg_black"
             android:id="@+id/sizeChangeBtn"
             app:layout_constraintBottom_toBottomOf="@id/previewGroup"
             app:layout_constraintLeft_toLeftOf="@id/previewGroup"
             android:tint="@android:color/white"
             android:src="@drawable/ic_crop_black_24dp"
-            android:padding="12dp"
-            android:layout_width="48dp"
-            android:layout_height="48dp"/>
+            android:padding="6dp"
+            android:layout_margin="6dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"/>
 
     <liang.lollipop.electronicclock.view.AutoSeekBar
             android:id="@+id/spanYSeekBar"
             app:layout_constraintTop_toTopOf="@id/previewGroup"
             app:layout_constraintBottom_toTopOf="@id/sizeChangeBtn"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="6dp"
             app:layout_constraintLeft_toLeftOf="@id/sizeChangeBtn"
             app:layout_constraintRight_toRightOf="@id/sizeChangeBtn"
             android:layout_marginLeft="5dp"
@@ -58,7 +78,7 @@
             android:layout_marginBottom="5dp"
             app:layout_constraintLeft_toRightOf="@id/sizeChangeBtn"
             app:layout_constraintRight_toRightOf="@id/previewGroup"
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="6dp"
             android:layout_marginRight="20dp"
             app:barColor="@color/colorBackground"
             app:selectedBarColor="@color/colorPrimaryDark"

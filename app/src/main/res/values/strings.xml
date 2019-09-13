@@ -2,7 +2,7 @@
     <string name="app_name">Electronic clock</string>
     <string name="action_back">Back</string>
     <string name="action_delete">Remove</string>
-    <string name="action_done">Complete</string>
+    <string name="action_done">Save</string>
     <string name="action_widget">System Widget</string>
     <string name="action_preview">Preview</string>
     <string name="action_inverted">Inverted</string>
@@ -45,38 +45,40 @@
     <string name="enter">Confirm</string>
     <string name="cancel">Cancel</string>
 
-    <string name="title_show_bg">显示背景色</string>
-    <string name="summary_show_bg">将会展示元素背景</string>
-    <string name="summary_hide_bg">将不会展示元素的背景</string>
-    <string name="title_show_border">显示元素边框</string>
-    <string name="summary_show_border">将会展示元素的边框</string>
-    <string name="summary_hide_border">将不会展示元素的边框</string>
-    <string name="title_corner">圆角尺寸</string>
-    <string name="summary_corner">元素角落的圆角大小</string>
+    <string name="title_show_bg">display background color </string>
+    <string name="summary_show_bg"> will display the background of the element </string>
+    <string name="summary_hide_bg"> will not display the background of the element </string>
+    <string name="title_show_border">display element border </string>
+    <string name="summary_show_border"> will display the border of the element </string>
+    <string name="summary_hide_border"> will not display the border of the element </string>
+    <string name="title_corner">rounding size </string>
+    <string name="summary_corner"> corner fillet size of the element </string>
 
-    <string name="err_color_cant_be_low">颜色数量不能再减少了</string>
-    <string name="err_color_cant_be_more">颜色数量不能再增加了</string>
+    <string name="err_color_cant_be_low">The number of colors can no longer be reduced </string>
+    <string name="err_color_cant_be_more">The number of colors can no longer be increased </string>
 
-    <string name="err_color_too_low">颜色数量太少了</string>
-    <string name="err_color_too_more">颜色数量太多</string>
-    <string name="title_color_array">颜色</string>
-    <string name="summary_color_array">选择元素的颜色</string>
+    <string name="err_color_too_low">The number of colors is too small </string>
+    <string name="err_color_too_more">There are too many colors</string>
+    <string name="title_color_array">color</string>
+    <string name="summary_color_array">Select the color of the element </string>
 
-    <string name="title_paddings">元素内补白</string>
-    <string name="summary_paddings">左:%1$.2f%% 上:%2$.2f%% 右:%3$.2f%% 下:%4$.2f%%</string>
-    <string name="title_arc_mode">环形显示</string>
-    <string name="summary_arc_true">使用扇形表示</string>
-    <string name="summary_arc_false">不使用扇形表示</string>
-    <string name="title_arc_width">扇形宽度</string>
-    <string name="summary_arc_width">扇形线条的宽度</string>
-    <string name="title_border_width">边框宽度</string>
-    <string name="summary_border_width">元素的边框宽度</string>
-    <string name="title_border_color">边框颜色</string>
-    <string name="summary_border_color">元素边框的颜色</string>
-    <string name="title_is_vertical">垂直放置元素</string>
-    <string name="summary_vertical">元素将会垂直排列</string>
-    <string name="summary_horizontal">元素将会水平排列</string>
-    <string name="title_is_animation">是否启用动画</string>
-    <string name="summary_animation_enable">动画已开启</string>
-    <string name="summary_animation_disable">动画已关闭</string>
+    <string name="title_paddings">Padding</string>
+    <string name="summary_paddings">Left: %1$.2f%% Top: %2$.2f%% Right: %3$.2f%% Bottom: %4$.2f%%</string>
+    <string name="title_arc_mode">ring display </string>
+    <string name="summary_arc_true">Use fan representation </string>
+    <string name="summary_arc_false">Do not use fan representation </string>
+    <string name="title_arc_width">fan width </string>
+    <string name="summary_arc_width">width of the fan line </string>
+    <string name="title_border_width">Border width </string>
+    <string name="summary_border_width">the border width of the element </string>
+    <string name="title_border_color">Border color </string>
+    <string name="summary_border_color">the color of the element border </string>
+    <string name="title_is_vertical"> vertically place elements </string>
+    <string name="summary_vertical"> elements will be arranged vertically </string>
+    <string name="summary_horizontal"> elements will be arranged horizontally </string>
+    <string name="title_is_animation"> whether to enable animation </string>
+    <string name="summary_animation_enable">Animation is turned on </string>
+    <string name="summary_animation_disable">Animation is closed </string>
+
+    <string name="alert_save_first">Please save first</string>
 </resources>

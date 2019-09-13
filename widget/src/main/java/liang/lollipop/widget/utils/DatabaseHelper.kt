@@ -111,8 +111,15 @@ class DatabaseHelper private constructor(context: Context):
         }
 
         fun update(info: PanelInfo, direction: String, pageNumber: Int = 0,
-                   result: ((Int) -> Unit)? = null): SqlDB {
+                    result: ((Int) -> Unit)? = null): SqlDB {
             val value = db.update(WidgetTable.TABLE, ContentValues().putData(info, direction, pageNumber),
+                " ${WidgetTable.ID} = ? ", arrayOf("${info.id}"))
+            result?.invoke(value)
+            return this
+        }
+
+        fun updateOnlyInfo(info: PanelInfo, result: ((Int) -> Unit)? = null): SqlDB {
+            val value = db.update(WidgetTable.TABLE, ContentValues().putData(info, null, null),
                 " ${WidgetTable.ID} = ? ", arrayOf("${info.id}"))
             result?.invoke(value)
             return this
@@ -146,14 +153,18 @@ class DatabaseHelper private constructor(context: Context):
             return info
         }
 
-        private fun ContentValues.putData(panelInfo: PanelInfo, direction: String, pageNumber: Int = 0): ContentValues {
+        private fun ContentValues.putData(panelInfo: PanelInfo, direction: String?, pageNumber: Int?): ContentValues {
             clear()
             put(WidgetTable.TYPE_NAME, PanelAdapter.className(panelInfo))
             val obj = JSONObject()
             panelInfo.serialize(obj)
             put(WidgetTable.INFO, obj.toString())
-            put(WidgetTable.DIRECTION, direction)
-            put(WidgetTable.PAGE_NUMBER, pageNumber)
+            direction?.let {
+                put(WidgetTable.DIRECTION, it)
+            }
+            pageNumber?.let {
+                put(WidgetTable.PAGE_NUMBER, it)
+            }
             return this
         }
 

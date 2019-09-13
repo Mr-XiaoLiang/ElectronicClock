@@ -25,6 +25,9 @@ class EmptyAdjustmentFragment: PanelInfoAdjustmentFragment() {
         }
     }
 
+    override fun initInfoByValue(info: String) {
+    }
+
     override fun onInfoFoundById(info: PanelInfo?) {
         panelInitComplete()
     }
