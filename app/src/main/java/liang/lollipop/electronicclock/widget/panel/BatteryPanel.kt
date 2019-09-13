@@ -1,37 +1,74 @@
 package liang.lollipop.electronicclock.widget.panel
 
 import android.content.Context
+import android.content.Context.BATTERY_SERVICE
 import android.graphics.*
 import android.graphics.drawable.Drawable
-import android.util.Log
+import android.os.BatteryManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.material.snackbar.Snackbar
+import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
 import liang.lollipop.widget.widget.Panel
+import liang.lollipop.widget.widget.PanelInfo
 import kotlin.math.min
+
 
 /**
  * @author lollipop
  * @date 2019-08-19 22:15
  * 电池信息的展示面板
  */
-class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
+class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.OnClickListener {
 
     private val batteryDrawable = BatteryDrawable(info)
+    private var batteryManager: BatteryManager? = null
 
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
         return createView(layoutInflater.context)
     }
 
     fun createView(context: Context): View {
+        batteryManager = context.getSystemService(BATTERY_SERVICE) as? BatteryManager
         return View(context).apply {
             background = batteryDrawable
+            setOnClickListener(this@BatteryPanel)
         }
     }
 
     override fun onInfoChange() {
         batteryDrawable.onInfoChange(panelInfo)
+    }
+
+    override fun onColorChange(color: Int, light: Float) {
+        super.onColorChange(color, light)
+        batteryDrawable.defColor = color
+        batteryDrawable.alpha = if (panelInfo.colorArray.isEmpty()) {
+            255
+        } else {
+            (light * 255).toInt()
+        }
+    }
+
+    override fun onClick(v: View?) {
+        v?:return
+        val context = v.context
+        if (panelInfo.id == PanelInfo.NO_ID) {
+            Snackbar.make(v, R.string.alert_save_first, Snackbar.LENGTH_LONG).show()
+            return
+        }
+        context?.startActivity(PanelInfoAdjustmentActivity.getIntent(panelInfo))
+    }
+
+    override fun onUpdate() {
+        super.onUpdate()
+        val manager = batteryManager?:return
+        //当前电量百分比
+        val value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) * 0.01F
+        batteryDrawable.progress = value
     }
 
     private class BatteryDrawable(private var info: BatteryPanelInfo): Drawable() {
@@ -70,7 +107,6 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
             info = newInfo
             relayout()
         }
-
         private fun relayout() {
             if (bounds.isEmpty) {
                 return
@@ -108,7 +144,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
                 borderPath.op(tmpPath, Path.Op.DIFFERENCE)
             }
 
-            if (info.colorArray.size > 1) {
+            if (info.colorArray.size > 0) {
                 val colorArray = IntArray(info.colorArray.size + 1)
                 for (i in colorArray.indices) {
                     colorArray[i] = info.colorArray[i % info.colorArray.size]
@@ -135,9 +171,6 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
                 }
             } else {
                 shader = null
-                if (info.colorArray.size > 0) {
-                    defColor = info.colorArray[0]
-                }
             }
             invalidateSelf()
         }

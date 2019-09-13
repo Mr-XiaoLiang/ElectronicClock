@@ -119,6 +119,8 @@ class EditActivity : BaseActivity() {
 
     private var isShowGuidelines = true
 
+    private var hasResult = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setScreenOrientation()
         fullScreen()
@@ -291,9 +293,17 @@ class EditActivity : BaseActivity() {
         widgetHelper.onStart()
     }
 
+    override fun onRestart() {
+        super.onRestart()
+        if (!hasResult) {
+            initData()
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         widgetHelper.onStop()
+        hasResult = false
     }
 
     /**
@@ -416,6 +426,7 @@ class EditActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (widgetHelper.onActivityResult(requestCode, resultCode, data)) {
+            hasResult = true
             return
         }
     }

@@ -2,17 +2,20 @@ package liang.lollipop.electronicclock.activity
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import kotlinx.android.synthetic.main.activity_panel_info_adjustment.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.fragment.PanelInfoAdjustmentFragment
 import liang.lollipop.electronicclock.utils.PanelInfoAdjustmentHelper
+import liang.lollipop.electronicclock.utils.doAsync
 import liang.lollipop.electronicclock.utils.gridSize
 import liang.lollipop.electronicclock.view.AutoSeekBar
 import liang.lollipop.guidelinesview.util.lifecycleBinding
 import liang.lollipop.guidelinesview.util.onEnd
 import liang.lollipop.guidelinesview.util.onStart
+import liang.lollipop.widget.utils.DatabaseHelper
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
 import kotlin.math.max
@@ -31,6 +34,8 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
 
     private var isSeekBarShown = true
 
+    private var isInvertedColor = false
+
     companion object {
 
         private const val ARG_PANEL_TYPE = "ARG_PANEL_TYPE"
@@ -47,6 +52,9 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
                 setClassName("liang.lollipop.electronicclock", PanelInfoAdjustmentActivity::class.java.name)
                 putExtra(ARG_PANEL_TYPE, typeInt)
                 putExtra(ARG_PANEL_ID, info.id)
+                val jsonObject = JSONObject()
+                info.serialize(jsonObject)
+                putExtra(ARG_PANEL_INFO, jsonObject.toString())
             }
         }
 
@@ -64,19 +72,23 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
     private fun initView() {
         val transaction = supportFragmentManager.beginTransaction()
         val fragment = PanelInfoAdjustmentHelper.createFragmentForIntent(intent, ARG_PANEL_TYPE, infoId)
+        fragment.putInfoValue(getInfo(intent))
         adjustmentFragment = fragment
         transaction.add(R.id.adjustmentFragmentGroup, fragment, TAG_FRAGMENT)
         transaction.commit()
 
         showFAB(R.drawable.ic_done_black_24dp) {
             it.setOnClickListener {
-                val result = Intent()
-                val json = JSONObject()
-                adjustmentFragment?.getPanelInfo()?.serialize(json)
-                result.putExtra(ARG_PANEL_INFO, json.toString())
-                setResult(Activity.RESULT_OK, result)
-                onBackPressed()
+                callSubmit()
             }
+        }
+        invertedBtn.setOnClickListener {
+            if (isInvertedColor) {
+                previewGroup.setBackgroundColor(Color.TRANSPARENT)
+            } else {
+                previewGroup.setBackgroundColor(Color.WHITE)
+            }
+            isInvertedColor = !isInvertedColor
         }
         bindSeekBarAnimation()
         spanXSeekBar.min = 1F
@@ -87,6 +99,39 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         spanYSeekBar.onProgressChangeListener = this
 
         setPanelSize(1, 1)
+    }
+
+    private fun callSubmit() {
+        val fragment = adjustmentFragment
+        if (fragment == null) {
+            onBackPressed()
+            return
+        }
+        startContentLoading()
+
+        val result = Intent()
+        val json = JSONObject()
+        val info = fragment.getPanelInfo()
+        info.serialize(json)
+        result.putExtra(ARG_PANEL_INFO, json.toString())
+        setResult(Activity.RESULT_OK, result)
+
+        // 没有ID就不做数据库更新了
+        if (info.id == PanelInfo.NO_ID) {
+            onBackPressed()
+            return
+        }
+        doAsync {
+            val helper = DatabaseHelper
+                .write(this)
+            helper.updateOnlyInfo(info) {
+                runOnUiThread {
+                    helper.close()
+                    stopContentLoading()
+                    onBackPressed()
+                }
+            }
+        }
     }
 
     private fun bindSeekBarAnimation() {
@@ -157,8 +202,12 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
     }
 
     override fun onPanelInitComplete() {
-        val panelView = adjustmentFragment?.getPanelView()?:return
-        previewGroup.addView(panelView)
+        adjustmentFragment?.let { fragment ->
+            previewGroup.addView(fragment.getPanelView())
+            fragment.getPanelInfo().let {
+                setPanelSize(it.spanX, it.spanY)
+            }
+        }
     }
 
     override fun getSizeChangeCallback(): PanelInfoAdjustmentFragment.PanelSizeChangeCallback {

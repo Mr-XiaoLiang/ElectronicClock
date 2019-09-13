@@ -606,6 +606,7 @@ class WidgetHelper private constructor(private val activity: Activity,
         }
         val panel = panelAdapter.createPanelByInfo(info)
         addPanel(panel)
+        panel.onInfoChange()
         result?.invoke(panel)
     }
 
