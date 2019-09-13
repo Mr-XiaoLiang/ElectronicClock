@@ -125,6 +125,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
             switch {
                 key = BatteryPanelInfo.IS_ANIMATION
                 title = getString(R.string.title_is_animation)
+                enable = false
                 summaryOfTrue = getString(R.string.summary_animation_enable)
                 summaryOfFalse = getString(R.string.summary_animation_disable)
                 value = batteryInfo.isAnimation

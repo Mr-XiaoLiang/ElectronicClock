@@ -75,8 +75,7 @@ class HuePaletteView(context: Context, attrs: AttributeSet?, defStyleAttr:Int):
             }
         }
 
-        override fun draw(canvas: Canvas?) {
-            canvas?:return
+        override fun draw(canvas: Canvas) {
             canvas.drawRect(bounds,paint)
             val selectY = getSelectY()
             canvas.drawLine(bounds.left.toFloat(),selectY,

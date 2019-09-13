@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
@@ -31,6 +32,7 @@ class SatValPaletteView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         )
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event == null) {
             return super.onTouchEvent(event)
@@ -88,8 +90,7 @@ class SatValPaletteView(context: Context, attrs: AttributeSet?, defStyleAttr: In
         private var satValue = 0.5F
         private var valValue = 0.5F
 
-        override fun draw(canvas: Canvas?) {
-            canvas?:return
+        override fun draw(canvas: Canvas) {
             canvas.drawRect(bounds, paint)
             drawPoint(canvas)
         }
@@ -145,9 +146,9 @@ class SatValPaletteView(context: Context, attrs: AttributeSet?, defStyleAttr: In
             paint.shader = valLinearGradient
             valBitmap =
                 Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(valBitmap)
+            val canvas = Canvas(valBitmap!!)
             canvas.drawRect(bounds, paint)
-            valShader = BitmapShader(valBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+            valShader = BitmapShader(valBitmap!!, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
         }
 
         fun onHueChange(hue: Float) {
@@ -163,12 +164,10 @@ class SatValPaletteView(context: Context, attrs: AttributeSet?, defStyleAttr: In
                 createNewValShader()
             }
 
-            if (valShader != null) {
-                val composeShader = ComposeShader(valShader, satShader, PorterDuff.Mode.MULTIPLY)
-
+            valShader?.let {
+                val composeShader = ComposeShader(it, satShader, PorterDuff.Mode.MULTIPLY)
                 paint.shader = composeShader
             }
-
             invalidateSelf()
         }
 
