@@ -46,11 +46,11 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
     override fun onColorChange(color: Int, light: Float) {
         super.onColorChange(color, light)
         batteryDrawable.defColor = color
-//        batteryDrawable.alpha = if (panelInfo.colorArray.isEmpty()) {
-//            255
-//        } else {
-//            (light * 255).toInt()
-//        }
+        batteryDrawable.alpha = if (panelInfo.colorArray.isEmpty()) {
+            255
+        } else {
+            (light * 255).toInt()
+        }
     }
 
     override fun onClick(v: View?) {

@@ -20,6 +20,8 @@ import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.PanelAdapter
 import liang.lollipop.widget.widget.PanelInfo
 import liang.lollipop.widget.widget.WidgetGroup
+import kotlin.math.max
+import kotlin.math.min
 
 
 /**
@@ -527,25 +529,28 @@ class WidgetHelper private constructor(private val activity: Activity,
             bg = backgroundColor
             fg = foregroundColor.updateColorByLight()
         }
+        val alpha = getAlphaByLight() * 1F / 255
         panelList.forEach {
             it.panelInfo.color = fg
-            it.onColorChange(fg, lightValue / lightMaxValue)
+            it.onColorChange(fg, alpha)
         }
         widgetGroup.setBackgroundColor(bg)
     }
 
     private fun Int.updateColorByLight(): Int {
         if (isAutoLight) {
-            var alpha = (191 * lightValue / lightMaxValue).toInt() + 64
-            if (alpha < 0) {
-                alpha = 0
-            }
-            if (alpha > 255) {
-                alpha = 255
-            }
+            val alpha = getAlphaByLight()
             return this and 0xFFFFFF or (alpha shl 24)
         }
         return this
+    }
+
+    private fun getAlphaByLight(): Int {
+        if (isAutoLight) {
+            val alpha = (191 * lightValue / lightMaxValue).toInt() + 64
+            return max(0, min(255, alpha))
+        }
+        return 255
     }
 
     private fun postUpdate() {
