@@ -42,6 +42,9 @@ open class BaseActivity: AppCompatActivity() {
         window.addFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN or
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_IMMERSIVE or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val lp = this.window.attributes
             lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
