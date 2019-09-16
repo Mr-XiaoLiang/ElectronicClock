@@ -1,5 +1,6 @@
 package liang.lollipop.widget.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -236,6 +237,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             return gridPaint.color
         }
 
+    private var isActive = false
+
     /**
      * 添加面板
      * 添加View的唯一途径
@@ -259,6 +262,9 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         addView(panel.view)
         setChildLongClick(panel)
         setChildClick(panel)
+        if (isActive) {
+            panel.updatePanelLifecycle(true)
+        }
         panelAddedListener?.invoke(panel)
         return true
     }
@@ -281,6 +287,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         return if (isDragState && dragMode != DragMode.None) { false } else { super.performClick() }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (lockedTouch) {
             return true
@@ -1103,6 +1110,31 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
 
     private fun Rect.recycle() {
         recyclerRectList.add(this)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        isActive = true
+        panelList.forEach {
+            it.updatePanelLifecycle(true)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        isActive = false
+        panelList.forEach {
+            it.updatePanelLifecycle(false)
+        }
+    }
+
+    private fun Panel<*>.updatePanelLifecycle(active: Boolean) {
+        isActive = active
+        if (active) {
+            onAttachedToWindow()
+        } else {
+            onDetachedFromWindow()
+        }
     }
 
 }
