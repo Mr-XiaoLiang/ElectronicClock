@@ -1,5 +1,7 @@
 package liang.lollipop.electronicclock.widget.panel
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Context.BATTERY_SERVICE
@@ -10,6 +12,8 @@ import android.os.BatteryManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.animation.addListener
+import androidx.core.animation.doOnEnd
 import com.google.android.material.snackbar.Snackbar
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
@@ -95,7 +99,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
         val manager = batteryManager?:return
         //当前电量百分比
         val value = manager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) * 0.01F
-        batteryDrawable.progress = value
+        batteryDrawable.updateProgress(value)
     }
 
     private class BatteryDrawable(private var info: BatteryPanelInfo): Drawable(), Animatable {
@@ -116,11 +120,13 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
             strokeCap = Paint.Cap.ROUND
         }
 
-        var progress = 0.7F
+        private var progress = 0.7F
             set(value) {
                 field = value
                 invalidateSelf()
             }
+
+        private var pendingProgress = progress
 
         private var shader: Shader? = null
 
@@ -136,6 +142,19 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
                 addUpdateListener {
                     progress = it.animatedValue as Float
                 }
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        progress = pendingProgress
+                    }
+                })
+            }
+        }
+
+        fun updateProgress(value: Float) {
+            pendingProgress = value
+            if (!isRunning) {
+                progress = value
             }
         }
 
