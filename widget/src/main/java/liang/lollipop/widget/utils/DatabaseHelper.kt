@@ -92,14 +92,19 @@ class DatabaseHelper private constructor(context: Context):
         }
 
         fun findInfoById(id: String, result: ((PanelInfo?) -> Unit)): SqlDB {
+            result(findInfoById(id))
+            return this
+        }
+
+        private fun findInfoById(id: String): PanelInfo? {
             val c = db.rawQuery(WidgetTable.SELECT_WIDGET_BY_ID, arrayOf(id))
-            if (c.moveToFirst()) {
-                result(newInfo(c))
+            val result = if (c.moveToFirst()) {
+                return newInfo(c)
             } else {
-                result(null)
+                null
             }
             c.close()
-            return this
+            return result
         }
 
         fun install(info: PanelInfo, direction: String, pageNumber: Int = 0,

@@ -201,7 +201,9 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
             doAsync ({ e ->
                 logE("init panel info from database error:" + e.localizedMessage)
             }) {
-                DatabaseHelper.read(activity!!).findInfoById(infoId) { resultInfo ->
+                DatabaseHelper
+                    .read(activity!!)
+                    .findInfoById(infoId) { resultInfo ->
                     uiThread {
                         stopLoading()
                         onInfoFoundById(resultInfo)

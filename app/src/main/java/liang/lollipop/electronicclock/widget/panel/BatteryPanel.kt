@@ -1,8 +1,10 @@
 package liang.lollipop.electronicclock.widget.panel
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Context.BATTERY_SERVICE
 import android.graphics.*
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.BatteryManager
 import android.view.LayoutInflater
@@ -27,6 +29,13 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
     private val batteryDrawable = BatteryDrawable(info)
     private var batteryManager: BatteryManager? = null
 
+    private val animationTask = {
+        if (isActive) {
+            batteryDrawable.start()
+        }
+        updateAnimation(isActive)
+    }
+
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
         return createView(layoutInflater.context)
     }
@@ -41,6 +50,24 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
 
     override fun onInfoChange() {
         batteryDrawable.onInfoChange(panelInfo)
+        updateAnimation(isActive)
+    }
+
+    private fun updateAnimation(active: Boolean) {
+        view?.handler?.removeCallbacks(animationTask)
+        if (panelInfo.isAnimation && active) {
+            view?.handler?.postDelayed(animationTask, panelInfo.animationDelay * 1000L)
+        }
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        updateAnimation(true)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        updateAnimation(false)
     }
 
     override fun onColorChange(color: Int, light: Float) {
@@ -71,7 +98,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
         batteryDrawable.progress = value
     }
 
-    private class BatteryDrawable(private var info: BatteryPanelInfo): Drawable() {
+    private class BatteryDrawable(private var info: BatteryPanelInfo): Drawable(), Animatable {
 
         private val batteryBounds = RectF()
 
@@ -102,6 +129,15 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
         private val tmpPath = Path()
 
         private var corner = 0F
+
+        private val animator: ValueAnimator by lazy {
+            ValueAnimator().apply {
+                this.duration = 600
+                addUpdateListener {
+                    progress = it.animatedValue as Float
+                }
+            }
+        }
 
         fun onInfoChange(newInfo: BatteryPanelInfo) {
             info = newInfo
@@ -173,6 +209,20 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
                 shader = null
             }
             invalidateSelf()
+        }
+
+        override fun isRunning(): Boolean {
+            return animator.isRunning
+        }
+
+        override fun start() {
+            animator.cancel()
+            animator.setFloatValues(progress, 0F, 1F, progress)
+            animator.start()
+        }
+
+        override fun stop() {
+            animator.cancel()
         }
 
         override fun onBoundsChange(bounds: Rect?) {

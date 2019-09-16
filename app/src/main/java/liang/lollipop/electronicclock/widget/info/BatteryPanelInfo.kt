@@ -27,6 +27,7 @@ class BatteryPanelInfo: PanelInfo() {
         const val IS_ANIMATION = "IS_ANIMATION"
         const val IS_ARC = "IS_ARC"
         const val ARC_WIDTH = "ARC_WIDTH"
+        const val ANIMATION_DELAY = "ANIMATION_DELAY"
     }
 
     /**
@@ -87,6 +88,11 @@ class BatteryPanelInfo: PanelInfo() {
      */
     var arcWidth = 0.3F
 
+    /**
+     * 动画间隔
+     */
+    var animationDelay = 5
+
     init {
         initIntent = PanelInfoAdjustmentActivity.getIntent(this)
     }
@@ -122,6 +128,7 @@ class BatteryPanelInfo: PanelInfo() {
         isAnimation = jsonObj.optBoolean(IS_ANIMATION, true)
         isArc = jsonObj.optBoolean(IS_ARC, false)
         arcWidth = jsonObj.optDouble(ARC_WIDTH, 0.3).toFloat()
+        animationDelay = jsonObj.optInt(ANIMATION_DELAY)
 
         // 如果初始化的intent没有被置空， 并且ID是有效ID，
         // 那么就重新生成一个带有新数据的intent
@@ -154,6 +161,7 @@ class BatteryPanelInfo: PanelInfo() {
             put(IS_ANIMATION, isAnimation)
             put(IS_ARC, isArc)
             put(ARC_WIDTH, arcWidth)
+            put(ANIMATION_DELAY, animationDelay)
         }
     }
 

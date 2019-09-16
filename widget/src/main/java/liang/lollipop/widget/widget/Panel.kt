@@ -38,6 +38,16 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
             return view?.visibility ?: View.GONE
         }
 
+    /**
+     * 是否活跃
+     */
+    var isActive: Boolean = false
+        internal set
+
+    open fun onAttachedToWindow() {}
+
+    open fun onDetachedFromWindow() {}
+
     open fun updatePanelInfo(group: WidgetGroup) {}
 
     fun copyBounds(rect: Rect) {
