@@ -245,6 +245,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
      * Group需要根据panel的一些参数决定小部件怎么进行布局排版
      */
     fun addPanel(panel: Panel<*>): Boolean {
+        logger("addPanel()")
         // 如果格子数据不为空，那么认为已经有测量结果了
         // 在添加前做位置检查，减少不必要的操作
         if (!gridSize.isEmpty()) {
@@ -1115,6 +1116,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         isActive = true
+        logger("onAttachedToWindow()")
         panelList.forEach {
             it.updatePanelLifecycle(true)
         }
@@ -1123,6 +1125,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         isActive = false
+        logger("onDetachedFromWindow()")
         panelList.forEach {
             it.updatePanelLifecycle(false)
         }
