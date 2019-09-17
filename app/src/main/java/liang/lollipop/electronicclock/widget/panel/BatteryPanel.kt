@@ -9,11 +9,10 @@ import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.BatteryManager
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.animation.addListener
-import androidx.core.animation.doOnEnd
 import com.google.android.material.snackbar.Snackbar
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
@@ -32,6 +31,8 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
 
     private val batteryDrawable = BatteryDrawable(info)
     private var batteryManager: BatteryManager? = null
+
+    private val handler = Handler()
 
     private val animationTask = {
         if (isActive) {
@@ -58,9 +59,9 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
     }
 
     private fun updateAnimation(active: Boolean) {
-        view?.handler?.removeCallbacks(animationTask)
+        handler.removeCallbacks(animationTask)
         if (panelInfo.isAnimation && active) {
-            view?.handler?.postDelayed(animationTask, panelInfo.animationDelay * 1000L)
+            handler.postDelayed(animationTask, panelInfo.animationDelay * 1000L)
         }
     }
 
@@ -138,7 +139,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
 
         private val animator: ValueAnimator by lazy {
             ValueAnimator().apply {
-                this.duration = 600
+                this.duration = 1600
                 addUpdateListener {
                     progress = it.animatedValue as Float
                 }

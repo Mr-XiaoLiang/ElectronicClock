@@ -81,4 +81,6 @@
     <string name="summary_animation_disable">Animation is closed </string>
 
     <string name="alert_save_first">Please save first</string>
+    <string name="title_animation_delay">Animation interval</string>
+    <string name="summary_animation_delay">Interval time to display animation effects</string>
 </resources>

@@ -109,7 +109,7 @@ class AutoSeekBar(context: Context, attr: AttributeSet?,
     fun setProgress(value: Float, callListener: Boolean = true) {
         seekBarDrawable.progress = value.isRtl()
         if (callListener) {
-            val v = value + min
+            val v = value
             onProgressChangeListener?.onProgressChange(this, v)
         }
     }

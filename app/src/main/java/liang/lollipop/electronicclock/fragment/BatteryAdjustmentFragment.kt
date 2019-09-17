@@ -125,10 +125,18 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
             switch {
                 key = BatteryPanelInfo.IS_ANIMATION
                 title = getString(R.string.title_is_animation)
-                enable = false
                 summaryOfTrue = getString(R.string.summary_animation_enable)
                 summaryOfFalse = getString(R.string.summary_animation_disable)
                 value = batteryInfo.isAnimation
+            },
+            seekBar {
+                key = BatteryPanelInfo.ANIMATION_DELAY
+                relevantKey = BatteryPanelInfo.IS_ANIMATION
+                title = getString(R.string.title_animation_delay)
+                summary = getString(R.string.summary_animation_delay)
+                min = 5
+                max = 60
+                value = batteryInfo.animationDelay
             }
         )
     }
@@ -187,6 +195,9 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
             }
             BatteryPanelInfo.IS_ANIMATION   -> {
                 batteryInfo.isAnimation = newValue.optBoolean(batteryInfo.isAnimation)
+            }
+            BatteryPanelInfo.ANIMATION_DELAY   -> {
+                batteryInfo.animationDelay = newValue.optInt(batteryInfo.animationDelay)
             }
             BatteryPanelInfo.IS_ARC         -> {
                 batteryInfo.isArc = newValue.optBoolean(batteryInfo.isArc)
