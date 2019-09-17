@@ -3,6 +3,7 @@ package liang.lollipop.electronicclock.activity
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.OrientationEventListener
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_widget.*
 import liang.lollipop.electronicclock.R
@@ -22,6 +23,8 @@ class WidgetActivity : BaseActivity() {
 
     private val logger = Utils.loggerI("WidgetActivity")
 
+    private var orientationEventListener: OrientationEventListener? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setScreenOrientation()
         fullScreen()
@@ -30,6 +33,12 @@ class WidgetActivity : BaseActivity() {
         initInsetListener(rootGroup)
         initView()
         initData()
+
+        orientationEventListener = object: OrientationEventListener(this) {
+            override fun onOrientationChanged(orientation: Int) {
+                fullScreen()
+            }
+        }
     }
 
     private fun initView() {
@@ -76,11 +85,13 @@ class WidgetActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         widgetHelper.onStart()
+        orientationEventListener?.enable()
     }
 
     override fun onStop() {
         super.onStop()
         widgetHelper.onStop()
+        orientationEventListener?.disable()
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
