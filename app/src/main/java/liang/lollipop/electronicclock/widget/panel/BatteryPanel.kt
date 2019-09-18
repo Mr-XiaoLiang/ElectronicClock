@@ -13,10 +13,12 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import com.google.android.material.snackbar.Snackbar
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
+import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.PanelInfo
 import kotlin.math.min
@@ -34,6 +36,8 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
 
     private val handler = Handler()
 
+    private val logger = Utils.loggerI("BatteryPanel")
+
     private val animationTask = {
         if (isActive) {
             batteryDrawable.start()
@@ -47,10 +51,10 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
 
     fun createView(context: Context): View {
         batteryManager = context.getSystemService(BATTERY_SERVICE) as? BatteryManager
-        return View(context).apply {
-            background = batteryDrawable
-            setOnClickListener(this@BatteryPanel)
-        }
+        val view = ImageView(context)
+        view.background = batteryDrawable
+        view.setOnClickListener(this)
+        return view
     }
 
     override fun onInfoChange() {
@@ -86,6 +90,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
     }
 
     override fun onClick(v: View?) {
+        logger("onClick")
         v?:return
         val context = v.context
         if (panelInfo.id == PanelInfo.NO_ID) {

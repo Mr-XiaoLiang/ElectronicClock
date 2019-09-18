@@ -296,10 +296,10 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         if (lockedGrid) {
             return false
         }
-        event?:return super.onInterceptTouchEvent(event)
+        event?:return super.onTouchEvent(event)
         // 如果不在拖拽模式，那么放弃手势处理
         if (!isDragState || dragMode == DragMode.None || activeActionId == NO_ID) {
-            return super.onInterceptTouchEvent(event)
+            return super.onTouchEvent(event)
         }
         when (event.actionMasked){
             MotionEvent.ACTION_MOVE -> {
