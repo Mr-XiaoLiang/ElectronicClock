@@ -1,7 +1,6 @@
 package liang.lollipop.widget.panel
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.*
 import android.graphics.drawable.Drawable

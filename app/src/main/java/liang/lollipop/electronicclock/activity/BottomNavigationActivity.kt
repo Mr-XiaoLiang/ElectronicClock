@@ -71,7 +71,7 @@ open class BottomNavigationActivity: BaseActivity() {
     }
 
     protected fun stopContentLoading() {
-        contentLoading.show()
+        contentLoading.hide()
     }
 
     private fun transparentSystemUI() {
