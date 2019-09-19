@@ -447,7 +447,7 @@ class WidgetHelper private constructor(private val activity: Activity,
                 onPendingPanelResult(requestCode, resultCode, data)
     }
 
-    fun onChildClick(lis: (Panel<*>) -> Unit): WidgetHelper {
+    fun onChildClick(lis: (Panel<*>) -> Boolean): WidgetHelper {
         widgetGroup.onChildClick(lis)
         return this
     }

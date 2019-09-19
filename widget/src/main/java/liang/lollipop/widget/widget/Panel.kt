@@ -44,6 +44,14 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     var isActive: Boolean = false
         internal set
 
+    fun callOnClick(v: View? = null) {
+        onClick(v ?: view)
+    }
+
+    open fun onClick(v: View?) {
+
+    }
+
     open fun onAttachedToWindow() {}
 
     open fun onDetachedFromWindow() {}

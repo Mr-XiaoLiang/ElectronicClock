@@ -29,7 +29,7 @@ import kotlin.math.min
  * @date 2019-08-19 22:15
  * 电池信息的展示面板
  */
-class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.OnClickListener {
+class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
 
     private val batteryDrawable = BatteryDrawable(info)
     private var batteryManager: BatteryManager? = null
@@ -53,7 +53,6 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
         batteryManager = context.getSystemService(BATTERY_SERVICE) as? BatteryManager
         val view = ImageView(context)
         view.background = batteryDrawable
-        view.setOnClickListener(this)
         return view
     }
 
@@ -90,6 +89,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info), View.
     }
 
     override fun onClick(v: View?) {
+        super.onClick(v)
         logger("onClick")
         v?:return
         val context = v.context

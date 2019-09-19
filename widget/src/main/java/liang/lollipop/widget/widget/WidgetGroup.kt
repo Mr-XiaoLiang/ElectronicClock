@@ -105,7 +105,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     /**
      * 子View的点击事件
      */
-    private var childClickListener: ((panel: Panel<*>) -> Unit)? = null
+    private var childClickListener: ((panel: Panel<*>) -> Boolean)? = null
 
     /**
      * 取消拖拽的监听器
@@ -954,7 +954,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
     }
 
-    fun onChildClick(listener: ((Panel<*>) -> Unit)?) {
+    fun onChildClick(listener: ((Panel<*>) -> Boolean)?) {
         childClickListener = listener
         for (p in panelList) {
             setChildClick(p)
@@ -962,11 +962,10 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     private fun setChildClick(panel: Panel<*>) {
-        val listener = childClickListener
-        if (listener != null) {
-            panel.view?.setOnClickListener{ listener(panel) }
-        } else {
-            panel.view?.setOnClickListener(null)
+        panel.view?.setOnClickListener{
+            if (childClickListener?.invoke(panel) != true) {
+                panel.callOnClick(it)
+            }
         }
     }
 
