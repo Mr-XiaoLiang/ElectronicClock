@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_edit.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.list.ActionAdapter
@@ -47,7 +48,7 @@ class EditActivity : BaseActivity() {
             activity.startActivity(intent)
         }
 
-        private const val MIN_LOAD_TIME = 800L
+        private const val MIN_LOAD_TIME = 500L
     }
 
     /**
@@ -121,15 +122,6 @@ class EditActivity : BaseActivity() {
 
     private var onInfoChange = false
 
-    private val broadcastHelper = BroadcastHelper {
-        when (it) {
-            BroadcastHelper.ACTION_WIDGET_INFO_CHANGE -> {
-                onInfoChange = true
-            }
-            else -> { }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         setScreenOrientation()
         fullScreen()
@@ -158,6 +150,16 @@ class EditActivity : BaseActivity() {
                     }.show()
                 }
             }
+        }
+    }
+
+    override fun onReceive(action: String, intent: Intent) {
+        super.onReceive(action, intent)
+        when (action) {
+            BroadcastHelper.ACTION_WIDGET_INFO_CHANGE -> {
+                onInfoChange = true
+            }
+            else -> { }
         }
     }
 
@@ -353,11 +355,12 @@ class EditActivity : BaseActivity() {
             }
             // 完成并保存
             ActionId.DONE -> {
-                widgetHelper.saveToDB { status ->
-                    if (status == WidgetHelper.LoadStatus.START) {
+                widgetHelper.saveToDB{
+                    if (it == WidgetHelper.LoadStatus.START) {
                         startLoading()
                     } else {
                         stopLoading()
+                        Snackbar.make(widgetGroup, R.string.saved, Snackbar.LENGTH_LONG).show()
                         initData()
                     }
                 }

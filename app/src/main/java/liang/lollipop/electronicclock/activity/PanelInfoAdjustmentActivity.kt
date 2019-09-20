@@ -10,13 +10,14 @@ import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.fragment.PanelInfoAdjustmentFragment
 import liang.lollipop.electronicclock.utils.BroadcastHelper
 import liang.lollipop.electronicclock.utils.PanelInfoAdjustmentHelper
-import liang.lollipop.electronicclock.utils.doAsync
+import liang.lollipop.widget.utils.doAsync
 import liang.lollipop.electronicclock.utils.gridSize
 import liang.lollipop.electronicclock.view.AutoSeekBar
 import liang.lollipop.guidelinesview.util.lifecycleBinding
 import liang.lollipop.guidelinesview.util.onEnd
 import liang.lollipop.guidelinesview.util.onStart
 import liang.lollipop.widget.utils.DatabaseHelper
+import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
 import kotlin.math.max
@@ -36,6 +37,8 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
     private var isSeekBarShown = true
 
     private var isInvertedColor = false
+
+    private val logger = Utils.loggerI("PanelInfoAdjustmentActivity")
 
     companion object {
 
@@ -113,12 +116,13 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         val result = Intent()
         val json = JSONObject()
         val info = fragment.getPanelInfo()
+        info.id = infoId
         info.serialize(json)
         result.putExtra(ARG_PANEL_INFO, json.toString())
         setResult(Activity.RESULT_OK, result)
-
         // 没有ID就不做数据库更新了
         if (info.id == PanelInfo.NO_ID) {
+            logger("info.id = NO_ID, no update")
             onBackPressed()
             return
         }
@@ -129,7 +133,10 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
                 runOnUiThread {
                     helper.close()
                     stopContentLoading()
-                    BroadcastHelper.sendEmptyBroadcast(this@PanelInfoAdjustmentActivity, BroadcastHelper.ACTION_WIDGET_INFO_CHANGE)
+                    BroadcastHelper.sendEmptyBroadcast(
+                        this@PanelInfoAdjustmentActivity,
+                        BroadcastHelper.ACTION_WIDGET_INFO_CHANGE
+                    )
                     onBackPressed()
                 }
             }

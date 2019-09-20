@@ -313,8 +313,8 @@ class WidgetHelper private constructor(private val activity: Activity,
      * 从数据库更新一次面板
      */
     fun updateByDB(statusListener: ((status: LoadStatus) -> Unit)? = null) {
-        try {
-            statusListener?.invoke(LoadStatus.START)
+        statusListener?.invoke(LoadStatus.START)
+        doAsync({ uiThread { statusListener?.invoke(LoadStatus.ERROR) } }) {
             // 根据当前参数，获取一次最新的数据
             val tmpInfoList = ArrayList<PanelInfo>()
             DatabaseHelper.read(context).getOnePage(directionValue, hostId, tmpInfoList).close()
@@ -336,23 +336,24 @@ class WidgetHelper private constructor(private val activity: Activity,
                     newList.add(info)
                 }
             }
-            // 移除了有意义的面板，现存面板中只剩下了多余的面板
-            // 添加新的面板前，需要先移除现有的无效面板，防止位置占用导致的添加失败
-            existedList.forEach { panel ->
-                removePanel(panel)
+            uiThread {
+                // 移除了有意义的面板，现存面板中只剩下了多余的面板
+                // 添加新的面板前，需要先移除现有的无效面板，防止位置占用导致的添加失败
+                existedList.forEach { panel ->
+                    removePanel(panel)
+                }
+                // 移除所有无效面板后，开始添加新的面板
+                newList.forEach { info ->
+                    addPanel(info)
+                }
+                // 如果没有小部件发生变更，那么手动触发一次排版动作
+                // 因为添加或者移除面板，会自动触发面板的更新，因此不做额外的触发
+                if (existedList.isEmpty() && newList.isEmpty()) {
+                    widgetGroup.notifyInfoChange()
+                    widgetGroup.requestLayout()
+                }
+                statusListener?.invoke(LoadStatus.SUCCESSFUL)
             }
-            // 移除所有无效面板后，开始添加新的面板
-            newList.forEach { info ->
-                addPanel(info)
-            }
-            // 如果没有小部件发生变更，那么手动触发一次排版动作
-            // 因为添加或者移除面板，会自动触发面板的更新，因此不做额外的触发
-            if (existedList.isEmpty() && newList.isEmpty()) {
-                widgetGroup.requestLayout()
-            }
-            statusListener?.invoke(LoadStatus.SUCCESSFUL)
-        } catch (e: Exception) {
-            statusListener?.invoke(LoadStatus.ERROR)
         }
     }
 
@@ -360,10 +361,10 @@ class WidgetHelper private constructor(private val activity: Activity,
      * 保存当前数据到数据库中
      */
     fun saveToDB(statusListener: ((status: LoadStatus) -> Unit)? = null) {
-        // 由于是数据操作，这里进行加锁保护
-        synchronized("saveToDB-LOCK") {
-            try {
-                statusListener?.invoke(LoadStatus.START)
+        doAsync({ uiThread { statusListener?.invoke(LoadStatus.ERROR) } }) {
+            // 由于是数据操作，这里进行加锁保护
+            synchronized("saveToDB-LOCK") {
+                uiThread { statusListener?.invoke(LoadStatus.START) }
                 // 新的面板的集合
                 val newList = ArrayList<PanelInfo>()
                 // 被删除的集合
@@ -413,15 +414,27 @@ class WidgetHelper private constructor(private val activity: Activity,
                         update(info, directionValue, hostId)
                     }
                 }
-                // 至此，完成了一次数据更新并存储的服务
-                statusListener?.invoke(LoadStatus.SUCCESSFUL)
-            } catch (e: Exception) {
-                statusListener?.invoke(LoadStatus.ERROR)
+                uiThread {
+                    // 至此，完成了一次数据更新并存储的服务
+                    statusListener?.invoke(LoadStatus.SUCCESSFUL)
+                }
             }
         }
     }
 
     private fun findPanelByInfo(existedList: ArrayList<Panel<*>>, info: PanelInfo): Panel<*>? {
+        if (info is SystemWidgetPanelInfo) {
+            for (panel in existedList) {
+                val panelInfo = panel.panelInfo
+                if (panelInfo == info) {
+                    return panel
+                }
+                if (panelInfo is SystemWidgetPanelInfo && panelInfo.appWidgetId == info.appWidgetId) {
+                    return panel
+                }
+            }
+            return null
+        }
         for (panel in existedList) {
             if (panel.panelInfo == info) {
                 return panel

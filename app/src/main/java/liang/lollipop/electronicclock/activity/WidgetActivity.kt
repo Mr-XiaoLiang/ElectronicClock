@@ -1,9 +1,11 @@
 package liang.lollipop.electronicclock.activity
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.OrientationEventListener
+import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_widget.*
 import liang.lollipop.electronicclock.R
@@ -26,18 +28,32 @@ class WidgetActivity : BaseActivity() {
     private var orientationEventListener: OrientationEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setScreenOrientation()
         fullScreen()
-        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_widget)
         initInsetListener(rootGroup)
         initView()
         initData()
 
+        broadcastHelper.addActions(BroadcastHelper.ACTION_WIDGET_INFO_CHANGE)
+        broadcastHelper.register(this)
+
         orientationEventListener = object: OrientationEventListener(this) {
             override fun onOrientationChanged(orientation: Int) {
                 fullScreen()
             }
+        }
+    }
+
+    override fun onReceive(action: String, intent: Intent) {
+        super.onReceive(action, intent)
+        when (action) {
+            BroadcastHelper.ACTION_WIDGET_INFO_CHANGE -> {
+                initData()
+            }
+            else -> { }
         }
     }
 
@@ -66,9 +82,9 @@ class WidgetActivity : BaseActivity() {
                 loadingView.show()
             } else {
                 loadingView.hide()
-            }
-            if (widgetHelper.panelCount < 1) {
-                onWidgetEmpty()
+                if (widgetHelper.panelCount < 1) {
+                    onWidgetEmpty()
+                }
             }
         }
     }
@@ -92,6 +108,11 @@ class WidgetActivity : BaseActivity() {
         super.onStop()
         widgetHelper.onStop()
         orientationEventListener?.disable()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        broadcastHelper.unregister(this)
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
