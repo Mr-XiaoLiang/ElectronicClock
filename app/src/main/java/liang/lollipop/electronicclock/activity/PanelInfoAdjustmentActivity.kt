@@ -8,6 +8,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.activity_panel_info_adjustment.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.fragment.PanelInfoAdjustmentFragment
+import liang.lollipop.electronicclock.utils.BroadcastHelper
 import liang.lollipop.electronicclock.utils.PanelInfoAdjustmentHelper
 import liang.lollipop.electronicclock.utils.doAsync
 import liang.lollipop.electronicclock.utils.gridSize
@@ -128,6 +129,7 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
                 runOnUiThread {
                     helper.close()
                     stopContentLoading()
+                    BroadcastHelper.sendEmptyBroadcast(this@PanelInfoAdjustmentActivity, BroadcastHelper.ACTION_WIDGET_INFO_CHANGE)
                     onBackPressed()
                 }
             }
