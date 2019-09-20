@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.activity
 
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Build
 import android.view.MenuItem
@@ -15,6 +16,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import liang.lollipop.electronicclock.fragment.FullScreenFragment
+import liang.lollipop.electronicclock.utils.BroadcastHelper
 
 /**
  * @author lollipop
@@ -31,6 +33,12 @@ open class BaseActivity: AppCompatActivity() {
 
     protected var isFullScreen = false
         private set
+
+    protected val broadcastHelper: BroadcastHelper by lazy {
+        BroadcastHelper.create{ action, intent ->
+            onReceive(action, intent)
+        }
+    }
 
     protected fun bindToolBar(t: Toolbar) {
         lToolbar = t
@@ -52,6 +60,8 @@ open class BaseActivity: AppCompatActivity() {
         }
         hideSystemUI()
     }
+
+    protected open fun onReceive(action: String, intent: Intent) {}
 
     override fun onResume() {
         super.onResume()

@@ -84,4 +84,5 @@
     <string name="title_animation_delay">动画间隔</string>
     <string name="summary_animation_delay">显示动画效果的间隔时间</string>
     <string name="dialog_message_on_info_change">小部件的偏好设置发生变化，是否重新加载？</string>
+    <string name="saved">已保存</string>
 </resources>

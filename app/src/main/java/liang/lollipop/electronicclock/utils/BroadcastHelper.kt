@@ -11,7 +11,7 @@ import liang.lollipop.widget.utils.Utils
  * @date 2019-09-20 22:27
  * 广播辅助类
  */
-class BroadcastHelper(private val receive: (String) -> Unit): BroadcastReceiver() {
+class BroadcastHelper private constructor(private val receive: (String, Intent) -> Unit): BroadcastReceiver() {
 
     private val filter = IntentFilter()
 
@@ -20,7 +20,7 @@ class BroadcastHelper(private val receive: (String) -> Unit): BroadcastReceiver(
     override fun onReceive(context: Context?, intent: Intent?) {
         logger("onReceive")
         intent?.action?.let {
-            receive(it)
+            receive(it, intent)
         }
     }
 
@@ -28,7 +28,7 @@ class BroadcastHelper(private val receive: (String) -> Unit): BroadcastReceiver(
 
         const val ACTION_WIDGET_INFO_CHANGE = "ACTION_WIDGET_INFO_CHANGE"
 
-        fun create(receive: (String) -> Unit): BroadcastHelper {
+        fun create(receive: (String, Intent) -> Unit): BroadcastHelper {
             return BroadcastHelper(receive)
         }
 
@@ -37,6 +37,7 @@ class BroadcastHelper(private val receive: (String) -> Unit): BroadcastReceiver(
             intent.action = action
             init?.invoke(intent)
             context.sendBroadcast(intent)
+            Utils.loggerI("BroadcastHelper")("sendEmptyBroadcast")
         }
     }
 

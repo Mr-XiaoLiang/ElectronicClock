@@ -1,4 +1,4 @@
-package liang.lollipop.electronicclock.utils
+package liang.lollipop.widget.utils
 
 import android.os.Handler
 import android.os.Looper
@@ -19,7 +19,9 @@ object AsyncHelper {
     private val uiHandler = Handler(Looper.getMainLooper())
 
     private val executorService: ExecutorService by lazy {
-        ThreadPoolExecutor(corePoolSize, maximumPoolSize,
+        ThreadPoolExecutor(
+            corePoolSize,
+            maximumPoolSize,
             0L, TimeUnit.MILLISECONDS,
             LinkedBlockingQueue<Runnable>())
     }

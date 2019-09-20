@@ -13,8 +13,8 @@ import kotlinx.android.synthetic.main.fragment_adjustment_info.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.bean.*
 import liang.lollipop.electronicclock.list.AdjustmentAdapter
-import liang.lollipop.electronicclock.utils.doAsync
-import liang.lollipop.electronicclock.utils.uiThread
+import liang.lollipop.widget.utils.doAsync
+import liang.lollipop.widget.utils.uiThread
 import liang.lollipop.widget.utils.DatabaseHelper
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.PanelInfo
@@ -198,17 +198,17 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         }
         if (infoId.isNotEmpty()) {
             startLoading()
-            doAsync ({ e ->
+            doAsync({ e ->
                 logE("init panel info from database error:" + e.localizedMessage)
             }) {
                 DatabaseHelper
                     .read(activity!!)
                     .findInfoById(infoId) { resultInfo ->
-                    uiThread {
-                        stopLoading()
-                        onInfoFoundById(resultInfo)
-                    }
-                }.close()
+                        uiThread {
+                            stopLoading()
+                            onInfoFoundById(resultInfo)
+                        }
+                    }.close()
             }
         } else {
             onInfoFoundById(null)

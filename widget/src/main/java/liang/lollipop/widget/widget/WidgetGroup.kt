@@ -1139,4 +1139,10 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
     }
 
+    fun notifyInfoChange() {
+        panelList.forEach {
+            it.onInfoChange()
+        }
+    }
+
 }
