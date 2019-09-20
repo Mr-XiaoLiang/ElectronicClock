@@ -255,8 +255,8 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
         }
 
         private fun isStylusButtonPressed(event: MotionEvent): Boolean {
-            return event.getToolType(0) === MotionEvent.TOOL_TYPE_STYLUS
-                    && event.buttonState and MotionEvent.BUTTON_SECONDARY === MotionEvent.BUTTON_SECONDARY
+            return event.getToolType(0) == MotionEvent.TOOL_TYPE_STYLUS
+                    && event.buttonState and MotionEvent.BUTTON_SECONDARY == MotionEvent.BUTTON_SECONDARY
         }
     }
 

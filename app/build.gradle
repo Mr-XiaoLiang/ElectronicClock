@@ -11,8 +11,8 @@ android {
         applicationId "liang.lollipop.electronicclock"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 3
-        versionName "0.9-beta3"
+        versionCode 4
+        versionName "0.9-beta4"
     }
     buildTypes {
         release {
@@ -33,5 +33,4 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation project(path: ':guidelinesView')
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.27.0-eap13"
 }

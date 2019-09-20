@@ -2,10 +2,6 @@ package liang.lollipop.electronicclock.utils
 
 import android.os.Handler
 import android.os.Looper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.android.Main
-import kotlinx.coroutines.android.UI
-import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -54,9 +50,6 @@ fun doAsync(onError:((e: Exception) -> Unit)? = null, run: () -> Unit) {
             onError?.invoke(e)
         }
     }
-//    launch(Dispatchers.Main) {
-//
-//    }
 }
 
 fun uiThread(run: () -> Unit) {

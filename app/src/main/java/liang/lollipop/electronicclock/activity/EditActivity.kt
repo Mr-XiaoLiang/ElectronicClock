@@ -119,7 +119,16 @@ class EditActivity : BaseActivity() {
 
     private var isShowGuidelines = true
 
-    private var hasResult = false
+    private var onInfoChange = false
+
+    private val broadcastHelper = BroadcastHelper {
+        when (it) {
+            BroadcastHelper.ACTION_WIDGET_INFO_CHANGE -> {
+                onInfoChange = true
+            }
+            else -> { }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setScreenOrientation()
@@ -131,7 +140,13 @@ class EditActivity : BaseActivity() {
         initView()
         initActions()
         initWidgets()
+        initGuidelines()
+        initData()
+        broadcastHelper.addActions(BroadcastHelper.ACTION_WIDGET_INFO_CHANGE)
+        broadcastHelper.register(this)
+    }
 
+    private fun initGuidelines() {
         isShowGuidelines = getPreferences(SHOW_EDIT_GUIDELINES, true)
         if (isShowGuidelines) {
             widgetGroup.onPanelAddedListener {
@@ -144,7 +159,6 @@ class EditActivity : BaseActivity() {
                 }
             }
         }
-        initData()
     }
 
     private fun initView() {
@@ -293,17 +307,34 @@ class EditActivity : BaseActivity() {
         widgetHelper.onStart()
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        if (!hasResult) {
-            initData()
-        }
-    }
-
     override fun onStop() {
         super.onStop()
         widgetHelper.onStop()
-        hasResult = false
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        if (onInfoChange) {
+            onInfoChange = false
+            alert {
+                // 设置对话框内容
+                setMessage(R.string.dialog_message_on_info_change)
+                setPositiveButton(R.string.enter) { dialog, _ ->
+                    initData()
+                    dialog.dismiss()
+                }
+                // 取消按钮，使用语义明确的文字来作为对话框的按钮文字
+                setNegativeButton(R.string.cancel) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                show()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        broadcastHelper.unregister(this)
+        super.onDestroy()
     }
 
     /**
@@ -327,6 +358,7 @@ class EditActivity : BaseActivity() {
                         startLoading()
                     } else {
                         stopLoading()
+                        initData()
                     }
                 }
             }
@@ -426,7 +458,6 @@ class EditActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (widgetHelper.onActivityResult(requestCode, resultCode, data)) {
-            hasResult = true
             return
         }
     }

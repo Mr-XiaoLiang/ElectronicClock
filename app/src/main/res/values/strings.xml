@@ -7,7 +7,7 @@
     <string name="action_preview">Preview</string>
     <string name="action_inverted">Inverted</string>
     <string name="action_auto_light">Automatic brightness</string>
-    <string name="action_reset">Undo modification</string>
+    <string name="action_reset">Reset/Refresh</string>
     <string name="dialog_message_reset">Are you sure you want to undo the changes? All existing changes will be overwritten and cleared.</string>
     <string name="dialog_positive_reset">undo</string>
     <string name="dialog_negative_reset">abandon</string>
@@ -83,4 +83,5 @@
     <string name="alert_save_first">Please save first</string>
     <string name="title_animation_delay">Animation interval</string>
     <string name="summary_animation_delay">Interval time to display animation effects</string>
+    <string name="dialog_message_on_info_change">小部件的偏好设置发生变化，是否重新加载？</string>
 </resources>
