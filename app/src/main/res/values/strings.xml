@@ -83,6 +83,6 @@
     <string name="alert_save_first">Please save first</string>
     <string name="title_animation_delay">Animation interval</string>
     <string name="summary_animation_delay">Interval time to display animation effects</string>
-    <string name="dialog_message_on_info_change">小部件的偏好设置发生变化，是否重新加载？</string>
-    <string name="saved">已保存</string>
+    <string name="dialog_message_on_info_change">The preference settings of the widgets have changed. Do you reload them?</string>
+    <string name="saved">Have been saved</string>
 </resources>
