@@ -25,4 +25,19 @@ class CalendarPanelInfo: PanelInfo() {
      */
     var todayBgColor = Color.BLUE
 
+    /**
+     * 默认日期的颜色
+     */
+    var defaultColor = Color.BLACK
+
+    /**
+     * 默认的背景颜色
+     */
+    var defaultBgColor = Color.TRANSPARENT
+
+    /**
+     * 面板的颜色
+     */
+    var panelColor = Color.TRANSPARENT
+
 }
