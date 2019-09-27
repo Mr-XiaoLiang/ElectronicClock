@@ -40,4 +40,9 @@ class CalendarPanelInfo: PanelInfo() {
      */
     var panelColor = Color.TRANSPARENT
 
+    /**
+     * 是否展示农历
+     */
+    var lunarCalendar = false
+
 }
