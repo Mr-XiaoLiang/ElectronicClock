@@ -2,17 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-            android:id="@+id/actionProtraitBtn"
+            android:id="@+id/actionLunar"
             android:title="@string/protrait_preference"
             android:iconTint="@android:color/white"
             app:showAsAction="ifRoom"
+            android:icon="@drawable/ic_event_white_24dp"/>
+
+    <item
+            android:id="@+id/actionProtraitBtn"
+            android:title="@string/protrait_preference"
+            android:iconTint="@android:color/white"
+            app:showAsAction="never"
             android:icon="@drawable/ic_stay_current_portrait_white_24dp"/>
 
     <item
             android:id="@+id/actionLandscapeBtn"
             android:title="@string/landscape_preference"
             android:iconTint="@android:color/white"
-            app:showAsAction="ifRoom"
+            app:showAsAction="never"
             android:icon="@drawable/ic_stay_current_landscape_white_24dp"/>
 
 </menu>

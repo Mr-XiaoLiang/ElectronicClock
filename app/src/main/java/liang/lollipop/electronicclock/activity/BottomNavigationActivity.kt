@@ -56,8 +56,13 @@ open class BottomNavigationActivity: BaseActivity() {
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
         super.onWindowInsetsChange(left, top, right, bottom)
         if (layoutId == DEF_LAYOUT_ID) {
-            rootGroup.setPadding(left, top, right, 0)
+            val newInset = filterRootGroupInset(left, top, right, bottom)
+            rootGroup.setPadding(newInset[0], newInset[1], newInset[2], 0)
         }
+    }
+
+    open fun filterRootGroupInset(left: Int, top: Int, right: Int, bottom: Int): IntArray {
+        return intArrayOf(left, top, right, bottom)
     }
 
     protected fun showFAB(icon: Int, run: ((FloatingActionButton) -> Unit)? = null) {

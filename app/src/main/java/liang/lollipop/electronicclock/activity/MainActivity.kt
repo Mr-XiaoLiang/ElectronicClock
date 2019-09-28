@@ -57,9 +57,15 @@ class MainActivity : BottomNavigationActivity() {
         when (item?.itemId) {
             R.id.actionProtraitBtn -> {
                 EditActivity.startByPortrait(this)
+                return true
             }
             R.id.actionLandscapeBtn -> {
                 EditActivity.startByLandscape(this)
+                return true
+            }
+            R.id.actionLunar -> {
+                startActivity(Intent(this, LunarActivity::class.java))
+                return true
             }
         }
         return super.onOptionsItemSelected(item)
