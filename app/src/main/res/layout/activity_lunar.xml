@@ -10,7 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/headerInfoGroup"
             android:layout_width="match_parent"
-            android:layout_height="240dp">
+            android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/topBounds"
@@ -18,6 +18,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 app:layout_constraintGuide_begin="0dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/headerBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="240dp" />
 
         <TextView
                 android:id="@+id/dateView"
@@ -33,18 +40,18 @@
                 android:id="@+id/cnMonthView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:alpha="0.3"
-                android:text="冬月"
-                android:textSize="70sp"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:alpha="0.2"
+                android:text="冬"
+                android:textSize="120sp"
+                android:layout_marginLeft="20dp"
+                app:layout_constraintLeft_toLeftOf="@id/cnDayView"
+                app:layout_constraintBottom_toBottomOf="@id/cnDayView" />
 
         <TextView
                 android:id="@+id/runView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:alpha="0.3"
+                android:alpha="0.2"
                 android:text="@string/run"
                 android:textSize="30sp"
                 app:layout_constraintRight_toRightOf="@id/cnMonthView"
@@ -57,7 +64,7 @@
                 android:layout_marginTop="40dp"
                 android:text="春分"
                 android:textSize="40sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/headerBottom"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/topBounds" />
@@ -68,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:text="廿一"
                 android:textSize="20sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/headerBottom"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cnDayView" />
@@ -82,13 +89,17 @@
         <LinearLayout
                 android:orientation="vertical"
                 android:paddingTop="240dp"
+                android:paddingBottom="60dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
             <com.google.android.material.card.MaterialCardView
                     android:id="@+id/festivalCard"
-                    android:layout_margin="10dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
                     android:padding="10dp"
+                    android:minHeight="70dp"
                     app:cardCornerRadius="10dp"
                     app:cardBackgroundColor="@color/colorBackground"
                     android:layout_width="match_parent"
@@ -105,7 +116,9 @@
             <com.google.android.material.card.MaterialCardView
                     android:id="@+id/auspiciousCard"
                     app:layout_constraintTop_toBottomOf="@id/festivalCard"
-                    android:layout_margin="10dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
                     android:padding="10dp"
                     app:cardCornerRadius="10dp"
                     app:cardBackgroundColor="@color/colorBackground"

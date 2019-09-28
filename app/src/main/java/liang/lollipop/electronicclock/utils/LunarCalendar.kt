@@ -82,7 +82,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
         /**
          * 农历的月份
          */
-        private val monthChinese = arrayOf("正月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "冬月", "腊月")
+        private val monthChinese = arrayOf("正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊")
         /**
          * 通胜十二建
          */
