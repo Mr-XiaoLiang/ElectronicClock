@@ -12,7 +12,7 @@ import kotlin.collections.HashMap
  * @param year 年份
  * @param month 月份 [0~11]
  */
-class LunarCalendar(private val year: Int, private val month: Int) {
+class LunarCalendar private constructor(private val year: Int, private val month: Int) {
 
     companion object {
         /**
@@ -66,7 +66,7 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             195551, 218072, 240693, 263343, 285989, 308563, 331033, 353350, 375494, 397447, 419210,
             440795, 462224, 483532, 504758)
         /**
-         * 星期、个位
+         * 星期", "个位
          */
         private val nStr1 = arrayOf("日", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十")
         /**
@@ -82,7 +82,10 @@ class LunarCalendar(private val year: Int, private val month: Int) {
         /**
          * 农历的月份
          */
-        private val monthChinese = arrayOf("正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊")
+        private val monthChinese = arrayOf("正月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "冬月", "腊月")
+        /**
+         * 通胜十二建
+         */
         private val jcName = arrayOf(
             arrayOf("建", "除", "满", "平", "定", "执", "破", "危", "成", "收", "开", "闭"),
             arrayOf("闭", "建", "除", "满", "平", "定", "执", "破", "危", "成", "收", "开"),
@@ -98,7 +101,62 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             arrayOf("除", "满", "平", "定", "执", "破", "危", "成", "收", "开", "闭", "建")
         )
 
-        //公历节日  *表示放假日
+        /**
+         * 通胜十二建的黄历描述
+         */
+        private val auspiciousDayArray = arrayOf(
+            // 大吉
+            AuspiciousDay("成", "成功、天帝纪万物成就的大吉日子，凡事皆顺",
+                arrayOf("结婚", "开市", "修造", "动土", "安床", "破土", "安葬", "搬迁", "交易",
+                    "求财", "出行", "立契", "竖柱", "裁种", "牧养"),
+                arrayOf("诉讼"), 2),
+            AuspiciousDay("收", "收成、收获，天帝宝库收纳的日子",
+                arrayOf("祈福", "求嗣", "赴任", "嫁娶", "安床", "修造", "动土", "求学", "开市",
+                    "交易", "买卖", "立契"),
+                arrayOf("放债", "新船下水", "新车下地", "破土", "安葬"), 2),
+            AuspiciousDay("开", "开始、开展的日子",
+                arrayOf("祭祀", "祈福", "入学", "上任", "修造", "动土", "开市", "安床", "交易",
+                    "出行", "竖柱"),
+                arrayOf("放债", "诉讼", "安葬"), 2),
+            // 次吉
+            AuspiciousDay("建", "万物生育、强健、健壮的日子",
+                arrayOf("赴任", "祈福", "求嗣", "破土", "安葬", "修造", "上梁", "求财", "置业",
+                    "入学", "考试", "结婚", "动土", "签约", "交涉", "出行"),
+                arrayOf("动土", "开仓", "掘井", "乘船", "新船下水", "新车下地", "维修水电器具"), 1),
+            AuspiciousDay("除", "扫除恶煞、去旧迎新的日子",
+                arrayOf("祭祀", "祈福", "婚姻", "出行", "入伙", "搬迁", "出货", "动土", "求医",
+                    "交易"),
+                arrayOf("结婚", "赴任", "远行", "签约"), 1),
+            AuspiciousDay("满", "丰收、美满、天帝宝库积满的日子",
+                arrayOf("嫁娶", "祈福", "移徙", "开市", "交易", "求财", "立契", "祭祀", "出行",
+                    "牧养"),
+                arrayOf("造葬", "赴任", "求医"), 1),
+            // 平
+            AuspiciousDay("平", "平常、官人集合平分的日子",
+                arrayOf("嫁娶", "修造", "破土", "安葬", "牧养", "开市", "安床", "动土", "求嗣"),
+                arrayOf("祈福", "求嗣", "赴任", "嫁娶", "开市", "安葬"), 0),
+            AuspiciousDay("定", "安定、平常、天帝众客定座的日子",
+                arrayOf("祭祀", "祈福", "嫁娶", "造屋", "装修", "修路", "开市", "入学", "上任", "入伙"),
+                arrayOf("诉讼", "出行", "交涉"), 0),
+            // 凶
+            AuspiciousDay("执", "破日之从神，曰小耗，天帝执行万物赐天福，较差的日子",
+                arrayOf("造屋", "装修", "嫁娶", "收购", "立契", "祭祀"),
+                arrayOf("开市", "求财", "出行", "搬迁"), -1),
+            AuspiciousDay("破", "日月相冲，曰大耗，斗柄相冲相向必破坏的日子，大事不宜",
+                arrayOf("破土", "拆卸", "求医"),
+                arrayOf("嫁娶", "签约", "交涉", "出行", "搬迁"), -1),
+            AuspiciousDay("危", "危机、危险，诸事不宜的日子",
+                arrayOf("祭祀", "祈福", "安床", "拆卸", "破土"),
+                arrayOf("登山", "乘船", "出行", "嫁娶", "造葬", "迁徙"), -1),
+            AuspiciousDay("闭", "关闭、收藏、天地阴阳闭寒的日子",
+                arrayOf("祭祀", "祈福", "筑堤", "埋池", "埋穴", "造葬", "填补", "修屋"),
+                arrayOf("开市", "出行", "求医", "手术", "嫁娶"), -1)
+        )
+
+        private val unknownAuspiciousDay = AuspiciousDay("虚", "万物皆虚，万事皆允",
+            arrayOf(), arrayOf(), 0)
+
+        //公历节日
         private val sFtv = arrayOf(
             Festival(1,1,"元旦", true),
             Festival(1,6," 中国13亿人口日"),
@@ -199,7 +257,7 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             Festival(12,25,"圣诞节 世界强化免疫日"),
             Festival(12,26,"毛泽东诞辰")
         )
-        //农历节日  *表示放假日
+        //农历节日
         private val lFtv = arrayOf(
             Festival(1,1,"春节",true),
             Festival(1,2,"大年初二",true),
@@ -251,7 +309,9 @@ class LunarCalendar(private val year: Int, private val month: Int) {
          * 日历的计算类
          */
         private val staticCalendar: Calendar by lazy {
-            Calendar.getInstance()
+            Calendar.getInstance().apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }
         }
 
         /**
@@ -260,14 +320,10 @@ class LunarCalendar(private val year: Int, private val month: Int) {
         private val cache = HashMap<String, LunarCalendar>()
 
         /**
-         * 获取日期信息的唯一公开方法
+         * 获取日期信息的方法
+         * 获取某一个月的农历
          */
-        fun getCalendar(timestamp: Long): LunarCalendar {
-            // 更新时间戳
-            staticCalendar.timeInMillis = timestamp
-            // 得到对应的年月
-            val year = staticCalendar.get(Calendar.YEAR)
-            val month = staticCalendar.get(Calendar.MONTH)
+        fun getCalendar(year: Int, month: Int): LunarCalendar {
             // 生成月历对应的key
             val key = "$year-$month"
             // 如果缓存中存在了，那么不做计算，直接返回
@@ -280,6 +336,21 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             newCalendar.calculation()
             cache[key] = newCalendar
             return newCalendar
+        }
+
+        /**
+         * 获取日期信息的方法
+         * 获取某一天的农历
+         */
+        fun getCalendar(timestamp: Long): Element {
+            // 更新时间戳
+            staticCalendar.timeInMillis = timestamp
+            // 得到对应的年月
+            val year = staticCalendar.get(Calendar.YEAR)
+            val month = staticCalendar.get(Calendar.MONTH)
+            val day = staticCalendar.get(Calendar.DAY_OF_MONTH)
+            val lunarCalendar = getCalendar(year, month);
+            return lunarCalendar.elementArray[day - 1]
         }
 
         /**
@@ -338,20 +409,55 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             return nStr2[ten] + nStr1[single]
         }
 
+        /**
+         * 择日算法
+         */
         private fun calConv2(yy: Int, mm: Int, dd: Int,
-            y: Int, d: Int, m: Int, dt: Int, nm: Int, nd: Int): String {
+                             y: Int, d: Int, m: Int, dt: Int, nm: Int, nd: Int): String {
             val dy = d + dd
-            return if (yy == 0 && dd == 6 || yy == 6 && dd == 0 || yy == 1 && dd == 7 || yy == 7 && dd == 1 || yy == 2 && dd == 8 || yy == 8 && dd == 2 || yy == 3 && dd == 9 || yy == 9 && dd == 3 || yy == 4 && dd == 10 || yy == 10 && dd == 4 || yy == 5 && dd == 11 || yy == 11 && dd == 5) {
+            return if (yy == 0 && dd == 6 || yy == 6 && dd == 0
+                || yy == 1 && dd == 7 || yy == 7 && dd == 1
+                || yy == 2 && dd == 8 || yy == 8 && dd == 2
+                || yy == 3 && dd == 9 || yy == 9 && dd == 3
+                || yy == 4 && dd == 10 || yy == 10 && dd == 4
+                || yy == 5 && dd == 11 || yy == 11 && dd == 5) {
                 "日值岁破 大事不宜"
-            } else if (mm == 0 && dd == 6 || mm == 6 && dd == 0 || mm == 1 && dd == 7 || mm == 7 && dd == 1 || mm == 2 && dd == 8 || mm == 8 && dd == 2 || mm == 3 && dd == 9 || mm == 9 && dd == 3 || mm == 4 && dd == 10 || mm == 10 && dd == 4 || mm == 5 && dd == 11 || mm == 11 && dd == 5) {
+            } else if (mm == 0 && dd == 6 || mm == 6 && dd == 0
+                || mm == 1 && dd == 7 || mm == 7 && dd == 1
+                || mm == 2 && dd == 8 || mm == 8 && dd == 2
+                || mm == 3 && dd == 9 || mm == 9 && dd == 3
+                || mm == 4 && dd == 10 || mm == 10 && dd == 4
+                || mm == 5 && dd == 11 || mm == 11 && dd == 5) {
                 "日值月破 大事不宜"
-            } else if (y == 0 && dy == 911 || y == 1 && dy == 55 || y == 2 && dy == 111 || y == 3 && dy == 75 || y == 4 && dy == 311 || y == 5 && dy == 9 || y == 6 && dy == 511 || y == 7 && dy == 15 || y == 8 && dy == 711 || y == 9 && dy == 35) {
+            } else if (y == 0 && dy == 911 || y == 1 && dy == 55
+                || y == 2 && dy == 111 || y == 3 && dy == 75
+                || y == 4 && dy == 311 || y == 5 && dy == 9
+                || y == 6 && dy == 511 || y == 7 && dy == 15
+                || y == 8 && dy == 711 || y == 9 && dy == 35) {
                 "日值上朔 大事不宜"
-            } else if (m == 1 && dt == 13 || m == 2 && dt == 11 || m == 3 && dt == 9 || m == 4 && dt == 7 || m == 5 && dt == 5 || m == 6 && dt == 3 || m == 7 && dt == 1 || m == 7 && dt == 29 || m == 8 && dt == 27 || m == 9 && dt == 25 || m == 10 && dt == 23 || m == 11 && dt == 21 || m == 12 && dt == 19) {
+            } else if (m == 1 && dt == 13 || m == 2 && dt == 11
+                || m == 3 && dt == 9 || m == 4 && dt == 7
+                || m == 5 && dt == 5 || m == 6 && dt == 3
+                || m == 7 && dt == 1 || m == 7 && dt == 29
+                || m == 8 && dt == 27 || m == 9 && dt == 25
+                || m == 10 && dt == 23 || m == 11 && dt == 21
+                || m == 12 && dt == 19) {
                 "日值杨公十三忌 大事不宜"
             } else {
-                "0"
+                ""
             }
+        }
+
+        /**
+         * 根据关键字检索相应的描述
+         */
+        private fun getAuspiciousDayByKey(key: String): AuspiciousDay {
+            for (day in auspiciousDayArray) {
+                if (day.key == key) {
+                    return day
+                }
+            }
+            return unknownAuspiciousDay
         }
 
         /**
@@ -388,7 +494,6 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             )
             val time = time2.add(BigDecimal.valueOf(utcTime))
             val offDate = Date(time.toLong())
-            staticCalendar.timeZone = TimeZone.getTimeZone("UTC")
             staticCalendar.time = offDate
             //日期从0算起
             return staticCalendar.get(Calendar.DATE)
@@ -419,28 +524,29 @@ class LunarCalendar(private val year: Int, private val month: Int) {
     /**
      * 日历的计算类
      */
-    private val calendar: Calendar by lazy {
-        Calendar.getInstance()
-    }
+    private val calendar: Calendar
+        get() {
+            return staticCalendar
+        }
 
     /**
      * 本月每一天的信息
      */
-    private val elementArray: Array<Element>
+    val elementArray: Array<Element>
     /**
      * 本月的日期有几天
      */
-    private val length: Int
+    val length: Int
     /**
      * 本月第一天星期几
      */
-    private val firstWeek: Int
+    val firstWeek: Int
 
     init {
         // 设置为一个月的开始时间
         calendar.set(year, month, 1, 0, 0, 0)
         //公历当月1日星期几
-        firstWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        firstWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1
         // 设置当月的天数
         length = solarDays(year, month)
         // 根据天数设置本月的信息集合
@@ -482,6 +588,7 @@ class LunarCalendar(private val year: Int, private val month: Int) {
         // 当月一日与 1900/1/1 相差天数
         // 1900/1/1与 1970/1/1 相差25567日, 1900/1/1 日柱为甲戌日(60进制10)
         calendar.set(year, month, 1, 0, 0, 0)
+        val t = calendar.timeInMillis
         val dayCyclical = calendar.timeInMillis / 86400000 + 25567 + 10
         for (i in 0 until this.length) {
             if (lD > lX) {
@@ -513,9 +620,8 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             cD = ganZhi(lD2)
             val element = elementArray[i]
             element.reset(year, month + 1, i + 1, nStr1[(i + this.firstWeek) % 7],
-                lY, lM, lD++, lL, cY, cM, cD
-            )
-            element.cDay = dayChinese(element.lDay)
+                lY, lM, lD++, lL, cY, cM, cD)
+//            element.cDay = dayChinese(element.lDay)
             val paramterLy2 = if (lY2 == null) -1 else lY2 % 12
             val paramterLm2 = if (lM2 == null) -1 else lM2 % 12
             val paramterLd2 = lD2 % 12
@@ -524,7 +630,9 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             val paramterLld = lD - 1
             element.sgz5 = calConv2(paramterLy2, paramterLm2, paramterLd2.toInt(),
                 paramterLy2b, paramterLy2c, lM, paramterLld, month + 1, cs1 ?: -1)
-            element.sgz3 = cyclical6(lM2!! % 12, (lD2 % 12).toInt())
+            if (lM2 != null) {
+                element.sgz3 = cyclical6(lM2 % 12, (lD2 % 12).toInt())
+            }
         }
 
         //节气
@@ -580,8 +688,6 @@ class LunarCalendar(private val year: Int, private val month: Int) {
         calendar
         //if (y == tY && m == tM) this[tD - 1].isToday = true;
     }
-
-
 
     private class Easter constructor(y: Int, calendar: Calendar) {
 
@@ -694,51 +800,81 @@ class LunarCalendar(private val year: Int, private val month: Int) {
 
     }
 
+    class TongShengAlmanac {
+
+    }
+
     class Element {
         /** 公元年份 **/
         var sYear: Int = 0
+            private set
         /** 公元月份 [1~12] **/
         var sMonth: Int = 0
+            private set
         /** 公元月内日期 **/
         var sDay: Int = 0
+            private set
         /** 星期 中文 **/
         var week: String = ""
+            private set
         /** 农历年份数字 **/
         var lYear: Int = 0
+            private set
         /** 农历月份数字 **/
         var lMonth: Int = 0
+            private set
         /** 农历月内日期数字 **/
         var lDay: Int = 0
+            private set
         /** 农历月份中文 **/
         var lMonthChinese: String = ""
+            private set
         /** 农历月内日期中文 **/
         var lDayChinese: String = ""
+            private set
         /** 是否是农历闰月 **/
         var isLeap: Boolean = false
+            private set
         /** 八字 年柱 **/
         var cYear: String = ""
+            private set
         /** 八字 月柱 **/
         var cMonth: String = ""
+            private set
         /** 八字日柱 **/
         var cDay: String = ""
         /** 今天 **/
         var isToday = false
+            private set
         /** 农历节日 **/
-        var lunarFestival = ArrayList<String>()
+        val lunarFestival = ArrayList<String>()
         /** 公元历节日 **/
         val solarFestival = ArrayList<String>()
         /** 节气 **/
         var solarTerms: String = ""
+
         var sgz5: String = ""
+
+        /** 择日描述 **/
+        var auspiciousDay = unknownAuspiciousDay
+            private set
+        /**
+         * 通胜十二建
+         */
         var sgz3: String = ""
+            set(value) {
+                field = value
+                auspiciousDay = getAuspiciousDayByKey(value)
+            }
         /** 假期 **/
         var holiday = false
         /** 生肖 **/
         var animals = ""
+            private set
 
         fun reset(sYear: Int, sMonth: Int, sDay: Int, week: String,
-            lYear: Int, lMonth: Int, lDay: Int, isLeap: Boolean,
-            cYear: String, cMonth: String, cDay: String) {
+                  lYear: Int, lMonth: Int, lDay: Int, isLeap: Boolean,
+                  cYear: String, cMonth: String, cDay: String) {
             this.isToday = false
             //瓣句
             this.sYear = sYear
@@ -764,9 +900,54 @@ class LunarCalendar(private val year: Int, private val month: Int) {
             this.animals = getAnimals(sYear)
         }
 
+        override fun toString(): String {
+            return "Element(sYear=$sYear, sMonth=$sMonth, sDay=$sDay, week='$week', lYear=$lYear, " +
+                    "lMonth=$lMonth, lDay=$lDay, lMonthChinese='$lMonthChinese', " +
+                    "lDayChinese='$lDayChinese', isLeap=$isLeap, cYear='$cYear', cMonth='$cMonth', " +
+                    "cDay='$cDay', isToday=$isToday, lunarFestival=$lunarFestival, " +
+                    "solarFestival=$solarFestival, solarTerms='$solarTerms', sgz5='$sgz5', " +
+                    "auspiciousDay=$auspiciousDay, sgz3='$sgz3', holiday=$holiday, animals='$animals')"
+        }
+
+
     }
 
     private data class Festival(val month: Int, val day: Int,
                                 val name: String, val isHoliday: Boolean = false)
+
+    /**
+     * 择日数据类
+     * @param key 日期的名称
+     * @param detail 描述
+     * @param matter 适合做的事情
+     * @param taboo 不适合做的事情
+     * @param type 日期类型，2：大吉，1：次吉，0：平，-1：凶
+     */
+    data class AuspiciousDay(val key: String, val detail: String, val matter: Array<String>,
+                                     val taboo: Array<String>, val type: Int) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as AuspiciousDay
+
+            if (key != other.key) return false
+            if (detail != other.detail) return false
+            if (!matter.contentEquals(other.matter)) return false
+            if (!taboo.contentEquals(other.taboo)) return false
+            if (type != other.type) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = key.hashCode()
+            result = 31 * result + detail.hashCode()
+            result = 31 * result + matter.contentHashCode()
+            result = 31 * result + taboo.contentHashCode()
+            result = 31 * result + type
+            return result
+        }
+    }
 
 }
