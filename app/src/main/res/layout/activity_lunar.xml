@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".activity.LunarActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/headerInfoGroup"
+            android:layout_width="match_parent"
+            android:layout_height="240dp">
+
+        <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/topBounds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="0dp" />
+
+        <TextView
+                android:id="@+id/dateView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="2019-09-29"
+                android:textSize="18sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/topBounds" />
+
+        <TextView
+                android:id="@+id/cnMonthView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.3"
+                android:text="冬月"
+                android:textSize="70sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+                android:id="@+id/runView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:alpha="0.3"
+                android:text="@string/run"
+                android:textSize="30sp"
+                app:layout_constraintRight_toRightOf="@id/cnMonthView"
+                app:layout_constraintTop_toBottomOf="@id/cnMonthView" />
+
+        <TextView
+                android:id="@+id/cnDayView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:text="春分"
+                android:textSize="40sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/topBounds" />
+
+        <TextView
+                android:id="@+id/cnDayView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="廿一"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cnDayView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:paddingTop="240dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/festivalCard"
+                    android:layout_margin="10dp"
+                    android:padding="10dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardBackgroundColor="@color/colorBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/festivalList"
+                        android:padding="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/auspiciousCard"
+                    app:layout_constraintTop_toBottomOf="@id/festivalCard"
+                    android:layout_margin="10dp"
+                    android:padding="10dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardBackgroundColor="@color/colorBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:padding="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    <TextView
+                            android:id="@+id/auspiciousKeyView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.3"
+                            android:text="成"
+                            android:textSize="40sp"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                            android:id="@+id/auspiciousDetailView"
+                            android:layout_width="0px"
+                            android:layout_height="0px"
+                            android:text="成功、天帝纪万物成就的大吉日子，凡事皆顺"
+                            android:textSize="18sp"
+                            android:layout_marginLeft="10dp"
+                            android:gravity="center_vertical"
+                            app:layout_constraintLeft_toRightOf="@id/auspiciousKeyView"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="@id/auspiciousKeyView"
+                            app:layout_constraintTop_toTopOf="@id/auspiciousKeyView" />
+
+                    <liang.lollipop.electronicclock.view.CirclePointView
+                            android:id="@+id/auspiciousIcon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="@string/suitable"
+                            android:gravity="center"
+                            android:textSize="16sp"
+                            app:layout_constraintTop_toTopOf="@id/auspiciousList"
+                            app:layout_constraintBottom_toBottomOf="@id/auspiciousList"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/auspiciousList"
+                            android:background="@color/colorAuspicious"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/auspiciousList"
+                            app:layout_constraintTop_toBottomOf="@id/auspiciousDetailView"
+                            app:layout_constraintLeft_toRightOf="@id/auspiciousIcon"
+                            app:layout_constraintRight_toRightOf="parent"
+                            android:layout_marginLeft="10dp"
+                            android:layout_width="0px"
+                            android:layout_height="70dp"/>
+
+                    <liang.lollipop.electronicclock.view.CirclePointView
+                            android:id="@+id/fierceIcon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:text="@string/taboo"
+                            android:textSize="16sp"
+                            android:gravity="center"
+                            app:layout_constraintTop_toTopOf="@id/fierceList"
+                            app:layout_constraintBottom_toBottomOf="@id/fierceList"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/fierceList"
+                            android:background="@color/colorFierce"
+                            android:padding="10dp"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/fierceList"
+                            app:layout_constraintTop_toBottomOf="@id/auspiciousList"
+                            app:layout_constraintLeft_toRightOf="@id/fierceIcon"
+                            app:layout_constraintRight_toRightOf="parent"
+                            android:layout_marginLeft="10dp"
+                            android:layout_width="0px"
+                            android:layout_height="70dp"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

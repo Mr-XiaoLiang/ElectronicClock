@@ -320,6 +320,11 @@ class LunarCalendar private constructor(private val year: Int, private val month
         private val cache = HashMap<String, LunarCalendar>()
 
         /**
+         * 受到支持的最大的年份
+         */
+        val maxYear = 1900 + lunarInfo.size
+
+        /**
          * 获取日期信息的方法
          * 获取某一个月的农历
          */

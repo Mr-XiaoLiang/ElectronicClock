@@ -85,4 +85,8 @@
     <string name="summary_animation_delay">Interval time to display animation effects</string>
     <string name="dialog_message_on_info_change">The preference settings of the widgets have changed. Do you reload them?</string>
     <string name="saved">Have been saved</string>
+
+    <string name="run" translatable="false">闰</string>
+    <string name="suitable" translatable="false">宜</string>
+    <string name="taboo" translatable="false">忌</string>
 </resources>

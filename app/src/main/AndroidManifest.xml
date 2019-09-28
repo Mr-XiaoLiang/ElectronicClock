@@ -12,7 +12,8 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".activity.PanelInfoAdjustmentActivity"/>
+        <activity android:name=".activity.LunarActivity"></activity>
+        <activity android:name=".activity.PanelInfoAdjustmentActivity" />
         <activity android:name=".activity.EditActivity" />
         <activity
                 android:name=".activity.WidgetActivity"
