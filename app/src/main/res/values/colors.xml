@@ -5,4 +5,7 @@
     <color name="colorAccent">#D81B60</color>
 
     <color name="colorBackground">#474747</color>
+    
+    <color name="colorAuspicious">#007453</color>
+    <color name="colorFierce">#7A0A01</color>
 </resources>
