@@ -59,6 +59,14 @@ class LunarCalendar private constructor(private val year: Int, private val month
         private val solarTerm = arrayOf("小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏",
             "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬",
             "小雪", "大雪", "冬至")
+
+        private fun getSolarTerm(index: Int): String {
+            if (index >= 0 && index < solarTerm.size) {
+                return solarTerm[index]
+            }
+            return ""
+        }
+
         /**
          * 节气对应的计算值
          */
@@ -643,8 +651,8 @@ class LunarCalendar private constructor(private val year: Int, private val month
         //节气
         tmp1 = sTerm(year, month * 2) - 1
         tmp2 = sTerm(year, month * 2 + 1) - 1
-        elementArray[tmp1].solarTerms = solarTerm[month * 2]
-        elementArray[tmp2].solarTerms = solarTerm[month * 2 + 1]
+        elementArray[tmp1].solarTerms = getSolarTerm(month * 2)
+        elementArray[tmp2].solarTerms = getSolarTerm(month * 2 + 1)
 
         //国历节日
         for (sf in sFtv) {

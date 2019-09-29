@@ -8,4 +8,6 @@
     
     <color name="colorAuspicious">#007453</color>
     <color name="colorFierce">#7A0A01</color>
+
+    <color name="colorDialogBackground">#8000</color>
 </resources>

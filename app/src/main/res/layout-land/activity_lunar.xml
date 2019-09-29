@@ -85,6 +85,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
+            android:id="@+id/bodyScrollView"
             android:layout_width="240dp"
             android:layout_gravity="end"
             android:layout_height="match_parent">

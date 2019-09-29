@@ -11,7 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/headerInfoGroup"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="240dp">
 
         <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/topBounds"
@@ -84,6 +84,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
+            android:id="@+id/bodyScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -91,6 +92,7 @@
                 android:orientation="vertical"
                 android:paddingTop="240dp"
                 android:paddingBottom="60dp"
+                android:minHeight="720dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
