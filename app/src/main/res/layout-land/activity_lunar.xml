@@ -4,13 +4,14 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="240dp"
-        android:layout_height="480dp"
+        android:layout_width="480dp"
+        android:layout_height="240dp"
         tools:context=".activity.LunarActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/headerInfoGroup"
-            android:layout_width="match_parent"
+            android:layout_width="240dp"
+            android:layout_gravity="start"
             android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.Guideline
@@ -84,12 +85,12 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
+            android:layout_width="240dp"
+            android:layout_gravity="end"
             android:layout_height="match_parent">
 
         <LinearLayout
                 android:orientation="vertical"
-                android:paddingTop="240dp"
                 android:paddingBottom="60dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

@@ -7,7 +7,7 @@ import liang.lollipop.electronicclock.R
  * 黄历，农历的Activity
  * @author Lollipop
  */
-class LunarActivity : BottomNavigationActivity() {
+class LunarActivity : DialogActivity() {
 
     override val contentViewId: Int
         get() = R.layout.activity_lunar

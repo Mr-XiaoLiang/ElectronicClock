@@ -13,6 +13,12 @@
         <item name="android:windowDisablePreview">true</item>
     </style>
 
+    <style name="AppTheme.Transparent" parent="AppTheme" >
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
     <style name="dialogAnim" parent="android:Animation.Dialog">
         <item name="android:windowEnterAnimation">@anim/dialog_anim_in</item>
         <item name="android:windowExitAnimation">@anim/dialog_anim_out</item>

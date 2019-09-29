@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/rootGroup"
+        android:background="#8000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+            android:id="@+id/contentGroup"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@color/colorBackground"
+            app:cardCornerRadius="10dp"
+            android:minWidth="100dp"
+            android:minHeight="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+</FrameLayout>
