@@ -8,6 +8,7 @@ import android.view.View
 import androidx.core.widget.NestedScrollView
 import kotlinx.android.synthetic.main.activity_lunar.*
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.bean.LunarFestivalInfo
 import liang.lollipop.electronicclock.utils.LunarCalendar
 import liang.lollipop.widget.utils.Utils
 
@@ -78,6 +79,17 @@ class LunarActivity : DialogActivity() {
         val auspiciousDay = calendar.auspiciousDay
         auspiciousKeyView.text = auspiciousDay.key
         auspiciousDetailView.text = auspiciousDay.detail
+        // 显示八字
+        cnCharacterView.text = "${calendar.cYear}(${calendar.animals})年 ${calendar.cMonth}月 ${calendar.cDay}日"
+        // 显示节假日
+        val festivalList = ArrayList<LunarFestivalInfo>()
+        for (f in calendar.solarFestival) {
+            festivalList.add(LunarFestivalInfo(f))
+        }
+        for (f in calendar.lunarFestival) {
+            festivalList.add(LunarFestivalInfo(f, LunarFestivalInfo.TYPE_LUNAR))
+        }
+//        festivalList.
     }
 
 }

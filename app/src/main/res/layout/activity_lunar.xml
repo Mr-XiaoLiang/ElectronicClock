@@ -32,7 +32,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="2019-09-29"
                 android:textSize="18sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/topBounds" />
@@ -42,7 +41,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:alpha="0.2"
-                android:text="冬"
                 android:textSize="120sp"
                 android:layout_marginLeft="20dp"
                 app:layout_constraintLeft_toLeftOf="@id/cnDayView"
@@ -53,17 +51,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:alpha="0.2"
-                android:text="@string/run"
                 android:textSize="30sp"
                 app:layout_constraintRight_toRightOf="@id/cnMonthView"
                 app:layout_constraintTop_toBottomOf="@id/cnMonthView" />
+
+        <TextView
+                android:id="@+id/cnCharacterView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:textSize="12sp"
+                android:layout_margin="10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/headerBottom" />
 
         <TextView
                 android:id="@+id/cnDayView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
-                android:text="春分"
                 android:textSize="40sp"
                 app:layout_constraintBottom_toBottomOf="@id/headerBottom"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -74,7 +80,6 @@
                 android:id="@+id/cnDayView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="廿一"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="@id/headerBottom"
                 app:layout_constraintLeft_toLeftOf="parent"

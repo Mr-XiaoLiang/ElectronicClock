@@ -50,6 +50,16 @@
                 app:layout_constraintBottom_toBottomOf="@id/cnDayView" />
 
         <TextView
+                android:id="@+id/cnCharacterView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:textSize="12sp"
+                android:layout_margin="10dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/headerBottom" />
+
+        <TextView
                 android:id="@+id/runView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
