@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.utils
 
+import java.lang.StringBuilder
 import java.math.BigDecimal
 import java.util.*
 import kotlin.collections.ArrayList
@@ -130,7 +131,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
             AuspiciousDay("建", "万物生育、强健、健壮的日子",
                 arrayOf("赴任", "祈福", "求嗣", "破土", "安葬", "修造", "上梁", "求财", "置业",
                     "入学", "考试", "结婚", "动土", "签约", "交涉", "出行"),
-                arrayOf("动土", "开仓", "掘井", "乘船", "新船下水", "新车下地", "维修水电器具"), 1),
+                arrayOf("动土", "开仓", "掘井", "乘船", "新船下水", "新车下地", "维修器具"), 1),
             AuspiciousDay("除", "扫除恶煞、去旧迎新的日子",
                 arrayOf("祭祀", "祈福", "婚姻", "出行", "入伙", "搬迁", "出货", "动土", "求医",
                     "交易"),
@@ -164,10 +165,46 @@ class LunarCalendar private constructor(private val year: Int, private val month
         private val unknownAuspiciousDay = AuspiciousDay("虚", "万物皆虚，万事皆允",
             arrayOf(), arrayOf(), 0)
 
+        /**
+         * 星宿信息
+         */
+        private val cnStar = arrayOf(
+            arrayOf("室", "奎", "胄", "毕", "参", "鬼", "张", "角", "氐", "心", "斗", "虚"),
+            arrayOf("壁", "娄", "昂", "觜", "井", "柳", "翼", "亢", "房", "尾", "女", "危"),
+            arrayOf("奎", "胄", "毕", "参", "鬼", "星", "轸", "氐", "心", "箕", "虚", "室"),
+            arrayOf("娄", "昂", "觜", "井", "柳", "张", "角", "房", "尾", "斗", "危", "壁"),
+            arrayOf("胄", "毕", "参", "鬼", "星", "翼", "亢", "心", "箕", "女", "室", "奎"),
+            arrayOf("昂", "觜", "井", "柳", "张", "轸", "氐", "尾", "斗", "虚", "壁", "娄"),
+            arrayOf("毕", "参", "鬼", "星", "翼", "角", "房", "箕", "女", "危", "奎", "胄"),
+            arrayOf("觜", "井", "柳", "张", "轸", "亢", "心", "斗", "虚", "室", "娄", "昂"),
+            arrayOf("参", "鬼", "星", "翼", "角", "氐", "尾", "女", "危", "壁", "胄", "毕"),
+            arrayOf("井", "柳", "张", "轸", "亢", "房", "箕", "虚", "室", "奎", "昂", "觜"),
+            arrayOf("鬼", "星", "翼", "角", "氐", "心", "斗", "危", "壁", "娄", "毕", "参"),
+            arrayOf("柳", "张", "轸", "亢", "房", "尾", "女", "室", "奎", "胄", "觜", "井"),
+            arrayOf("星", "翼", "角", "氐", "心", "箕", "虚", "壁", "娄", "昂", "参", "鬼"),
+            arrayOf("张", "轸", "亢", "房", "尾", "斗", "危", "奎", "胄", "毕", "井", "柳"),
+            arrayOf("翼", "角", "氐", "心", "箕", "女", "室", "娄", "昂", "觜", "鬼", "星"),
+            arrayOf("轸", "亢", "房", "尾", "斗", "虚", "壁", "胄", "毕", "参", "柳", "张"),
+            arrayOf("角", "氐", "心", "箕", "女", "危", "奎", "昂", "觜", "井", "星", "翼"),
+            arrayOf("亢", "房", "尾", "斗", "虚", "室", "娄", "毕", "参", "鬼", "张", "轸"),
+            arrayOf("氐", "心", "箕", "女", "危", "壁", "胄", "觜", "井", "柳", "翼", "角"),
+            arrayOf("房", "尾", "斗", "虚", "室", "奎", "昂", "参", "鬼", "星", "轸", "亢"),
+            arrayOf("心", "箕", "女", "危", "壁", "娄", "毕", "井", "柳", "张", "角", "氐"),
+            arrayOf("尾", "斗", "虚", "室", "奎", "胄", "觜", "鬼", "星", "翼", "亢", "房"),
+            arrayOf("箕", "女", "危", "壁", "娄", "昂", "参", "柳", "张", "轸", "氐", "心"),
+            arrayOf("斗", "虚", "室", "奎", "胄", "毕", "井", "星", "翼", "角", "房", "尾"),
+            arrayOf("女", "危", "壁", "娄", "昂", "觜", "鬼", "张", "轸", "亢", "心", "箕"),
+            arrayOf("虚", "室", "奎", "胄", "毕", "参", "柳", "翼", "角", "氐", "尾", "斗"),
+            arrayOf("危", "壁", "娄", "昂", "觜", "井", "星", "轸", "亢", "房", "箕", "女"),
+            arrayOf("室", "奎", "胄", "毕", "参", "鬼", "张", "角", "氐", "心", "斗", "虚"),
+            arrayOf("壁", "娄", "昂", "觜", "井", "柳", "翼", "亢", "房", "尾", "女", "危"),
+            arrayOf("奎", "胄", "毕", "参", "鬼", "星", "轸", "氐", "心", "箕", "虚", "室")
+        )
+
         //公历节日
         private val sFtv = arrayOf(
             Festival(1,1,"元旦", true),
-            Festival(1,6," 中国13亿人口日"),
+            Festival(1,6,"中国13亿人口日"),
             Festival(1,10,"中国110宣传日"),
 
             Festival(2,2,"世界湿地日"),
@@ -179,7 +216,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
 
             Festival(3,3,"全国爱耳日"),
             Festival(3,8,"妇女节"),
-            Festival(3,12,"植树节 孙中山逝世纪念日"),
+            Festival(3,12, arrayOf("植树节", "孙中山逝世纪念日")),
             Festival(3,15,"消费者权益保护日"),
             Festival(3,21,"世界森林日"),
             Festival(3,22,"世界水日"),
@@ -198,7 +235,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
             Festival(5,15,"国际家庭日"),
             Festival(5,17,"世界电信日"),
             Festival(5,18,"国际博物馆日"),
-            Festival(5,19,"中国汶川地震哀悼日 全国助残日"),
+            Festival(5,19, arrayOf("中国汶川地震哀悼日", "全国助残日")),
             Festival(5,20,"全国学生营养日"),
             Festival(5,22,"国际生物多样性日"),
             Festival(5,23,"国际牛奶日"),
@@ -212,7 +249,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
             Festival(6,25,"全国土地日"),
             Festival(6,26,"国际反毒品日"),
 
-            Festival(7,1,"建党节 香港回归纪念日"),
+            Festival(7,1, arrayOf("建党节", "香港回归纪念日")),
             Festival(7,7,"抗日战争纪念日"),
             Festival(7,11,"世界人口日"),
 
@@ -229,13 +266,13 @@ class LunarCalendar private constructor(private val year: Int, private val month
             Festival(9,27,"世界旅游日"),
             Festival(9,28,"孔子诞辰"),
 
-            Festival(10,1,"国庆节 国际音乐节 国际老人节", true),
+            Festival(10,1, arrayOf("国庆节", "国际音乐节", "国际老人节"), true),
             Festival(10,2,"国际减轻自然灾害日"),
             Festival(10,4,"世界动物日"),
             Festival(10,7,"国际住房日"),
-            Festival(10,8,"世界视觉日 全国高血压日"),
+            Festival(10,8, arrayOf("世界视觉日", "全国高血压日")),
             Festival(10,9,"世界邮政日"),
-            Festival(10,10,"辛亥革命纪念日 世界精神卫生日"),
+            Festival(10,10, arrayOf("辛亥革命纪念日", "世界精神卫生日")),
             Festival(10,15,"国际盲人节"),
             Festival(10,16,"世界粮食节"),
             Festival(10,17,"世界消除贫困日"),
@@ -262,7 +299,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
             Festival(12,20,"澳门回归纪念日"),
             Festival(12,21,"国际篮球日"),
             Festival(12,24,"平安夜"),
-            Festival(12,25,"圣诞节 世界强化免疫日"),
+            Festival(12,25, arrayOf("圣诞节", "世界强化免疫日")),
             Festival(12,26,"毛泽东诞辰")
         )
         //农历节日
@@ -281,7 +318,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
             Festival(4,4,"寒食节"),
             Festival(4,8,"佛诞节 "),
             Festival(5,5,"端午节",true),
-            Festival(6,6,"天贶节 姑姑节"),
+            Festival(6,6, arrayOf("天贶节", "姑姑节")),
             Festival(6,24,"彝族火把节"),
             Festival(7,7,"七夕节"),
             Festival(7,14,"鬼节(南方)"),
@@ -291,7 +328,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
             Festival(9,9,"重阳节"),
             Festival(10,1,"祭祖节"),
             Festival(11,17,"阿弥陀佛圣诞"),
-            Festival(12,8,"腊八节 释迦如来成道日"),
+            Festival(12,8, arrayOf("腊八节", "释迦如来成道日")),
             Festival(12,23,"过小年"),
             Festival(12,29,"腊月二十九",true),
             Festival(1,0,"除夕",true)
@@ -357,7 +394,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
          */
         fun getCalendar(timestamp: Long): Element {
             // 更新时间戳
-            staticCalendar.timeInMillis = timestamp
+            staticCalendar.timeInMillis = timestamp + (1000 * 60 * 60 * 8)
             // 得到对应的年月
             val year = staticCalendar.get(Calendar.YEAR)
             val month = staticCalendar.get(Calendar.MONTH)
@@ -532,6 +569,44 @@ class LunarCalendar private constructor(private val year: Int, private val month
             return Animals[(year - 1900) % Animals.size]
         }
 
+        /**
+         * 将文本竖起来的方法
+         */
+        fun stringToVertical(value: String, maxLines: Int): String {
+            val valueLength = value.length
+            if (valueLength < 2 || maxLines < 2) {
+                return value
+            }
+            val builder = StringBuilder()
+            var colCount: Int
+            var lineCount: Int = maxLines
+            if (valueLength <= maxLines) {
+                colCount = 1
+                lineCount = valueLength
+            } else {
+                colCount = valueLength / maxLines
+                if (colCount * maxLines < valueLength) {
+                    colCount++
+                }
+            }
+            for (line in 0 until lineCount) {
+                for (col in 0 until colCount) {
+                    val index = col * maxLines + line
+                    if (index >= valueLength) {
+                        if (line < lineCount - 1) {
+                            builder.append("\n")
+                        }
+                        break
+                    }
+                    builder.append(value[index])
+                    if (col == colCount - 1 && line < lineCount - 1) {
+                        builder.append("\n")
+                    }
+                }
+            }
+            return builder.toString()
+        }
+
     }
 
     /**
@@ -601,7 +676,6 @@ class LunarCalendar private constructor(private val year: Int, private val month
         // 当月一日与 1900/1/1 相差天数
         // 1900/1/1与 1970/1/1 相差25567日, 1900/1/1 日柱为甲戌日(60进制10)
         calendar.set(year, month, 1, 0, 0, 0)
-        val t = calendar.timeInMillis
         val dayCyclical = calendar.timeInMillis / 86400000 + 25567 + 10
         for (i in 0 until this.length) {
             if (lD > lX) {
@@ -658,7 +732,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
         for (sf in sFtv) {
             if (sf.month == month + 1) {
                 val element = elementArray[sf.day - 1]
-                element.solarFestival.add(sf.name)
+                element.solarFestival.addAll(sf.name)
                 if (sf.isHoliday) {
                     element.holiday = true
                 }
@@ -675,7 +749,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
                 tmp2 = lDPOS[tmp1] + lf.day - 1
                 if (tmp2 >= 0 && tmp2 < this.length) {
                     val element = elementArray[tmp2]
-                    element.lunarFestival.add(lf.name)
+                    element.lunarFestival.addAll(lf.name)
                     if (lf.isHoliday) {
                         element.holiday = true
                     }
@@ -925,8 +999,10 @@ class LunarCalendar private constructor(private val year: Int, private val month
 
     }
 
-    private data class Festival(val month: Int, val day: Int,
-                                val name: String, val isHoliday: Boolean = false)
+    private class Festival(val month: Int, val day: Int,
+                                val name: Array<String>, val isHoliday: Boolean = false) {
+        constructor(month: Int, day: Int, name: String, isHoliday: Boolean = false): this(month, day, arrayOf(name), isHoliday)
+    }
 
     /**
      * 择日数据类
