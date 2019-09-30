@@ -6,10 +6,18 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import androidx.core.widget.NestedScrollView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.flexbox.FlexboxLayoutManager
 import kotlinx.android.synthetic.main.activity_lunar.*
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.bean.LunarAuspiciousDayInfo
 import liang.lollipop.electronicclock.bean.LunarFestivalInfo
+import liang.lollipop.electronicclock.list.LunarAuspiciousDayAdapter
+import liang.lollipop.electronicclock.list.LunarFestivalAdapter
 import liang.lollipop.electronicclock.utils.LunarCalendar
+import liang.lollipop.electronicclock.utils.getPreferences
+import liang.lollipop.electronicclock.utils.putPreferences
 import liang.lollipop.widget.utils.Utils
 
 /**
@@ -27,6 +35,8 @@ class LunarActivity : DialogActivity() {
 
     companion object {
         private const val ARG_TIME = "ARG_TIME"
+
+        private const val FIRST_SHOW = "LUNAR_ACTIVITY_FIRST_SHOW"
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
@@ -43,6 +53,16 @@ class LunarActivity : DialogActivity() {
         isPortrait = this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         initView()
         initData()
+        if (getPreferences(FIRST_SHOW, true)) {
+            alert {
+                setMessage(R.string.lunar_hint)
+                setPositiveButton(R.string.enter) { dialog, _ ->
+                    putPreferences(FIRST_SHOW, false)
+                    dialog.dismiss()
+                }
+                show()
+            }
+        }
     }
 
     private fun initView() {
@@ -75,21 +95,44 @@ class LunarActivity : DialogActivity() {
         runView.visibility = if (calendar.isLeap) { View.VISIBLE } else { View.GONE }
         // 公元历显示
         dateView.text = "${calendar.sYear}-${calendar.sMonth}-${calendar.sDay}"
+        // 显示八字
+        cnCharacterView.text = "${calendar.cYear}(${calendar.animals})年 ${calendar.cMonth}月 ${calendar.cDay}日"
+        // 显示节假日
+        val festivalData = ArrayList<LunarFestivalInfo>()
+        for (f in calendar.solarFestival) {
+            festivalData.add(LunarFestivalInfo(f))
+        }
+        for (f in calendar.lunarFestival) {
+            festivalData.add(LunarFestivalInfo(f, LunarFestivalInfo.TYPE_LUNAR))
+        }
+        if (festivalData.isEmpty()) {
+            festivalCard.visibility = View.GONE
+        } else {
+            festivalCard.visibility = View.VISIBLE
+            festivalList.layoutManager = FlexboxLayoutManager(this)
+            festivalList.adapter = LunarFestivalAdapter(festivalData, layoutInflater)
+            festivalList.adapter?.notifyDataSetChanged()
+        }
         // 黄历显示
         val auspiciousDay = calendar.auspiciousDay
         auspiciousKeyView.text = auspiciousDay.key
         auspiciousDetailView.text = auspiciousDay.detail
-        // 显示八字
-        cnCharacterView.text = "${calendar.cYear}(${calendar.animals})年 ${calendar.cMonth}月 ${calendar.cDay}日"
-        // 显示节假日
-        val festivalList = ArrayList<LunarFestivalInfo>()
-        for (f in calendar.solarFestival) {
-            festivalList.add(LunarFestivalInfo(f))
+
+        auspiciousIconView.visibility = if (auspiciousDay.type > 1) { View.VISIBLE } else { View.GONE }
+
+        val matterData = ArrayList<LunarAuspiciousDayInfo>()
+        for (name in auspiciousDay.matter) {
+            matterData.add(LunarAuspiciousDayInfo(name))
         }
-        for (f in calendar.lunarFestival) {
-            festivalList.add(LunarFestivalInfo(f, LunarFestivalInfo.TYPE_LUNAR))
+        auspiciousList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        auspiciousList.adapter = LunarAuspiciousDayAdapter(matterData, layoutInflater)
+
+        val tabooData = ArrayList<LunarAuspiciousDayInfo>()
+        for (name in auspiciousDay.taboo) {
+            tabooData.add(LunarAuspiciousDayInfo(name))
         }
-//        festivalList.
+        fierceList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        fierceList.adapter = LunarAuspiciousDayAdapter(tabooData, layoutInflater)
     }
 
 }
