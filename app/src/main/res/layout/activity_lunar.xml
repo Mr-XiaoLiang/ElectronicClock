@@ -65,6 +65,21 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintBottom_toBottomOf="@id/headerBottom" />
 
+        <liang.lollipop.electronicclock.view.CirclePointView
+                android:id="@+id/auspiciousIconView"
+                android:visibility="invisible"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="@string/auspicious"
+                android:textSize="10dp"
+                android:textColor="#FFD500"
+                android:gravity="center"
+                android:background="#F02727"
+                android:layout_marginLeft="10dp"
+                app:layout_constraintLeft_toRightOf="@id/cnCharacterView"
+                app:layout_constraintTop_toTopOf="@id/cnCharacterView"
+                app:layout_constraintBottom_toBottomOf="@id/cnCharacterView"/>
+
         <TextView
                 android:id="@+id/cnDayView"
                 android:layout_width="wrap_content"
