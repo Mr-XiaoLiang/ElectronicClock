@@ -33,7 +33,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="2019-09-29"
                 android:textSize="18sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/topBounds" />
@@ -43,7 +42,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:alpha="0.2"
-                android:text="冬"
                 android:textSize="120sp"
                 android:layout_marginLeft="20dp"
                 app:layout_constraintLeft_toLeftOf="@id/cnDayView"
@@ -59,12 +57,26 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintBottom_toBottomOf="@id/headerBottom" />
 
+        <liang.lollipop.electronicclock.view.CirclePointView
+                android:id="@+id/auspiciousIconView"
+                android:visibility="invisible"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:text="@string/auspicious"
+                android:textSize="10dp"
+                android:textColor="#FFD500"
+                android:gravity="center"
+                android:background="#F02727"
+                android:layout_marginLeft="10dp"
+                app:layout_constraintLeft_toRightOf="@id/cnCharacterView"
+                app:layout_constraintTop_toTopOf="@id/cnCharacterView"
+                app:layout_constraintBottom_toBottomOf="@id/cnCharacterView"/>
+
         <TextView
                 android:id="@+id/runView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:alpha="0.2"
-                android:text="@string/run"
                 android:textSize="30sp"
                 app:layout_constraintRight_toRightOf="@id/cnMonthView"
                 app:layout_constraintTop_toBottomOf="@id/cnMonthView" />
@@ -74,7 +86,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
-                android:text="春分"
                 android:textSize="40sp"
                 app:layout_constraintBottom_toBottomOf="@id/headerBottom"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -85,7 +96,6 @@
                 android:id="@+id/cnDayView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="廿一"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="@id/headerBottom"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -146,7 +156,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.3"
-                            android:text="成"
                             android:textSize="40sp"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -155,7 +164,6 @@
                             android:id="@+id/auspiciousDetailView"
                             android:layout_width="0px"
                             android:layout_height="0px"
-                            android:text="成功、天帝纪万物成就的大吉日子，凡事皆顺"
                             android:textSize="14sp"
                             android:layout_marginLeft="10dp"
                             android:gravity="center_vertical"
