@@ -89,4 +89,7 @@
     <string name="run" translatable="false">闰</string>
     <string name="suitable" translatable="false">宜</string>
     <string name="taboo" translatable="false">忌</string>
+
+    <string name="lunar_hint">Hint: Because the lunar calendar belongs to China\'s unique calendar and calculation rules. Including the national cultural connotation, simple translation cannot express the meaning clearly and accurately. Therefore, the part of the lunar calendar is not translated. At the same time, due to the special calendar, the time zone is locked into the Chinese time zone. Please understand that the trouble caused by this. </string>
+    <string name="auspicious" translatable="false">吉</string>
 </resources>
