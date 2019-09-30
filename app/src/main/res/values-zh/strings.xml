@@ -85,4 +85,6 @@
     <string name="summary_animation_delay">显示动画效果的间隔时间</string>
     <string name="dialog_message_on_info_change">小部件的偏好设置发生变化，是否重新加载？</string>
     <string name="saved">已保存</string>
+
+    <string name="lunar_hint">提示：由于黄历属于中国特有的历法和计算规则。包含了民族文化内涵在内，简单的翻译无法清晰准确的表达涵义，因此，农历展示部分不做翻译处理。同时由于特殊历法的原因，时区被锁定为中国时区。对此造成的困扰，请谅解。</string>
 </resources>
