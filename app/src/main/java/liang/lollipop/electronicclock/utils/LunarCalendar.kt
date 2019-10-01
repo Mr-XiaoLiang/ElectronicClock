@@ -201,6 +201,124 @@ class LunarCalendar private constructor(private val year: Int, private val month
             arrayOf("奎", "胄", "毕", "参", "鬼", "星", "轸", "氐", "心", "箕", "虚", "室")
         )
 
+        /**
+         * 星宿的描述信息
+         */
+        private val cnStarInfo = arrayOf(
+            // 东方苍龙
+            ChineseStar("角", "东方苍龙", "属木，为蛟",
+                "为东方七宿之首，有两颗星如苍龙的两角。龙角，乃斗杀之首冲，故多凶",
+                arrayOf("角宿值日不非轻", "祭祀婚姻事不成", "埋葬若还逢此日", "三年之内有灾惊")),
+            ChineseStar("亢", "东方苍龙", "属金，为龙",
+                "是东方第二宿，为苍龙的颈。龙颈，有龙角之护卫，变者带动全身，故多吉",
+                arrayOf("亢宿之星事可求", "婚姻祭祀有来头", "葬埋必出有官贵", "开门放水出公侯")),
+            ChineseStar("氐", "东方苍龙", "属土，为貉",
+                "氐，为根为本，如木之有根始能往上支天柱、往下扎深根，但当其根露现时即是冬寒草木枯黄之时。" +
+                        "《史记》记载：“氐，东方之宿，氐者言万物皆至也。”氐宿是东方第三宿，为苍龙之胸，" +
+                        "万事万物皆了然于心。龙胸，乃龙之中心要害，重中之重，故多吉",
+                arrayOf("氐宿之星吉庆多", "招得横财贺有功", "葬埋若还逢此日", "一年之内进钱财")),
+            ChineseStar("房", "东方苍龙", "为日，为兔",
+                "为东方第四宿，为苍龙腹房，古人也称之为“天驷”，取龙为天马和房宿有四颗星之意。" +
+                        "龙腹，五脏之所在，万物在这里被消化，故多凶",
+                arrayOf("房宿值日事难成", "办事多半不吉庆", "葬埋多有不吉利", "起造三年有灾殃")),
+            ChineseStar("心", "东方苍龙", "为月，为狐",
+                "为东方第五宿，为苍龙腰部。心为火，是夏季第一个月应候的星宿，常和房宿连用，" +
+                        "用来论述“中央支配四方”。龙腰，肾脏之所在，新陈代谢的源泉，不可等闲视之，故多凶",
+                arrayOf("心宿恶星元非横", "起造男女事有伤", "坟葬不可用此日", "三年之内见瘟亡")),
+            ChineseStar("尾", "东方苍龙", "属火，为虎",
+                "为东方第六宿，尾宿九颗星形成苍龙之尾。龙尾，是斗杀中最易受到攻击部位，故多凶",
+                arrayOf("尾宿之日不可求", "一切兴工有犯仇", "若是婚姻用此日", "三年之内有悲哀")),
+            ChineseStar("箕", "东方苍龙", "属水，为豹",
+                "为东方最后一宿，为龙尾摆动所引发之旋风。故箕宿好风，一旦特别明亮就是起风的预兆，" +
+                        "因此又代表好调弄是非的人物、主口舌之象，故多凶",
+                arrayOf("箕宿值日害男女", "官非口舌入门来", "一切修造不用利", "婚姻孤独守空房")),
+
+            // 北方玄武
+            ChineseStar("斗", "北方玄武", "属水，为獬",
+                "为北方之首宿，因其星群组合状如斗而得名，古人又称“天庙”，是属于天子的星。" +
+                        "天子之星常人是不可轻易冒犯的，故多凶",
+                arrayOf("斗宿值日不吉良", "婚姻祭祀不吉昌", "葬埋不可用此日", "百般万事有灾殃")),
+            ChineseStar("牛", "北方玄武", "属金，为牛",
+                "为北方第二宿，因其星群组合如牛角而得名，其中最著名的是织女与牵牛星，虽然牛郎与" +
+                        "织女的忠贞爱情能让数代人倾心感动，然最终还是无法逃脱悲剧性的结局，故牛宿多凶",
+                arrayOf("牛宿值日利不多", "一切修造事灾多", "葬埋修造用此日", "卖尽田庄不记丘")),
+            ChineseStar("女", "北方玄武", "属土，为蝠",
+                "为北方第三宿，其星群组合状如箕，亦似“女”字，古时妇女常用簸箕颠簸五谷，" +
+                        "去弃糟粕留取精华，故女宿多吉",
+                arrayOf("女宿值日吉庆多", "起造兴工事事昌", "葬埋婚姻用此日", "三年之内进田庄")),
+            ChineseStar("虚", "北方玄武", "为日，为鼠",
+                "为北方第四宿，古人称为“天节”。当半夜时虚宿居于南中正是冬至的节令。" +
+                        "冬至一阳初生，为新的一年即将开始，如同子时一阳初生意味着新的一天开始一样，" +
+                        "给人以美好的期待和希望，故虚宿多吉",
+                arrayOf("虚宿值日吉庆多", "祭祀婚姻大吉昌", "埋葬若还逢此日", "一年之内进钱财")),
+            ChineseStar("危", "北方玄武", "为月，为燕",
+                "为北方第五宿，居龟蛇尾部之处，故此而得名“危”（战斗中，断后者常常有危险）。" +
+                        "危者，高也，高而有险，故危宿多凶",
+                arrayOf("危宿值日不多吉", "灾祸必定注瘟亡", "一切修营尽不利", "灾多吉少事成灾")),
+            ChineseStar("室", "北方玄武", "属火，为猪",
+                "为北方第六宿，因其星群组合象房屋状而得名“室”（象一所覆盖龟蛇之上的房子），" +
+                        "房屋乃居住之所，人之所需，故室宿多吉",
+                arrayOf("室宿值日大吉利", "婚姻祭祀主恩荣", "葬埋苦还逢此日", "三年必定进田庄")),
+            ChineseStar("壁", "北方玄武", "属水，为貐",
+                "为北方第七宿，居室宿之外，形如室宿的围墙，故此而得名“壁”。墙壁，乃家园之屏障，故壁宿多吉",
+                arrayOf("壁宿之星好利宜", "祭祀兴工吉庆多", "修造安门逢此日", "三朝七日进钱财")),
+
+            // 西方白虎
+            ChineseStar("奎", "西方白虎", "属木，为狼",
+                "为西方第一宿，有天之府库的意思，故奎宿多吉",
+                arrayOf("奎宿值日好安营", "一切修造大吉昌", "葬埋婚姻用此日", "朝朝日日进田庄")),
+            ChineseStar("娄", "西方白虎", "属金，为狗",
+                "为西方第二宿，娄，同“屡”，有聚众的含意，也有牧养众畜以供祭祀的意思，故娄宿多吉",
+                arrayOf("娄宿之星吉庆多", "婚姻祭祀主荣华", "开门放水用此日", "三年之内主官班")),
+            ChineseStar("胃", "西方白虎", "属土，为雉",
+                "为西方第三宿，如同人体胃之作用一样，胃宿就象天的仓库屯积粮食，故胃宿多吉",
+                arrayOf("胃宿修造事亨通", "祭祀婚姻贺有功", "葬埋若还逢此日", "田园五谷大登丰")),
+            ChineseStar("昴", "西方白虎", "为日，为鸡",
+                "为西方第四宿，居白虎七宿的中央，在古文中西从卯，西为秋门，一切已收获入内，" +
+                        "该是关门闭户的时候了，故昴宿多凶",
+                arrayOf("昴宿值日有灾殃", "凶多吉少不寻常", "一切兴工多不利", "朝朝日日有瘟伤")),
+            ChineseStar("毕", "西方白虎", "为月，为鸟",
+                "为西方第五宿，又名“罕车”，相当于边境的军队，又“毕”有“完全”之意，故毕宿多吉",
+                arrayOf("毕宿造作主兴隆", "祭祀开门吉庆多", "一切修造主大旺", "钱财牛马满山川")),
+            ChineseStar("觜", "西方白虎", "属火，为猴",
+                "为西方第六宿，居白虎之口，口福之象征，故觜宿多吉",
+                arrayOf("觜宿值日主吉良", "埋葬修造主荣昌", "若是婚姻用此日", "三年之内降麒麟")),
+            ChineseStar("参", "西方白虎", "属水，为猿",
+                "为西方第七宿，居白虎之前胸，虽居七宿之末但为最要害部位，故参宿多吉",
+                arrayOf("参宿造作事兴隆", "富贵荣华胜石崇", "葬埋婚姻多吉庆", "衣粮牛马满家中")),
+
+            // 南方朱雀
+            ChineseStar("井", "南方朱雀", "属水，为犴",
+                "为南方第一宿，其组合星群状如网，由此而得名“井”（井字如网状）。井宿就象一张迎头之网，" +
+                        "又如一片无底汪洋（请参阅神话传说中的“精卫填海”故事），故井宿多凶",
+                arrayOf("井宿值日事无通", "凶多吉少有瘟灾", "一切所求皆不利", "钱财耗散百灾非")),
+            ChineseStar("鬼", "南方朱雀", "属金，为羊",
+                "为南方第二宿，犹如一顶戴在朱雀头上的帽子，鸟类在受到惊吓时头顶羽毛成冠状，" +
+                        "人们把最害怕而又并不存在的东西称作“鬼”，鬼宿因此而得名，主惊吓，故多凶",
+                arrayOf("鬼宿值日不非轻", "一切所求事有惊", "买卖求财都不利", "家门灾祸散零丁")),
+            ChineseStar("柳", "南方朱雀", "属土，为獐",
+                "为南方第三宿，居朱雀之嘴，其状如柳叶（鸟类嘴之形状大多如此），嘴为进食之用，故柳宿多吉",
+                arrayOf("柳宿修造主钱财", "富贵双全入家来", "葬埋婚姻用此日", "多招福禄主荣昌")),
+            ChineseStar("星", "南方朱雀", "为日，为马",
+                "为南方第四宿，居朱雀之目，鸟类的眼睛多如星星般明亮，故由此而得名“星”。" +
+                        "俗话说“眼里不揉沙子”，故星宿多凶",
+                arrayOf("星宿值日有悲哀", "凶多吉少有横灾", "一切兴工都不利", "家门灾祸起重重")),
+            ChineseStar("张", "南方朱雀", "为月，为鹿",
+            "为南方第五宿，居朱雀身体与翅膀连接处，翅膀张开才意味着飞翔，民间常有“开张大吉”等说法，故张宿多吉",
+            arrayOf("张宿之星大吉昌", "祭祀婚姻日久长", "葬埋兴工用此日", "三年官禄进朝堂")),
+            ChineseStar("翼", "南方朱雀", "属火，为蛇",
+                "为南方第六宿，居朱雀之翅膀之位，故而得名“翼”，鸟有了翅膀才能腾飞，翼宿多吉",
+                arrayOf("翼宿值日主吉祥", "年年进禄入门堂", "一切兴工有利益", "子孙富贵置田庄")),
+            ChineseStar("轸", "南方朱雀", "属水，为蚓",
+                "为南方第七宿，居朱雀之尾，鸟儿的尾巴是用来掌握方向的。古代称车箱底部后面的横木为“轸”，" +
+                        "其部位与轸宿居朱雀之位相当，故此而得名。轸宿古称“天车”，“轸”有悲痛之意，故轸宿多凶",
+                arrayOf("轸宿凶星不敢当", "人离财散有消亡", "葬埋婚姻皆不利", "朝朝日日有惊慌"))
+        )
+
+        private val unknownChineseStar = ChineseStar("无", "方位不明", "属相不明",
+            "找不到对应的天象",
+            arrayOf())
+
         //公历节日
         private val sFtv = arrayOf(
             Festival(1,1,"元旦", true),
@@ -567,6 +685,25 @@ class LunarCalendar private constructor(private val year: Int, private val month
          */
         private fun getAnimals(year: Int): String {
             return Animals[(year - 1900) % Animals.size]
+        }
+
+        /**
+         * 获取星宿的key
+         */
+        private fun getCnStar(lMonth: Int, lDay: Int): String {
+            return cnStar[lDay - 1][lMonth - 1]
+        }
+
+        /**
+         * 获取星宿信息的描述
+         */
+        private fun getCnStarInfoByKey(key: String): ChineseStar {
+            for (star in cnStarInfo) {
+                if (star.key == key) {
+                    return star
+                }
+            }
+            return unknownChineseStar
         }
 
         /**
@@ -959,6 +1096,11 @@ class LunarCalendar private constructor(private val year: Int, private val month
         var animals = ""
             private set
 
+        /**
+         * 星宿信息
+         */
+        var cnStar: ChineseStar = unknownChineseStar
+
         fun reset(sYear: Int, sMonth: Int, sDay: Int, week: String,
                   lYear: Int, lMonth: Int, lDay: Int, isLeap: Boolean,
                   cYear: String, cMonth: String, cDay: String) {
@@ -984,18 +1126,11 @@ class LunarCalendar private constructor(private val year: Int, private val month
             this.lunarFestival.clear()
             this.solarFestival.clear()
             this.solarTerms = ""
+            // 生肖
             this.animals = getAnimals(sYear)
+            // 星宿
+            this.cnStar = getCnStarInfoByKey(getCnStar(lMonth, lDay))
         }
-
-        override fun toString(): String {
-            return "Element(sYear=$sYear, sMonth=$sMonth, sDay=$sDay, week='$week', lYear=$lYear, " +
-                    "lMonth=$lMonth, lDay=$lDay, lMonthChinese='$lMonthChinese', " +
-                    "lDayChinese='$lDayChinese', isLeap=$isLeap, cYear='$cYear', cMonth='$cMonth', " +
-                    "cDay='$cDay', isToday=$isToday, lunarFestival=$lunarFestival, " +
-                    "solarFestival=$solarFestival, solarTerms='$solarTerms', sgz5='$sgz5', " +
-                    "auspiciousDay=$auspiciousDay, sgz3='$sgz3', holiday=$holiday, animals='$animals')"
-        }
-
 
     }
 
@@ -1035,6 +1170,37 @@ class LunarCalendar private constructor(private val year: Int, private val month
             result = 31 * result + matter.contentHashCode()
             result = 31 * result + taboo.contentHashCode()
             result = 31 * result + type
+            return result
+        }
+    }
+
+    /**
+     * 星宿的信息
+     */
+    data class ChineseStar(val key: String, val group: String,
+                           val kind: String, val detail: String,
+                           val inscription: Array<String>) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as ChineseStar
+
+            if (key != other.key) return false
+            if (group != other.group) return false
+            if (kind != other.kind) return false
+            if (detail != other.detail) return false
+            if (!inscription.contentEquals(other.inscription)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = key.hashCode()
+            result = 31 * result + group.hashCode()
+            result = 31 * result + kind.hashCode()
+            result = 31 * result + detail.hashCode()
+            result = 31 * result + inscription.contentHashCode()
             return result
         }
     }

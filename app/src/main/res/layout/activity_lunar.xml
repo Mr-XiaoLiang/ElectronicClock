@@ -156,7 +156,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:alpha="0.3"
-                            android:text="成"
                             android:textSize="40sp"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -165,7 +164,6 @@
                             android:id="@+id/auspiciousDetailView"
                             android:layout_width="0px"
                             android:layout_height="0px"
-                            android:text="成功、天帝纪万物成就的大吉日子，凡事皆顺"
                             android:textSize="14sp"
                             android:layout_marginLeft="10dp"
                             android:gravity="center_vertical"
@@ -217,6 +215,81 @@
                             android:layout_marginLeft="10dp"
                             android:layout_width="0px"
                             android:layout_height="70dp"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </FrameLayout>
+
+            <FrameLayout
+                    android:background="@drawable/bg_black"
+                    android:id="@+id/cnStarCard"
+                    app:layout_constraintTop_toBottomOf="@id/festivalCard"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:padding="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:padding="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                    <TextView
+                            android:id="@+id/cnStarKeyView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.3"
+                            android:textSize="40sp"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                            android:id="@+id/cnStarGroupView"
+                            android:layout_width="0px"
+                            android:layout_height="0px"
+                            android:textSize="14sp"
+                            android:layout_marginLeft="10dp"
+                            android:gravity="center_vertical"
+                            app:layout_constraintLeft_toRightOf="@id/cnStarKeyView"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toTopOf="@id/cnStarKindView"
+                            app:layout_constraintTop_toTopOf="@id/cnStarKeyView" />
+
+                    <TextView
+                            android:id="@+id/cnStarKindView"
+                            android:layout_width="0px"
+                            android:layout_height="0px"
+                            android:textSize="14sp"
+                            android:gravity="center_vertical"
+                            app:layout_constraintLeft_toLeftOf="@id/cnStarGroupView"
+                            app:layout_constraintRight_toRightOf="@id/cnStarGroupView"
+                            app:layout_constraintBottom_toBottomOf="@id/cnStarKeyView"
+                            app:layout_constraintTop_toBottomOf="@id/cnStarGroupView" />
+
+                    <TextView
+                            android:id="@+id/cnStarInscriptionView"
+                            android:layout_width="0px"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:gravity="center"
+                            android:layout_marginTop="10dp"
+                            app:layout_constraintLeft_toLeftOf="@id/cnStarKeyView"
+                            app:layout_constraintRight_toRightOf="@id/cnStarGroupView"
+                            app:layout_constraintTop_toBottomOf="@id/cnStarKindView" />
+
+                    <TextView
+                            android:id="@+id/cnStarInfoView"
+                            android:layout_width="0px"
+                            android:layout_height="wrap_content"
+                            android:textSize="14sp"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="10dp"
+                            app:layout_constraintLeft_toLeftOf="@id/cnStarKeyView"
+                            app:layout_constraintRight_toRightOf="@id/cnStarGroupView"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/cnStarInscriptionView" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

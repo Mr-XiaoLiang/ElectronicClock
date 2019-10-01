@@ -34,6 +34,8 @@ open class BaseActivity: AppCompatActivity() {
     protected var isFullScreen = false
         private set
 
+    protected var isPaddingToolbarWithInset = true
+
     protected val broadcastHelper: BroadcastHelper by lazy {
         BroadcastHelper.create{ action, intent ->
             onReceive(action, intent)
@@ -123,6 +125,9 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     private fun whenDisplayCutout(leftInset: Int, statusBarHeight: Int, rightInset: Int) {
+        if (!isPaddingToolbarWithInset) {
+            return
+        }
         val toolBar = lToolbar?:return
         when(val layoutParams = toolBar.layoutParams?:return) {
             is CoordinatorLayout.LayoutParams -> {
