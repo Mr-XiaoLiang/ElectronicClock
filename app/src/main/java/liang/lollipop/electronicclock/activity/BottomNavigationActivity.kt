@@ -36,6 +36,7 @@ open class BottomNavigationActivity: BaseActivity() {
         if (layoutId != 0) {
             setContentView(layoutId)
             if (layoutId == DEF_LAYOUT_ID) {
+                isPaddingToolbarWithInset = false
                 transparentSystemUI()
                 initInsetListener(rootGroup)
                 bindToolBar(appBarLayout)

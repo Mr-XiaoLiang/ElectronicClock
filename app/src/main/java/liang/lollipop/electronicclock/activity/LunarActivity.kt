@@ -18,7 +18,6 @@ import liang.lollipop.electronicclock.list.LunarFestivalAdapter
 import liang.lollipop.electronicclock.utils.LunarCalendar
 import liang.lollipop.electronicclock.utils.getPreferences
 import liang.lollipop.electronicclock.utils.putPreferences
-import liang.lollipop.widget.utils.Utils
 
 /**
  * 黄历，农历的Activity
@@ -31,12 +30,14 @@ class LunarActivity : DialogActivity() {
 
     private var isPortrait = true
 
-    private val logger = Utils.loggerI("LunarActivity")
+//    private val logger = Utils.loggerI("LunarActivity")
 
     companion object {
         private const val ARG_TIME = "ARG_TIME"
 
         private const val FIRST_SHOW = "LUNAR_ACTIVITY_FIRST_SHOW"
+
+
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
@@ -133,6 +134,21 @@ class LunarActivity : DialogActivity() {
         }
         fierceList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         fierceList.adapter = LunarAuspiciousDayAdapter(tabooData, layoutInflater)
+
+        // 星宿展示
+        val cnStar = calendar.cnStar
+        cnStarKeyView.text = cnStar.key
+        cnStarGroupView.text = cnStar.group
+        cnStarKindView.text = cnStar.kind
+        cnStarInfoView.text = cnStar.detail
+        val cnStarInscriptionBuilder = StringBuilder()
+        for (index in cnStar.inscription.indices) {
+            if (index != 0) {
+                cnStarInscriptionBuilder.append("\n")
+            }
+            cnStarInscriptionBuilder.append(cnStar.inscription[index])
+        }
+        cnStarInscriptionView.text = cnStarInscriptionBuilder.toString()
     }
 
 }
