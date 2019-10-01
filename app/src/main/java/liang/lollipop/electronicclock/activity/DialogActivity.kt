@@ -16,6 +16,7 @@ open class DialogActivity: BaseActivity() {
 
     companion object {
         private const val DEF_LAYOUT_ID = R.layout.activity_dialog
+        protected const val TRANSITION_NAME = "DIALOG_BODY"
     }
 
     protected open val contentViewId = 0
