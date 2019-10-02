@@ -506,13 +506,15 @@ class LunarCalendar private constructor(private val year: Int, private val month
             return newCalendar
         }
 
+        private const val ONE_DAY = 1000L * 60 * 60 * 8
+
         /**
          * 获取日期信息的方法
          * 获取某一天的农历
          */
         fun getCalendar(timestamp: Long): Element {
             // 更新时间戳
-            staticCalendar.timeInMillis = timestamp + (1000 * 60 * 60 * 8)
+            staticCalendar.timeInMillis = timestamp + ONE_DAY
             // 得到对应的年月
             val year = staticCalendar.get(Calendar.YEAR)
             val month = staticCalendar.get(Calendar.MONTH)
@@ -909,8 +911,12 @@ class LunarCalendar private constructor(private val year: Int, private val month
         }
 
         //今日
-        calendar
-        //if (y == tY && m == tM) this[tD - 1].isToday = true;
+        calendar.timeInMillis = System.currentTimeMillis() + ONE_DAY
+        if (year == calendar.get(Calendar.YEAR) &&
+                month == calendar.get(Calendar.MONTH)) {
+            val index = calendar.get(Calendar.DAY_OF_MONTH) - 1
+            elementArray[index].isToday = true
+        }
     }
 
     private class Easter constructor(y: Int, calendar: Calendar) {
@@ -1069,7 +1075,6 @@ class LunarCalendar private constructor(private val year: Int, private val month
         var cDay: String = ""
         /** 今天 **/
         var isToday = false
-            private set
         /** 农历节日 **/
         val lunarFestival = ArrayList<String>()
         /** 公元历节日 **/
