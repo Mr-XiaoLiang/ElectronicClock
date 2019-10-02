@@ -1106,6 +1106,14 @@ class LunarCalendar private constructor(private val year: Int, private val month
          */
         var cnStar: ChineseStar = unknownChineseStar
 
+        /**
+         * 是否是吉日
+         */
+        val isAuspiciousDay: Boolean
+            get() {
+                return auspiciousDay.type > 1
+            }
+
         fun reset(sYear: Int, sMonth: Int, sDay: Int, week: String,
                   lYear: Int, lMonth: Int, lDay: Int, isLeap: Boolean,
                   cYear: String, cMonth: String, cDay: String) {
