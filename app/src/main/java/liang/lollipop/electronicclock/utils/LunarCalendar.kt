@@ -490,6 +490,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
         /**
          * 获取日期信息的方法
          * 获取某一个月的农历
+         * @param month [0~11]
          */
         fun getCalendar(year: Int, month: Int): LunarCalendar {
             // 生成月历对应的key
@@ -509,6 +510,18 @@ class LunarCalendar private constructor(private val year: Int, private val month
         private const val ONE_DAY = 1000L * 60 * 60 * 8
 
         /**
+         * 获取月份信息
+         */
+        fun getMonth(timestamp: Long, run: (year: Int, month: Int) -> Unit) {
+            // 更新时间戳
+            staticCalendar.timeInMillis = timestamp + ONE_DAY
+            // 得到对应的年月
+            val year = staticCalendar.get(Calendar.YEAR)
+            val month = staticCalendar.get(Calendar.MONTH)
+            run(year, month)
+        }
+
+        /**
          * 获取日期信息的方法
          * 获取某一天的农历
          */
@@ -519,7 +532,7 @@ class LunarCalendar private constructor(private val year: Int, private val month
             val year = staticCalendar.get(Calendar.YEAR)
             val month = staticCalendar.get(Calendar.MONTH)
             val day = staticCalendar.get(Calendar.DAY_OF_MONTH)
-            val lunarCalendar = getCalendar(year, month);
+            val lunarCalendar = getCalendar(year, month)
             return lunarCalendar.elementArray[day - 1]
         }
 
@@ -769,6 +782,9 @@ class LunarCalendar private constructor(private val year: Int, private val month
      */
     val firstWeek: Int
 
+    var today: Element? = null
+        private set
+
     init {
         // 设置为一个月的开始时间
         calendar.set(year, month, 1, 0, 0, 0)
@@ -916,6 +932,9 @@ class LunarCalendar private constructor(private val year: Int, private val month
                 month == calendar.get(Calendar.MONTH)) {
             val index = calendar.get(Calendar.DAY_OF_MONTH) - 1
             elementArray[index].isToday = true
+            today = elementArray[index]
+        } else {
+            today = null
         }
     }
 
