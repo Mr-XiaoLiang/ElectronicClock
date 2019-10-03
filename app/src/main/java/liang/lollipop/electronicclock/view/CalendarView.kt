@@ -12,7 +12,6 @@ import liang.lollipop.electronicclock.utils.LunarCalendar
 import kotlin.math.min
 
 
-
 /**
  * @author lollipop
  * @date 2019-10-01 23:42
@@ -27,6 +26,47 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
     private var onSizeChangeListener: ((view: CalendarView,
                                         w: Int, h: Int, oldw: Int, oldh: Int) -> Unit)? = null
 
+    private var year = 0
+    /**
+     * month = [0 ~ 11]
+     */
+    private var month = 0
+
+    /**
+     * 农历的日历
+     */
+    private var lunarCalendar: LunarCalendar? = null
+
+    /**
+     * 周的数量
+     */
+    private var weekSize = 0
+
+    /**
+     * 星期的view的高度
+     */
+    private var weekViewHeight = 0.6F
+
+    /**
+     * 每天的View
+     */
+    private val dayViewList = ArrayList<DayView>()
+
+    /**
+     * 星期的View
+     */
+    private val weekViewList = ArrayList<NumberPointIcon>()
+
+    /**
+     * 空的日期信息
+     */
+    private val emptyElement = LunarCalendar.Element()
+
+    /**
+     * 日历展示模式
+     */
+    var calendarType = Type.Month
+
     /**
      * 参数设置
      */
@@ -36,8 +76,177 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             notifyDataChange()
         }
 
+    init {
+        if (isInEditMode) {
+            LunarCalendar.getMonth(System.currentTimeMillis()) { year, month ->
+                dateChange(year, month)
+            }
+        }
+    }
+
+    /**
+     * 指定日历显示的时间
+     */
+    fun dateChange(year: Int, month: Int) {
+        this.year = year
+        this.month = month % 12
+        lunarCalendar = LunarCalendar.getCalendar(year, month)
+        onDataChange()
+    }
+
+
+
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (lunarCalendar == null || weekSize < 1) {
+            // 如果没有有效的数据，那么隐藏所有内容
+            for (i in 0 until childCount) {
+                getChildAt(i).visibility = View.GONE
+            }
+            return
+        }
+        // 排版
+        val left = paddingLeft
+        val top = paddingTop
+        val width = r - l - paddingLeft - paddingRight
+        val height = b - t - paddingTop - paddingBottom
+        when (calendarType) {
+            // 天模式下，只展示当天的信息，同时占满整个View
+            Type.Day -> {
+                val day = dayViewList[0]
+                day.element = lunarCalendar?.today?:emptyElement
+                layoutDayView(day, left, top,
+                    (left + width), (top + height))
+                for (week in weekViewList) {
+                    week.visibility = View.GONE
+                }
+                for (index in 1 until dayViewList.size) {
+                    dayViewList[index].visibility = View.GONE
+                }
+            }
+            // 星期模式，只展示一周的内容
+            Type.Week -> {
+                layoutByWeekType(left, top, width, height)
+            }
+            // 月模式，展示整月的数据
+            Type.Month -> {
+                layoutByMonthType(left, top, width, height)
+            }
+        }
+
+    }
+
+    private fun layoutByWeekType(left: Int, top: Int, width: Int, height: Int) {
+        val calendar = lunarCalendar?:return
+        // 每一天的View的尺寸
+        val dayWidth = width / 7F
+        val dayHeight = if (options.isShowWeek) {
+            height / (1 + weekViewHeight)
+        } else {
+            height * 1F
+        }
+        // 对星期进行排版
+        val weekHeight = layoutWeek(left, top, dayWidth, dayHeight)
+        // 对天进行排版
+        // 首先拿到开始的index
+        val startIndex = if (options.isStartingOnSunday) {
+            calendar.firstWeek
+        } else {
+            // 为了防止出现负数，做一点处理
+            (calendar.firstWeek + 7 - 1) % 7
+        }
+        val elementArray = calendar.elementArray
+        // 如果今天的不存在的，那么随便拿第一周就好了
+        val startElement = if (calendar.today != null) {
+            val todayIndex = elementArray.indexOf(calendar.today)
+            (todayIndex + startIndex) / 7 * 7
+        } else {
+            0
+        }
+        var x = left + dayWidth * startIndex
+        val y = weekHeight
+        for (index in 0 until (7 - startIndex)) {
+            val day = dayViewList[index]
+            day.element = elementArray[startElement + index]
+            layoutDayView(day, x.toInt(), y.toInt(),
+                (x + dayWidth).toInt(), (y + dayHeight).toInt())
+            x += dayWidth
+        }
+        for (index in (7 - startIndex) until dayViewList.size) {
+            dayViewList[index].visibility = View.GONE
+        }
+    }
+
+    private fun layoutByMonthType(left: Int, top: Int, width: Int, height: Int) {
+        val calendar = lunarCalendar?:return
+        // 每一天的View的尺寸
+        val dayWidth = width / 7F
+        val dayHeight = if (options.isShowWeek) {
+            height / (weekSize + weekViewHeight)
+        } else {
+            height * 1F / weekSize
+        }
+        // 对星期进行排版
+        val weekHeight = layoutWeek(left, top, dayWidth, dayHeight)
+        // 对天进行排版
+        // 首先拿到开始的index
+        val startIndex = if (options.isStartingOnSunday) {
+            calendar.firstWeek
+        } else {
+            // 为了防止出现负数，做一点处理
+            (calendar.firstWeek + 7 - 1) % 7
+        }
+        // 直接开始排版
+        val elementArray = calendar.elementArray
+        var x = left + dayWidth * startIndex
+        var y = weekHeight
+        for (index in elementArray.indices) {
+            val day = dayViewList[index]
+            day.element = elementArray[index]
+            layoutDayView(day, x.toInt(), y.toInt(),
+                (x + dayWidth).toInt(), (y + dayHeight).toInt())
+            if ((index + startIndex) % 7 == 0) {
+                x = left.toFloat()
+                y += dayHeight
+            } else {
+                x += dayWidth
+            }
+        }
+    }
+
+    private fun layoutWeek(left: Int, top: Int, dayWidth: Float, dayHeight: Float): Float {
+        // 如果显示星期的话，那么开始排版星期
+        if (options.isShowWeek) {
+            // 星期的View的尺寸
+            val weekHeight = dayHeight * weekViewHeight
+            var x = left.toFloat()
+            var weekNumber = if (options.isStartingOnSunday) { 0 } else { 1 }
+            val padding = (min(weekHeight, dayWidth) * 0.3F).toInt()
+            // 遍历每一个星期的View
+            for (week in weekViewList) {
+                // 为他设置显示的数字
+                week.number = weekNumber % 7
+                week.setPadding(padding, padding, padding, padding)
+                // 按顺序排版
+                week.layout(x.toInt(), top,
+                    (x + dayWidth).toInt(), (y + weekHeight).toInt())
+                // 增加计数
+                weekNumber ++
+                // 横轴偏移
+                x += dayWidth
+            }
+            return weekHeight
+        } else {
+            for (week in weekViewList) {
+                week.visibility = View.GONE
+            }
+        }
+        return 0F
+    }
+
+    private fun layoutDayView(day: DayView, left: Int, top: Int, right: Int, bottom: Int) {
+        val padding = (min(right - left, bottom - top) * 0.06F).toInt()
+        day.setPadding(padding, padding, padding, padding)
+        day.layout(left, top, right, bottom)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -45,9 +254,54 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         onSizeChangeListener?.invoke(this, w, h, oldw, oldh)
     }
 
+    /**
+     * 触发一次数据检查
+     */
     fun notifyDataChange() {
+        onDataChange()
         requestLayout()
-        // 其他设置
+    }
+
+    /**
+     * 计算日历相关数据
+     */
+    private fun onDataChange() {
+        val calendar = lunarCalendar?:return
+        // 第一天星期几[0~6]，周日为0
+        var firstWeek = calendar.firstWeek
+        // 如果不是周日开始，那么开始的星期延后一天
+        if (!options.isStartingOnSunday) {
+            firstWeek -= 1
+        }
+        val daySize = calendar.elementArray.size + firstWeek
+        weekSize = daySize / 7
+        // 如果不是完整的周，那么再加一周
+        if (daySize % 7 != 0) {
+            weekSize++
+        }
+        // 检查一次星期的View
+        if (options.isShowWeek && weekViewList.size < 7) {
+            while (weekViewList.size < 7) {
+                val view = NumberPointIcon(context)
+                weekViewList.add(view)
+                addView(view)
+            }
+        }
+        // 检查天的View，并且补齐
+        val elementSize = when (calendarType) {
+            Type.Month -> calendar.elementArray.size
+            Type.Week -> 7
+            Type.Day -> 1
+        }
+        while (dayViewList.size < elementSize) {
+            val view = DayView(context)
+            dayViewList.add(view)
+            addView(view)
+        }
+        // 为新旧view都更新一次参数
+        dayViewList.forEach {
+            it.options.copy(options)
+        }
     }
 
     private class DayView(context: Context) : View(context) {
@@ -78,6 +332,11 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
          */
         private var secondaryValue = ""
 
+        /**
+         * 最大的文字长度
+         */
+        private val maxSecondaryLength = 3
+
         private val paint = Paint().apply {
             isDither = true
             isAntiAlias = true
@@ -104,16 +363,23 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
                     hasSecondary -> points.add(options.solarFestivalPointColor)
                     // 如果可以显示并且只有节日，那么占用它
                     element.solarFestival.size == 1 -> {
-                        hasSecondary = true
-                        secondaryValue = element.solarFestival[0]
+                        val value = element.solarFestival[0]
+                        if (value.length > maxSecondaryLength) {
+                            points.add(options.solarFestivalPointColor)
+                        } else {
+                            hasSecondary = true
+                            secondaryValue = value
+                        }
                     }
                     // 否则的话，说明是没有被占用，并且是多个节日，
                     // 那么占用显示名额并且增加小点，表示有节日被省略
                     else -> {
-                        hasSecondary = true
-                        secondaryValue = element.solarFestival[0]
+                        val values = element.solarFestival.filter { it.length <= maxSecondaryLength }
+                        if (values.isNotEmpty()) {
+                            hasSecondary = true
+                            secondaryValue = values[0]
+                        }
                         points.add(options.solarFestivalPointColor)
-
                     }
                 }
             }
@@ -124,16 +390,23 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
                     hasSecondary -> points.add(options.lunarFestivalPointColor)
                     // 如果可以显示并且只有节日，那么占用它
                     element.lunarFestival.size == 1 -> {
-                        hasSecondary = true
-                        secondaryValue = element.lunarFestival[0]
+                        val value = element.lunarFestival[0]
+                        if (value.length > maxSecondaryLength) {
+                            points.add(options.lunarFestivalPointColor)
+                        } else {
+                            hasSecondary = true
+                            secondaryValue = value
+                        }
                     }
                     // 否则的话，说明是没有被占用，并且是多个节日，
                     // 那么占用显示名额并且增加小点，表示有节日被省略
                     else -> {
-                        hasSecondary = true
-                        secondaryValue = element.lunarFestival[0]
+                        val values = element.lunarFestival.filter { it.length <= maxSecondaryLength }
+                        if (values.isNotEmpty()) {
+                            hasSecondary = true
+                            secondaryValue = values[0]
+                        }
                         points.add(options.lunarFestivalPointColor)
-
                     }
                 }
             }
@@ -150,6 +423,10 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         override fun onDraw(canvas: Canvas?) {
             super.onDraw(canvas)
             canvas?:return
+            // 无效的数据，认为业务不希望我们绘制
+            if (element.sYear == 0 || element.sMonth == 0 || element.sDay == 0) {
+                return
+            }
             val radius = min(bounds.width(), bounds.height()) / 2
             // 背景绘制
             paint.color = if (element.isToday) { options.todayBgColor } else { options.otherBgColor }
@@ -175,7 +452,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
                     paint.color = color
                     // 旋转相应的角度然后绘制
                     canvas.save()
-                    canvas.rotate(angle * -1)
+                    canvas.rotate(angle)
                     canvas.drawCircle(radius - pointRadius, 0F, pointRadius, paint)
                     canvas.restore()
                     angle += angleStep
@@ -266,11 +543,11 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         var auspiciousPointColor = Color.RED
 
         /** 主要文字尺寸比例 **/
-        var mainFontSizeWeight = 0.24F
+        var mainFontSizeWeight = 0.5F
         /** 次要文字尺寸比例 **/
         var secondaryFontSizeWeight = 0.16F
         /** 标识点的尺寸比例 **/
-        var identificationSizeWeight = 0.06F
+        var identificationSizeWeight = 0.1F
         /** 最大的小点数量 **/
         var maxPointSize = 9
 

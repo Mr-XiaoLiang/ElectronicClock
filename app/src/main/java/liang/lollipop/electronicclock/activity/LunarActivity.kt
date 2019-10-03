@@ -37,7 +37,6 @@ class LunarActivity : DialogActivity() {
 
         private const val FIRST_SHOW = "LUNAR_ACTIVITY_FIRST_SHOW"
 
-
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
