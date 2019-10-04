@@ -87,4 +87,35 @@
     <string name="saved">已保存</string>
 
     <string name="lunar_hint">提示：由于黄历属于中国特有的历法和计算规则。包含了民族文化内涵在内，简单的翻译无法清晰准确的表达涵义，因此，农历展示部分不做翻译处理。同时由于特殊历法的原因，时区被锁定为中国时区。对此造成的困扰，请谅解。</string>
+
+    <string name="title_show_week">显示星期</string>
+    <string name="summary_show_week">周模式、月模式下生效</string>
+    <string name="title_show_lunar">显示农历</string>
+    <string name="summary_show_lunar">显示农历的日期</string>
+    <string name="title_show_festival">显示节日</string>
+    <string name="summary_show_festival">开启后将会显示一些基本的节日</string>
+    <string name="title_show_solar_terms">显示节气</string>
+    <string name="summary_show_solar_terms">开启后将会在日历中显示节气信息</string>
+    <string name="title_show_auspicious">显示吉日</string>
+    <string name="summary_show_auspicious">开启后将会在日历中标注出比较吉利的日子</string>
+    <string name="title_starting_on_sunday">周日开始</string>
+    <string name="summary_starting_on_sunday">每周的第一天为周日</string>
+    <string name="title_auto_text_color">自动设置文字颜色</string>
+    <string name="summary_auto_text_color">它可以更好的保护您的屏幕</string>
+    <string name="title_oval_bg">圆形的背景</string>
+    <string name="summary_oval_bg">每一天的背景形状设置为圆形</string>
+    <string name="title_today_text_color">当日文字的颜色</string>
+    <string name="summary_today_text_color">请注意与背景颜色之间的协调</string>
+    <string name="title_today_bg_color">当日文字的背景颜色</string>
+    <string name="summary_today_bg_color">请注意与文字颜色之间的协调</string>
+    <string name="title_other_text_color">其他文字的颜色</string>
+    <string name="summary_other_text_color">请注意与背景颜色之间的协调</string>
+    <string name="title_other_bg_color">其他文字的背景颜色</string>
+    <string name="summary_other_bg_color">请注意与文字颜色之间的协调</string>
+    <string name="title_solar_festival_point_color">公元历的节日提示颜色</string>
+    <string name="summary_solar_festival_point_color">当节日信息被省略为小点时的颜色</string>
+    <string name="title_lunar_festival_point_color">农历的节日提示颜色</string>
+    <string name="summary_lunar_festival_point_color">当节日信息被省略为小点时的颜色</string>
+    <string name="title_auspicious_point_color">吉日提示颜色</string>
+    <string name="summary_auspicious_point_color">当天为吉日时，展示的提示颜色</string>
 </resources>

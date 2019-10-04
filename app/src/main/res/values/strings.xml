@@ -92,4 +92,35 @@
 
     <string name="lunar_hint">Hint: Because the lunar calendar belongs to China\'s unique calendar and calculation rules. Including the national cultural connotation, simple translation cannot express the meaning clearly and accurately. Therefore, the part of the lunar calendar is not translated. At the same time, due to the special calendar, the time zone is locked into the Chinese time zone. Please understand that the trouble caused by this. </string>
     <string name="auspicious" translatable="false">吉</string>
+
+    <string name="title_show_week">Show the week </string>
+    <string name="summary_show_week">week mode, monthly mode effective </string>
+    <string name="title_show_lunar">Show the lunar calendar </string>
+    <string name="summary_show_lunar">display the date of the lunar calendar </string>
+    <string name="title_show_festival">Show holiday</string>
+    <string name="summary_show_festival">will show some basic holiday</string>
+    <string name="title_show_solar_terms">Show the solar terms</string>
+    <string name="summary_show_solar_terms">will display the solar energy information in the calendar after opening </string>
+    <string name="title_show_auspicious">Show auspicious day </string>
+    <string name="summary_show_auspicious">Opened will mark the days of auspicious days in the calendar </string>
+    <string name="title_starting_on_sunday">Starting Sunday </string>
+    <string name="summary_starting_on_sunday">The first day of the week is Sunday </string>
+    <string name="title_auto_text_color">Automatically set the text color </string>
+    <string name="summary_auto_text_color">It can better protect your screen</string>
+    <string name="title_oval_bg">Round background </string>
+    <string name="summary_oval_bg">The background shape of each day is set to a circle </string>
+    <string name="title_today_text_color">the color of the day text </string>
+    <string name="summary_today_text_color">Please note the coordination with the background color </string>
+    <string name="title_today_bg_color">The background color of the day text </string>
+    <string name="summary_today_bg_color">Please note the coordination with the text color </string>
+    <string name="title_other_text_color">The color of other texts</string>
+    <string name="summary_other_text_color">Please note the coordination with the background color </string>
+    <string name="title_other_bg_color">Background color of other text</string>
+    <string name="summary_other_bg_color">Please note the coordination with the text color </string>
+    <string name="title_solar_festival_point_color">The holiday reminder color of the epoch </string>
+    <string name="summary_solar_festival_point_color">Color when holiday information is omitted as a small dot </string>
+    <string name="title_lunar_festival_point_color">The holiday reminder color of the lunar calendar</string>
+    <string name="summary_lunar_festival_point_color">color when holiday information is omitted as a small dot </string>
+    <string name="title_auspicious_point_color">Auspicious reminder color </string>
+    <string name="summary_auspicious_point_color">The color of the prompt displayed on the day of the day is </string>
 </resources>
