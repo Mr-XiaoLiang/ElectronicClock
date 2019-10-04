@@ -1,10 +1,17 @@
 package liang.lollipop.electronicclock.widget.panel
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.material.snackbar.Snackbar
+import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
+import liang.lollipop.electronicclock.utils.LunarCalendar
+import liang.lollipop.electronicclock.view.CalendarView
 import liang.lollipop.electronicclock.widget.info.CalendarPanelInfo
 import liang.lollipop.widget.widget.Panel
+import liang.lollipop.widget.widget.PanelInfo
 
 /**
  * @author lollipop
@@ -13,10 +20,38 @@ import liang.lollipop.widget.widget.Panel
  */
 class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
 
-
-
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
-        // 什么也没有
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return createView(layoutInflater.context)
     }
+
+    fun createView(context: Context): View {
+        return CalendarView(context)
+    }
+
+    override fun onInfoChange() {
+        tryMyView<CalendarView> {
+            it.options = panelInfo.calendarOptions
+        }
+    }
+
+    override fun onUpdate() {
+        super.onUpdate()
+        tryMyView<CalendarView> {
+            LunarCalendar.getMonth(System.currentTimeMillis()) { year, month ->
+                it.dateChange(year, month)
+            }
+        }
+    }
+
+    override fun onClick(v: View?) {
+        super.onClick(v)
+        v?:return
+        val context = v.context
+        if (panelInfo.id == PanelInfo.NO_ID) {
+            Snackbar.make(v, R.string.alert_save_first, Snackbar.LENGTH_LONG).show()
+            return
+        }
+        context?.startActivity(PanelInfoAdjustmentActivity.getIntent(panelInfo))
+    }
+
 }
