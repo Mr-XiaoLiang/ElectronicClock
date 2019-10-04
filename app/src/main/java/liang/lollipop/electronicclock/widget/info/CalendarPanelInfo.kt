@@ -19,6 +19,7 @@ class CalendarPanelInfo: PanelInfo() {
         const val IS_SHOW_SOLAR_TERMS         = "IS_SHOW_SOLAR_TERMS"
         const val IS_SHOW_AUSPICIOUS          = "IS_SHOW_AUSPICIOUS"
         const val IS_OVAL_BG                  = "IS_OVAL_BG"
+        const val IS_AUTO_TEXT_COLOR          = "IS_AUTO_TEXT_COLOR"
         const val TODAY_TEXT_COLOR            = "TODAY_TEXT_COLOR"
         const val TODAY_BG_COLOR              = "TODAY_BG_COLOR"
         const val OTHER_TEXT_COLOR            = "OTHER_TEXT_COLOR"
@@ -28,9 +29,19 @@ class CalendarPanelInfo: PanelInfo() {
         const val SOLAR_FESTIVAL_POINT_COLOR  = "SOLAR_FESTIVAL_POINT_COLOR"
         const val LUNAR_FESTIVAL_POINT_COLOR  = "LUNAR_FESTIVAL_POINT_COLOR"
         const val AUSPICIOUS_POINT_COLOR      = "AUSPICIOUS_POINT_COLOR"
+
+        const val PADDING = "PADDING"
     }
 
     val calendarOptions = CalendarView.Options()
+
+    var isAutoTextColor = true
+
+//    /**
+//     * 四个方向的内缩进
+//     * 缩进的尺寸是相应维度的比例值
+//     */
+//    val padding = FloatArray(4)
 
     override fun parse(jsonObj: JSONObject) {
         super.parse(jsonObj)
@@ -49,6 +60,7 @@ class CalendarPanelInfo: PanelInfo() {
         calendarOptions.solarFestivalPointColor  = jsonObj.optInt(SOLAR_FESTIVAL_POINT_COLOR, Color.CYAN)
         calendarOptions.lunarFestivalPointColor  = jsonObj.optInt(LUNAR_FESTIVAL_POINT_COLOR, Color.MAGENTA)
         calendarOptions.auspiciousPointColor     = jsonObj.optInt(AUSPICIOUS_POINT_COLOR, Color.RED)
+        isAutoTextColor                          = jsonObj.optBoolean(IS_AUTO_TEXT_COLOR, true)
     }
 
     override fun serialize(jsonObj: JSONObject) {
@@ -68,6 +80,7 @@ class CalendarPanelInfo: PanelInfo() {
         jsonObj.put(SOLAR_FESTIVAL_POINT_COLOR , calendarOptions.solarFestivalPointColor)
         jsonObj.put(LUNAR_FESTIVAL_POINT_COLOR , calendarOptions.lunarFestivalPointColor)
         jsonObj.put(AUSPICIOUS_POINT_COLOR     , calendarOptions.auspiciousPointColor   )
+        jsonObj.put(IS_AUTO_TEXT_COLOR         , isAutoTextColor                        )
     }
 
 }

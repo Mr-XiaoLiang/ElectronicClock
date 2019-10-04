@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.fragment
 
 import android.os.Bundle
 import android.view.View
+import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
 import liang.lollipop.electronicclock.widget.info.CalendarPanelInfo
 import liang.lollipop.electronicclock.widget.panel.CalendarPanel
@@ -49,40 +50,106 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
     }
 
     private fun putAdjustmentInfo() {
-        /*
-        const val IS_SHOW_FESTIVAL            = "IS_SHOW_FESTIVAL"
-        const val IS_SHOW_SOLAR_TERMS         = "IS_SHOW_SOLAR_TERMS"
-        const val IS_SHOW_AUSPICIOUS          = "IS_SHOW_AUSPICIOUS"
-        const val IS_OVAL_BG                  = "IS_OVAL_BG"
-        const val TODAY_TEXT_COLOR            = "TODAY_TEXT_COLOR"
-        const val TODAY_BG_COLOR              = "TODAY_BG_COLOR"
-        const val OTHER_TEXT_COLOR            = "OTHER_TEXT_COLOR"
-        const val OTHER_BG_COLOR              = "OTHER_BG_COLOR"
-        const val IS_STARTING_ON_SUNDAY       = "IS_STARTING_ON_SUNDAY "
-        const val IS_SHOW_SCHEDULE            = "IS_SHOW_SCHEDULE"
-        const val SOLAR_FESTIVAL_POINT_COLOR  = "SOLAR_FESTIVAL_POINT_COLOR"
-        const val LUNAR_FESTIVAL_POINT_COLOR  = "LUNAR_FESTIVAL_POINT_COLOR"
-        const val AUSPICIOUS_POINT_COLOR      = "AUSPICIOUS_POINT_COLOR"
-         */
         addAdjustmentInfo(
             switch {
                 key = CalendarPanelInfo.IS_SHOW_WEEK
-                title = "显示星期"
-                summary = "周模式、月模式下生效"
+                title = getString(R.string.title_show_week)
+                summary = getString(R.string.summary_show_week)
                 value = calendarPanelInfo.calendarOptions.isShowWeek
             },
             switch {
                 key = CalendarPanelInfo.IS_SHOW_LUNAR
-                title = "显示农历"
-                summary = "显示农历的日期"
+                title = getString(R.string.title_show_lunar)
+                summary = getString(R.string.summary_show_lunar)
                 value = calendarPanelInfo.calendarOptions.isShowLunar
             },
             switch {
                 key = CalendarPanelInfo.IS_SHOW_FESTIVAL
-                title = "显示节日"
-                summary = "将会显示一些基本的节日"
+                title = getString(R.string.title_show_festival)
+                summary = getString(R.string.summary_show_festival)
                 value = calendarPanelInfo.calendarOptions.isShowFestival
+            },
+            switch {
+                key = CalendarPanelInfo.IS_SHOW_SOLAR_TERMS
+                title = getString(R.string.title_show_solar_terms)
+                summary = getString(R.string.summary_show_solar_terms)
+                value = calendarPanelInfo.calendarOptions.isShowSolarTerms
+            },
+            switch {
+                key = CalendarPanelInfo.IS_SHOW_AUSPICIOUS
+                title = getString(R.string.title_show_auspicious)
+                summary = getString(R.string.summary_show_auspicious)
+                value = calendarPanelInfo.calendarOptions.isShowAuspicious
+            },
+            switch {
+                key = CalendarPanelInfo.IS_STARTING_ON_SUNDAY
+                title = getString(R.string.title_starting_on_sunday)
+                summary = getString(R.string.summary_starting_on_sunday)
+                value = calendarPanelInfo.calendarOptions.isStartingOnSunday
+            },
+            switch {
+                key = CalendarPanelInfo.IS_OVAL_BG
+                title = getString(R.string.title_oval_bg)
+                summary = getString(R.string.summary_oval_bg)
+                value = calendarPanelInfo.calendarOptions.isOvalBg
+            },
+            switch {
+                key = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                title = getString(R.string.title_auto_text_color)
+                summary = getString(R.string.summary_auto_text_color)
+                value = calendarPanelInfo.isAutoTextColor
+            },
+            colors {
+                key = CalendarPanelInfo.TODAY_TEXT_COLOR
+                relevantKey = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                title = getString(R.string.title_today_text_color)
+                summary = getString(R.string.summary_today_text_color)
+                reset(calendarPanelInfo.calendarOptions.todayTextColor)
+            },
+            colors {
+                key = CalendarPanelInfo.TODAY_BG_COLOR
+                relevantKey = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                title = getString(R.string.title_today_bg_color)
+                summary = getString(R.string.summary_today_bg_color)
+                reset(calendarPanelInfo.calendarOptions.todayBgColor)
+            },
+            colors {
+                key = CalendarPanelInfo.OTHER_TEXT_COLOR
+                relevantKey = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                title = getString(R.string.title_other_text_color)
+                summary = getString(R.string.summary_other_text_color)
+                reset(calendarPanelInfo.calendarOptions.otherTextColor)
+            },
+            colors {
+                key = CalendarPanelInfo.OTHER_BG_COLOR
+                relevantKey = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                title = getString(R.string.title_other_bg_color)
+                summary = getString(R.string.summary_other_bg_color)
+                reset(calendarPanelInfo.calendarOptions.otherBgColor)
+            },
+            colors {
+                key = CalendarPanelInfo.SOLAR_FESTIVAL_POINT_COLOR
+                title = getString(R.string.title_solar_festival_point_color)
+                summary = getString(R.string.summary_solar_festival_point_color)
+                reset(calendarPanelInfo.calendarOptions.solarFestivalPointColor)
+            },
+            colors {
+                key = CalendarPanelInfo.LUNAR_FESTIVAL_POINT_COLOR
+                title = getString(R.string.title_lunar_festival_point_color)
+                summary = getString(R.string.summary_lunar_festival_point_color)
+                reset(calendarPanelInfo.calendarOptions.lunarFestivalPointColor)
+            },
+            colors {
+                key = CalendarPanelInfo.AUSPICIOUS_POINT_COLOR
+                title = getString(R.string.title_auspicious_point_color)
+                summary = getString(R.string.summary_auspicious_point_color)
+                reset(calendarPanelInfo.calendarOptions.auspiciousPointColor)
             }
+//            paddings {
+//                key = BatteryPanelInfo.PADDING
+//                title = getString(R.string.title_paddings)
+//                reset(batteryInfo.padding)
+//            },
         )
     }
 
