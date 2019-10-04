@@ -13,14 +13,9 @@ import liang.lollipop.electronicclock.bean.PreferenceBoolean
 import liang.lollipop.electronicclock.bean.PreferenceChoice
 import liang.lollipop.electronicclock.bean.PreferenceInfo
 import liang.lollipop.electronicclock.bean.PreferenceNumber
-import liang.lollipop.electronicclock.list.*
-import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
-import liang.lollipop.electronicclock.widget.panel.BatteryPanel
+import liang.lollipop.electronicclock.list.PreferenceAdapter
 import liang.lollipop.widget.WidgetHelper
-import liang.lollipop.widget.utils.PanelProviders
 import liang.lollipop.widget.utils.dp
-import liang.lollipop.widget.widget.Panel
-import liang.lollipop.widget.widget.PanelInfo
 import liang.lollipop.widget.widget.WidgetGroup
 
 /**
@@ -67,23 +62,6 @@ object PreferenceHelper {
             it.isInverted = activity.isInverted
             it
         }
-    }
-
-    class LPanelProviders: PanelProviders {
-        override fun createPanelByInfo(info: PanelInfo): Panel<*>? {
-            return when (info) {
-                is BatteryPanelInfo -> BatteryPanel(info)
-                else -> null
-            }
-        }
-
-        override fun createInfoByName(name: String): PanelInfo? {
-            return when (name) {
-                BatteryPanelInfo::class.java.name -> BatteryPanelInfo()
-                else -> null
-            }
-        }
-
     }
 
     class PreferenceHelperImpl(private val group: RecyclerView) {
