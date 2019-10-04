@@ -63,6 +63,18 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
     private val emptyElement = LunarCalendar.Element()
 
     /**
+     * 当某天被点击时
+     */
+    private var onDayViewClickListener: OnDayViewClickListener? = null
+
+    private val childClickListener = OnClickListener {
+        if (it is DayView) {
+            val element = it.element
+            onDayViewClickListener?.onDayViewClick(element.sYear, element.sMonth, element.sDay)
+        }
+    }
+
+    /**
      * 日历展示模式
      */
     var calendarType = Type.Month
@@ -93,8 +105,6 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         lunarCalendar = LunarCalendar.getCalendar(year, month)
         onDataChange()
     }
-
-
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         if (lunarCalendar == null || weekSize < 1) {
@@ -295,6 +305,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         }
         while (dayViewList.size < elementSize) {
             val view = DayView(context)
+            view.setOnClickListener(childClickListener)
             dayViewList.add(view)
             addView(view)
         }
@@ -355,6 +366,11 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             if (options.isShowSolarTerms && element.solarTerms.isNotEmpty()) {
                 hasSecondary = true
                 secondaryValue = element.solarTerms
+            }
+            // 如果是月初，那么优先展示月份
+            if (element.lDay == 1) {
+                hasSecondary = true
+                secondaryValue = "${element.lMonthChinese}月"
             }
             // 其次是公元历的节日（常规情况下，公元历的节日比较让人重视
             if (options.isShowFestival && element.solarFestival.isNotEmpty()) {
@@ -573,6 +589,10 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             maxPointSize             = other.maxPointSize
         }
 
+    }
+
+    interface OnDayViewClickListener {
+        fun onDayViewClick(year: Int, month: Int, day: Int)
     }
 
 }
