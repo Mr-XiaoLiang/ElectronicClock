@@ -147,4 +147,11 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
      */
     open fun onSizeChange(width: Int, height: Int) {}
 
+    protected inline fun <reified T> tryMyView(run: (T) -> Unit) {
+        val myView = view?:return
+        if (myView is T) {
+            run(myView)
+        }
+    }
+
 }
