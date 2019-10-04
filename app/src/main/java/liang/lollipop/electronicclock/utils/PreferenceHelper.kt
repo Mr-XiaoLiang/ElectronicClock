@@ -36,8 +36,8 @@ object PreferenceHelper {
     const val ORIENTATION_LANDSCAPE = 2
 
     const val DEF_GRID_SIZE = 6
-    const val MIN_GRID_SIZE = 4
-    const val MAX_GRID_SIZE = 20
+    private const val MIN_GRID_SIZE = 4
+    private const val MAX_GRID_SIZE = 20
 
     init {
         WidgetHelper.panelProviders(LPanelProviders())
