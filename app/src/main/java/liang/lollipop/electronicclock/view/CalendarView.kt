@@ -17,8 +17,8 @@ import kotlin.math.min
  * @date 2019-10-01 23:42
  * 日历的View
  */
-class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
-    : ViewGroup(context,attrs,defStyleAttr) {
+class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
+    : ViewGroup(context,attrs,defStyleAttr), WeightPaddingView {
 
     constructor(context: Context, attrs: AttributeSet?):this(context,attrs,0)
     constructor(context: Context):this(context,null)
@@ -88,12 +88,36 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             notifyDataChange()
         }
 
+    private val weightPaddingViewHelper = WeightPaddingViewHelper()
+
+    override val paddingLeftW: Float
+        get() {
+            return weightPaddingViewHelper.paddingLeftW(width)
+        }
+    override val paddingTopW: Float
+        get() {
+            return weightPaddingViewHelper.paddingTopW(height)
+        }
+    override val paddingRightW: Float
+        get() {
+            return weightPaddingViewHelper.paddingRightW(width)
+        }
+    override val paddingBottomW: Float
+        get() {
+            return weightPaddingViewHelper.paddingBottomW(height)
+        }
+
     init {
         if (isInEditMode) {
             LunarCalendar.getMonth(System.currentTimeMillis()) { year, month ->
                 dateChange(year, month)
             }
         }
+    }
+
+    override fun setWeightPadding(left: Float, top: Float, right: Float, bottom: Float) {
+        weightPaddingViewHelper.setWeightPadding(left, top, right, bottom)
+        requestLayout()
     }
 
     /**
@@ -115,17 +139,17 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
             return
         }
         // 排版
-        val left = paddingLeft
-        val top = paddingTop
-        val width = r - l - paddingLeft - paddingRight
-        val height = b - t - paddingTop - paddingBottom
+        val left = paddingLeftW
+        val top = paddingTopW
+        val width = r - l - paddingLeftW - paddingRightW
+        val height = b - t - paddingTopW - paddingBottomW
         when (calendarType) {
             // 天模式下，只展示当天的信息，同时占满整个View
             Type.Day -> {
                 val day = dayViewList[0]
                 day.element = lunarCalendar?.today?:emptyElement
-                layoutDayView(day, left, top,
-                    (left + width), (top + height))
+                layoutDayView(day, left.toInt(), top.toInt(),
+                    (left + width).toInt(), (top + height).toInt())
                 for (week in weekViewList) {
                     week.visibility = View.GONE
                 }
@@ -145,7 +169,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
 
     }
 
-    private fun layoutByWeekType(left: Int, top: Int, width: Int, height: Int) {
+    private fun layoutByWeekType(left: Float, top: Float, width: Float, height: Float) {
         val calendar = lunarCalendar?:return
         // 每一天的View的尺寸
         val dayWidth = width / 7F
@@ -186,7 +210,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         }
     }
 
-    private fun layoutByMonthType(left: Int, top: Int, width: Int, height: Int) {
+    private fun layoutByMonthType(left: Float, top: Float, width: Float, height: Float) {
         val calendar = lunarCalendar?:return
         // 每一天的View的尺寸
         val dayWidth = width / 7F
@@ -223,12 +247,12 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         }
     }
 
-    private fun layoutWeek(left: Int, top: Int, dayWidth: Float, dayHeight: Float): Float {
+    private fun layoutWeek(left: Float, top: Float, dayWidth: Float, dayHeight: Float): Float {
         // 如果显示星期的话，那么开始排版星期
         if (options.isShowWeek) {
             // 星期的View的尺寸
             val weekHeight = dayHeight * weekViewHeight
-            var x = left.toFloat()
+            var x = left
             var weekNumber = if (options.isStartingOnSunday) { 0 } else { 1 }
             val padding = (min(weekHeight, dayWidth) * 0.3F).toInt()
             // 遍历每一个星期的View
@@ -237,7 +261,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
                 week.number = weekNumber % 7
                 week.setPadding(padding, padding, padding, padding)
                 // 按顺序排版
-                week.layout(x.toInt(), top,
+                week.layout(x.toInt(), top.toInt(),
                     (x + dayWidth).toInt(), (y + weekHeight).toInt())
                 // 增加计数
                 weekNumber ++

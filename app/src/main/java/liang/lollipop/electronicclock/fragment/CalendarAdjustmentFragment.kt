@@ -144,12 +144,12 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 title = getString(R.string.title_auspicious_point_color)
                 summary = getString(R.string.summary_auspicious_point_color)
                 reset(calendarPanelInfo.calendarOptions.auspiciousPointColor)
+            },
+            paddings {
+                key = PanelInfo.PADDING
+                title = getString(R.string.title_paddings)
+                reset(calendarPanelInfo.padding)
             }
-//            paddings {
-//                key = BatteryPanelInfo.PADDING
-//                title = getString(R.string.title_paddings)
-//                reset(batteryInfo.padding)
-//            },
         )
     }
 
