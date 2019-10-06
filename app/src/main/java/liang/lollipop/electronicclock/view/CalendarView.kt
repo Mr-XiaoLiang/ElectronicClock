@@ -260,7 +260,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
                 week.setPadding(padding, padding, padding, padding)
                 // 按顺序排版
                 week.layout(x.toInt(), top.toInt(),
-                    (x + dayWidth).toInt(), (y + weekHeight).toInt())
+                    (x + dayWidth).toInt(), (top + weekHeight).toInt())
                 // 增加计数
                 weekNumber ++
                 // 横轴偏移
