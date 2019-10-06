@@ -30,7 +30,6 @@ class CalendarPanelInfo: PanelInfo() {
         const val LUNAR_FESTIVAL_POINT_COLOR  = "LUNAR_FESTIVAL_POINT_COLOR"
         const val AUSPICIOUS_POINT_COLOR      = "AUSPICIOUS_POINT_COLOR"
 
-        const val PADDING = "PADDING"
     }
 
     val calendarOptions = CalendarView.Options()

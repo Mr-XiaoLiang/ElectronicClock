@@ -154,7 +154,57 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
     }
 
     override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
+        val option = calendarPanelInfo.calendarOptions
+        when (info.key) {
+            CalendarPanelInfo.IS_SHOW_WEEK               -> {
+                option.isShowWeek = newValue.optBoolean(option.isShowWeek)
+            }
+            CalendarPanelInfo.IS_SHOW_LUNAR              -> {
+                option.isShowLunar = newValue.optBoolean(option.isShowLunar)
+            }
+            CalendarPanelInfo.IS_SHOW_FESTIVAL           -> {
+                option.isShowFestival = newValue.optBoolean(option.isShowFestival)
+            }
+            CalendarPanelInfo.IS_SHOW_SOLAR_TERMS        -> {
+                option.isShowSolarTerms = newValue.optBoolean(option.isShowSolarTerms)
+            }
+            CalendarPanelInfo.IS_SHOW_AUSPICIOUS         -> {
+                option.isShowAuspicious = newValue.optBoolean(option.isShowAuspicious)
+            }
+            CalendarPanelInfo.IS_OVAL_BG                 -> {
+                option.isOvalBg = newValue.optBoolean(option.isOvalBg)
+            }
+            CalendarPanelInfo.IS_AUTO_TEXT_COLOR         -> {
+                calendarPanelInfo.isAutoTextColor = newValue.optBoolean(calendarPanelInfo.isAutoTextColor)
+            }
+            CalendarPanelInfo.TODAY_TEXT_COLOR           -> {
+                option.todayTextColor = newValue.optInt(option.todayTextColor)
+            }
+            CalendarPanelInfo.TODAY_BG_COLOR             -> {
 
+            }
+            CalendarPanelInfo.OTHER_TEXT_COLOR           -> {
+
+            }
+            CalendarPanelInfo.OTHER_BG_COLOR             -> {
+
+            }
+            CalendarPanelInfo.IS_STARTING_ON_SUNDAY      -> {
+
+            }
+            CalendarPanelInfo.IS_SHOW_SCHEDULE           -> {
+
+            }
+            CalendarPanelInfo.SOLAR_FESTIVAL_POINT_COLOR -> {
+
+            }
+            CalendarPanelInfo.LUNAR_FESTIVAL_POINT_COLOR -> {
+
+            }
+            CalendarPanelInfo.AUSPICIOUS_POINT_COLOR     -> {
+
+            }
+        }
     }
 
 }
