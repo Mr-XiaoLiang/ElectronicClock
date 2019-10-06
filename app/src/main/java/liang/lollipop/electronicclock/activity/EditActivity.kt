@@ -20,6 +20,7 @@ import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.bean.ActionInfo
 import liang.lollipop.electronicclock.utils.*
 import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
+import liang.lollipop.electronicclock.widget.info.CalendarPanelInfo
 import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
@@ -81,6 +82,8 @@ class EditActivity : BaseActivity() {
         const val CLOCK = 0
         /** 电池 **/
         const val BATTERY = 1
+        /** 日历 **/
+        const val CALENDAR = 2
     }
 
     private val logger = Utils.loggerI("EditActivity")
@@ -280,6 +283,13 @@ class EditActivity : BaseActivity() {
                 R.string.widget_battery
             )
         )
+        widgetInfoArray.add(
+            ActionInfo(
+                WidgetId.CALENDAR,
+                R.drawable.ic_event_white_24dp,
+                R.string.calendar
+            )
+        )
 
 
         val adapter = ActionAdapter(widgetInfoArray, layoutInflater, false) { holder ->
@@ -413,6 +423,9 @@ class EditActivity : BaseActivity() {
             }
             WidgetId.BATTERY -> {
                 widgetHelper.addPanel(BatteryPanelInfo())
+            }
+            WidgetId.CALENDAR -> {
+                widgetHelper.addPanel(CalendarPanelInfo())
             }
         }
     }
