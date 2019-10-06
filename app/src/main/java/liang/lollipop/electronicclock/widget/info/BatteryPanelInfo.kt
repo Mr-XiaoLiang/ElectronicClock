@@ -20,7 +20,6 @@ class BatteryPanelInfo: PanelInfo() {
         const val IS_SHOW_BORDER = "IS_SHOW_BORDER"
         const val CORNER = "CORNER"
         const val COLOR_ARRAY = "COLOR_ARRAY"
-        const val PADDING = "PADDING"
         const val IS_VERTICAL = "IS_VERTICAL"
         const val BORDER_WIDTH = "BORDER_WIDTH"
         const val BORDER_COLOR = "BORDER_COLOR"
@@ -49,12 +48,6 @@ class BatteryPanelInfo: PanelInfo() {
      * 颜色的集合
      */
     val colorArray = ArrayList<Int>()
-
-    /**
-     * 四个方向的内缩进
-     * 缩进的尺寸是相应维度的比例值
-     */
-    val padding = FloatArray(4)
 
     /**
      * 是否是垂直放置
@@ -111,17 +104,6 @@ class BatteryPanelInfo: PanelInfo() {
             }
         }
 
-        val paddingJsonArray = jsonObj.optJSONArray(PADDING)
-        if (paddingJsonArray != null && paddingJsonArray.length() == 4) {
-            for (i in padding.indices) {
-                padding[i] = paddingJsonArray.optDouble(i, 0.0).toFloat()
-            }
-        } else {
-            for (i in padding.indices) {
-                padding[i] = 0F
-            }
-        }
-
         isVertical = jsonObj.optBoolean(IS_VERTICAL, false)
         borderWidth = jsonObj.optDouble(BORDER_WIDTH, 0.05).toFloat()
         borderColor = jsonObj.optInt(BORDER_COLOR, Color.BLACK)
@@ -148,12 +130,6 @@ class BatteryPanelInfo: PanelInfo() {
                 colorJsonArray.put(color)
             }
             put(COLOR_ARRAY, colorJsonArray)
-
-            val paddingJsonArray = JSONArray()
-            for (p in padding) {
-                paddingJsonArray.put(p)
-            }
-            put(PADDING, paddingJsonArray)
 
             put(IS_VERTICAL, isVertical)
             put(BORDER_WIDTH, borderWidth)

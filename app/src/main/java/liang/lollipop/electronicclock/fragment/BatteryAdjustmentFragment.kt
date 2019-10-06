@@ -77,7 +77,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 reset(batteryInfo.colorArray)
             },
             paddings {
-                key = BatteryPanelInfo.PADDING
+                key = PanelInfo.PADDING
                 title = getString(R.string.title_paddings)
                 reset(batteryInfo.padding)
             },
@@ -170,7 +170,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                     }
                 }
             }
-            BatteryPanelInfo.PADDING        -> {
+            PanelInfo.PADDING        -> {
                 if (newValue is FloatArray) {
                     batteryInfo.padding[0] = newValue[0]
                     batteryInfo.padding[1] = newValue[1]
