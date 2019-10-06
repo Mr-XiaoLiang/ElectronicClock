@@ -1,6 +1,7 @@
 package liang.lollipop.electronicclock.widget.panel
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,7 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
         tryMyView<CalendarView> {
             it.options = panelInfo.calendarOptions
         }
+        onUpdate()
     }
 
     override fun onUpdate() {
@@ -39,6 +41,22 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
         tryMyView<CalendarView> {
             LunarCalendar.getMonth(System.currentTimeMillis()) { year, month ->
                 it.dateChange(year, month)
+            }
+        }
+    }
+
+    override fun onColorChange(color: Int, light: Float) {
+        super.onColorChange(color, light)
+        if (panelInfo.isAutoTextColor) {
+            tryMyView<CalendarView> {
+                it.options.apply {
+                    val inverted = if (color == Color.WHITE) { Color.BLACK } else  { Color.WHITE }
+                    todayTextColor = inverted
+                    todayBgColor = color
+                    otherTextColor = color
+                    otherBgColor = Color.TRANSPARENT
+                }
+                it.notifyDataChange()
             }
         }
     }

@@ -1,10 +1,7 @@
 package liang.lollipop.electronicclock.utils
 
 import android.content.Intent
-import liang.lollipop.electronicclock.fragment.BatteryAdjustmentFragment
-import liang.lollipop.electronicclock.fragment.CalendarAdjustmentFragment
-import liang.lollipop.electronicclock.fragment.EmptyAdjustmentFragment
-import liang.lollipop.electronicclock.fragment.PanelInfoAdjustmentFragment
+import liang.lollipop.electronicclock.fragment.*
 import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
 import liang.lollipop.electronicclock.widget.info.CalendarPanelInfo
 import liang.lollipop.widget.widget.PanelInfo
@@ -29,10 +26,10 @@ object PanelInfoAdjustmentHelper {
     private fun createFragmentByType(typeId: Int, infoId: Int): PanelInfoAdjustmentFragment {
         return when (typeId) {
             PanelType.Battery.value -> {
-                BatteryAdjustmentFragment.getInstance(infoId)
+                BatteryAdjustmentFragment().bindId(infoId)
             }
             PanelType.Calendar.value -> {
-                CalendarAdjustmentFragment.getInstance(infoId)
+                CalendarAdjustmentFragment().bindId(infoId)
             }
             else -> {
                 EmptyAdjustmentFragment.getInstance()

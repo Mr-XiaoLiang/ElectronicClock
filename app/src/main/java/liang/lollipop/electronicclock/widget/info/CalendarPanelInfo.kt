@@ -1,6 +1,7 @@
 package liang.lollipop.electronicclock.widget.info
 
 import android.graphics.Color
+import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.electronicclock.view.CalendarView
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
@@ -29,18 +30,15 @@ class CalendarPanelInfo: PanelInfo() {
         const val SOLAR_FESTIVAL_POINT_COLOR  = "SOLAR_FESTIVAL_POINT_COLOR"
         const val LUNAR_FESTIVAL_POINT_COLOR  = "LUNAR_FESTIVAL_POINT_COLOR"
         const val AUSPICIOUS_POINT_COLOR      = "AUSPICIOUS_POINT_COLOR"
-
     }
 
     val calendarOptions = CalendarView.Options()
 
     var isAutoTextColor = true
 
-//    /**
-//     * 四个方向的内缩进
-//     * 缩进的尺寸是相应维度的比例值
-//     */
-//    val padding = FloatArray(4)
+    init {
+        initIntent = PanelInfoAdjustmentActivity.getIntent(this)
+    }
 
     override fun parse(jsonObj: JSONObject) {
         super.parse(jsonObj)
@@ -60,6 +58,12 @@ class CalendarPanelInfo: PanelInfo() {
         calendarOptions.lunarFestivalPointColor  = jsonObj.optInt(LUNAR_FESTIVAL_POINT_COLOR, Color.MAGENTA)
         calendarOptions.auspiciousPointColor     = jsonObj.optInt(AUSPICIOUS_POINT_COLOR, Color.RED)
         isAutoTextColor                          = jsonObj.optBoolean(IS_AUTO_TEXT_COLOR, true)
+
+        // 如果初始化的intent没有被置空， 并且ID是有效ID，
+        // 那么就重新生成一个带有新数据的intent
+        if (initIntent != null && id != NO_ID) {
+            initIntent = PanelInfoAdjustmentActivity.getIntent(this)
+        }
     }
 
     override fun serialize(jsonObj: JSONObject) {

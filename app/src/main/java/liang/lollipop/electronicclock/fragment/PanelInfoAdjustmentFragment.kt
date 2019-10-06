@@ -19,6 +19,16 @@ import liang.lollipop.widget.utils.DatabaseHelper
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.PanelInfo
 
+inline fun <reified T: PanelInfoAdjustmentFragment> T.bindId(id: Int): T {
+    return this.apply {
+        arguments = Bundle().apply {
+            if (id != PanelInfo.NO_ID) {
+                putString(PanelInfoAdjustmentFragment.ARG_INFO_ID, "$id")
+            }
+        }
+    }
+}
+
 /**
  * @author lollipop
  * @date 2019-08-25 15:23
@@ -32,6 +42,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         const val ARG_INFO_VALUE = "ARG_INFO_VALUE"
 
         private const val TAG = "PanelInfoAdjustmentFragment"
+
     }
 
     private var infoId = ""

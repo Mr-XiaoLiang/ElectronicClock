@@ -1,6 +1,5 @@
 package liang.lollipop.electronicclock.fragment
 
-import android.os.Bundle
 import android.util.Log
 import android.view.View
 import liang.lollipop.electronicclock.R
@@ -15,18 +14,6 @@ import org.json.JSONObject
  * 用于调整电池小部件的参数
  */
 class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
-
-    companion object {
-        fun getInstance(id: Int): BatteryAdjustmentFragment {
-            return BatteryAdjustmentFragment().apply {
-                arguments = Bundle().apply {
-                    if (id != PanelInfo.NO_ID) {
-                        putString(ARG_INFO_ID, "$id")
-                    }
-                }
-            }
-        }
-    }
 
     private val batteryInfo = BatteryPanelInfo()
     private val batteryPanel = BatteryPanel(batteryInfo)

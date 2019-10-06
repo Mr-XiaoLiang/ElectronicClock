@@ -108,10 +108,8 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         }
 
     init {
-        if (isInEditMode) {
-            LunarCalendar.getMonth(System.currentTimeMillis()) { year, month ->
-                dateChange(year, month)
-            }
+        LunarCalendar.getMonth(System.currentTimeMillis()) { year, month ->
+            dateChange(year, month)
         }
     }
 

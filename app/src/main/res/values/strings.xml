@@ -123,4 +123,5 @@
     <string name="summary_lunar_festival_point_color">color when holiday information is omitted as a small dot </string>
     <string name="title_auspicious_point_color">Auspicious reminder color </string>
     <string name="summary_auspicious_point_color">The color of the prompt displayed on the day of the day is </string>
+    <string name="calendar">日历</string>
 </resources>

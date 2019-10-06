@@ -1,6 +1,5 @@
 package liang.lollipop.electronicclock.fragment
 
-import android.os.Bundle
 import android.view.View
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
@@ -15,18 +14,6 @@ import org.json.JSONObject
  * 日历面板的参数调整页面
  */
 class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
-
-    companion object {
-        fun getInstance(id: Int): BatteryAdjustmentFragment {
-            return BatteryAdjustmentFragment().apply {
-                arguments = Bundle().apply {
-                    if (id != PanelInfo.NO_ID) {
-                        putString(ARG_INFO_ID, "$id")
-                    }
-                }
-            }
-        }
-    }
 
     private val calendarPanelInfo = CalendarPanelInfo()
     private val calendarPanel = CalendarPanel(calendarPanelInfo)
@@ -102,6 +89,7 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
             colors {
                 key = CalendarPanelInfo.TODAY_TEXT_COLOR
                 relevantKey = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                relevantEnable = false
                 title = getString(R.string.title_today_text_color)
                 summary = getString(R.string.summary_today_text_color)
                 reset(calendarPanelInfo.calendarOptions.todayTextColor)
@@ -109,6 +97,7 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
             colors {
                 key = CalendarPanelInfo.TODAY_BG_COLOR
                 relevantKey = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                relevantEnable = false
                 title = getString(R.string.title_today_bg_color)
                 summary = getString(R.string.summary_today_bg_color)
                 reset(calendarPanelInfo.calendarOptions.todayBgColor)
@@ -116,6 +105,7 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
             colors {
                 key = CalendarPanelInfo.OTHER_TEXT_COLOR
                 relevantKey = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                relevantEnable = false
                 title = getString(R.string.title_other_text_color)
                 summary = getString(R.string.summary_other_text_color)
                 reset(calendarPanelInfo.calendarOptions.otherTextColor)
@@ -123,6 +113,7 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
             colors {
                 key = CalendarPanelInfo.OTHER_BG_COLOR
                 relevantKey = CalendarPanelInfo.IS_AUTO_TEXT_COLOR
+                relevantEnable = false
                 title = getString(R.string.title_other_bg_color)
                 summary = getString(R.string.summary_other_bg_color)
                 reset(calendarPanelInfo.calendarOptions.otherBgColor)
@@ -178,33 +169,62 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 calendarPanelInfo.isAutoTextColor = newValue.optBoolean(calendarPanelInfo.isAutoTextColor)
             }
             CalendarPanelInfo.TODAY_TEXT_COLOR           -> {
-                option.todayTextColor = newValue.optInt(option.todayTextColor)
+                if (newValue is IntArray && newValue.size > 0) {
+                    option.todayTextColor = newValue[0]
+                } else if (newValue is ArrayList<*> && newValue.size > 0) {
+                    option.todayTextColor = newValue[0] as? Int ?: option.todayTextColor
+                }
             }
             CalendarPanelInfo.TODAY_BG_COLOR             -> {
-
+                if (newValue is IntArray && newValue.size > 0) {
+                    option.todayBgColor = newValue[0]
+                } else if (newValue is ArrayList<*> && newValue.size > 0) {
+                    option.todayBgColor = newValue[0] as? Int ?: option.todayBgColor
+                }
             }
             CalendarPanelInfo.OTHER_TEXT_COLOR           -> {
-
+                if (newValue is IntArray && newValue.size > 0) {
+                    option.otherTextColor = newValue[0]
+                } else if (newValue is ArrayList<*> && newValue.size > 0) {
+                    option.otherTextColor = newValue[0] as? Int ?: option.otherTextColor
+                }
             }
             CalendarPanelInfo.OTHER_BG_COLOR             -> {
-
+                if (newValue is IntArray && newValue.size > 0) {
+                    option.otherBgColor = newValue[0]
+                } else if (newValue is ArrayList<*> && newValue.size > 0) {
+                    option.otherBgColor = newValue[0] as? Int ?: option.otherBgColor
+                }
             }
             CalendarPanelInfo.IS_STARTING_ON_SUNDAY      -> {
-
+                option.isStartingOnSunday = newValue.optBoolean(option.isStartingOnSunday)
             }
             CalendarPanelInfo.IS_SHOW_SCHEDULE           -> {
-
+                option.isShowSchedule = newValue.optBoolean(option.isShowSchedule)
             }
             CalendarPanelInfo.SOLAR_FESTIVAL_POINT_COLOR -> {
-
+                if (newValue is IntArray && newValue.size > 0) {
+                    option.solarFestivalPointColor = newValue[0]
+                } else if (newValue is ArrayList<*> && newValue.size > 0) {
+                    option.solarFestivalPointColor = newValue[0] as? Int ?: option.solarFestivalPointColor
+                }
             }
             CalendarPanelInfo.LUNAR_FESTIVAL_POINT_COLOR -> {
-
+                if (newValue is IntArray && newValue.size > 0) {
+                    option.lunarFestivalPointColor = newValue[0]
+                } else if (newValue is ArrayList<*> && newValue.size > 0) {
+                    option.lunarFestivalPointColor = newValue[0] as? Int ?: option.lunarFestivalPointColor
+                }
             }
             CalendarPanelInfo.AUSPICIOUS_POINT_COLOR     -> {
-
+                if (newValue is IntArray && newValue.size > 0) {
+                    option.auspiciousPointColor = newValue[0]
+                } else if (newValue is ArrayList<*> && newValue.size > 0) {
+                    option.auspiciousPointColor = newValue[0] as? Int ?: option.auspiciousPointColor
+                }
             }
         }
+        calendarPanel.onInfoChange()
     }
 
 }
