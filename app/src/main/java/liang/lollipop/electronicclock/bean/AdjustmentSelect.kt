@@ -15,4 +15,12 @@ class AdjustmentSelect(run: AdjustmentSelect.() -> Unit):
         itemList.addAll(items)
     }
 
+    fun selectBy(value: String) {
+        for (index in itemList.indices) {
+            if (itemList[index] == value) {
+                selectedIndex = index
+            }
+        }
+    }
+
 }
