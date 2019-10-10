@@ -11,6 +11,10 @@ class AdjustmentSelect(run: AdjustmentSelect.() -> Unit):
 
     var selectedIndex = -1
 
+    init {
+        run(this)
+    }
+
     fun addItem(vararg items: String) {
         itemList.addAll(items)
     }
@@ -21,6 +25,13 @@ class AdjustmentSelect(run: AdjustmentSelect.() -> Unit):
                 selectedIndex = index
             }
         }
+    }
+
+    fun selectedItem(): String {
+        if (itemList.isEmpty() || selectedIndex < 0 || selectedIndex >= itemList.size) {
+            return ""
+        }
+        return itemList[selectedIndex]
     }
 
 }
