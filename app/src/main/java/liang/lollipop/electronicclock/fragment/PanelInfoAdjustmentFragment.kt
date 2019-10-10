@@ -261,6 +261,10 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         return AdjustmentPadding(run)
     }
 
+    fun select(run: AdjustmentSelect.() -> Unit): AdjustmentSelect {
+        return AdjustmentSelect(run)
+    }
+
     protected fun Any.optBoolean(def: Boolean): Boolean {
         if (this is Boolean) {
             return this
