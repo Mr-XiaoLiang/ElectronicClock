@@ -544,8 +544,10 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
 
     }
 
-    enum class Type {
-        Month, Week, Day
+    enum class Type(val value: Int) {
+        Month(0),
+        Week(1),
+        Day(2)
     }
 
     open class Options {

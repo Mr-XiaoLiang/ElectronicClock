@@ -19,6 +19,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
         private const val TYPE_SEEKBAR = 1
         private const val TYPE_COLOR = 2
         private const val TYPE_PADDING = 3
+        private const val TYPE_LIST = 4
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdjustmentHolder<*> {
@@ -27,6 +28,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
             TYPE_SEEKBAR -> AdjustmentSeekBarHolder.create(inflater, parent)
             TYPE_COLOR -> AdjustmentColorHolder.create(inflater, parent)
             TYPE_PADDING -> AdjustmentPaddingHolder.create(inflater, parent)
+            TYPE_LIST -> AdjustmentSelectHolder.create(inflater, parent)
             else -> throw RuntimeException("unknown the viewType:$viewType")
         }
         holder.onValueChangeListener = this
@@ -47,6 +49,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
             is AdjustmentInteger -> TYPE_SEEKBAR
             is AdjustmentColor -> TYPE_COLOR
             is AdjustmentPadding -> TYPE_PADDING
+            is AdjustmentSelect -> TYPE_LIST
             else -> throw RuntimeException("unknown the AdjustmentInfo type")
         }
     }
@@ -64,6 +67,9 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
                 holder.onBind(info)
             }
             is AdjustmentPaddingHolder -> if (info is AdjustmentPadding) {
+                holder.onBind(info)
+            }
+            is AdjustmentSelectHolder -> if (info is AdjustmentSelect) {
                 holder.onBind(info)
             }
         }
