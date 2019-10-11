@@ -119,4 +119,8 @@
     <string name="title_auspicious_point_color">吉日提示颜色</string>
     <string name="summary_auspicious_point_color">当天为吉日时，展示的提示颜色</string>
     <string name="calendar">日历</string>
+    <string name="calendar_type_month">月历</string>
+    <string name="calendar_type_week">周历</string>
+    <string name="calendar_type_day">日历</string>
+    <string name="title_calendar_type">日历模式</string>
 </resources>

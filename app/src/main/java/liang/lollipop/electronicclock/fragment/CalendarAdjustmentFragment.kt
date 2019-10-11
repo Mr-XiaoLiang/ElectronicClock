@@ -140,6 +140,15 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 key = PanelInfo.PADDING
                 title = getString(R.string.title_paddings)
                 reset(calendarPanelInfo.padding)
+            },
+            select {
+                key = CalendarPanelInfo.CALENDAR_TYPE
+                title = getString(R.string.title_calendar_type)
+                addItem(
+                    getString(R.string.calendar_type_month),
+                    getString(R.string.calendar_type_week),
+                    getString(R.string.calendar_type_day)
+                )
             }
         )
     }

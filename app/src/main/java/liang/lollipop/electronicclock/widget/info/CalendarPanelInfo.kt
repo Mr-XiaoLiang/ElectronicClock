@@ -30,11 +30,20 @@ class CalendarPanelInfo: PanelInfo() {
         const val SOLAR_FESTIVAL_POINT_COLOR  = "SOLAR_FESTIVAL_POINT_COLOR"
         const val LUNAR_FESTIVAL_POINT_COLOR  = "LUNAR_FESTIVAL_POINT_COLOR"
         const val AUSPICIOUS_POINT_COLOR      = "AUSPICIOUS_POINT_COLOR"
+
+        const val CALENDAR_TYPE               = "CALENDAR_TYPE"
+
+        val CALENDAR_TYPE_ARRAY = intArrayOf(
+            CalendarView.Type.Month.value,
+            CalendarView.Type.Week.value,
+            CalendarView.Type.Day.value)
     }
 
     val calendarOptions = CalendarView.Options()
 
     var isAutoTextColor = true
+
+    var calendarType = CalendarView.Type.Month
 
     init {
         initIntent = PanelInfoAdjustmentActivity.getIntent(this)
@@ -58,6 +67,8 @@ class CalendarPanelInfo: PanelInfo() {
         calendarOptions.lunarFestivalPointColor  = jsonObj.optInt(LUNAR_FESTIVAL_POINT_COLOR, Color.MAGENTA)
         calendarOptions.auspiciousPointColor     = jsonObj.optInt(AUSPICIOUS_POINT_COLOR, Color.RED)
         isAutoTextColor                          = jsonObj.optBoolean(IS_AUTO_TEXT_COLOR, true)
+
+        parseType(jsonObj.optInt(CALENDAR_TYPE, CalendarView.Type.Month.value))
 
         // 如果初始化的intent没有被置空， 并且ID是有效ID，
         // 那么就重新生成一个带有新数据的intent
@@ -84,6 +95,16 @@ class CalendarPanelInfo: PanelInfo() {
         jsonObj.put(LUNAR_FESTIVAL_POINT_COLOR , calendarOptions.lunarFestivalPointColor)
         jsonObj.put(AUSPICIOUS_POINT_COLOR     , calendarOptions.auspiciousPointColor   )
         jsonObj.put(IS_AUTO_TEXT_COLOR         , isAutoTextColor                        )
+        jsonObj.put(CALENDAR_TYPE              , calendarType.value                     )
+    }
+
+    fun parseType(value: Int) {
+        calendarType = when (value) {
+            CalendarView.Type.Month.value -> CalendarView.Type.Month
+            CalendarView.Type.Week.value -> CalendarView.Type.Week
+            CalendarView.Type.Day.value -> CalendarView.Type.Day
+            else -> CalendarView.Type.Month
+        }
     }
 
 }
