@@ -3,6 +3,7 @@ package liang.lollipop.electronicclock.fragment
 import android.view.View
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
+import liang.lollipop.electronicclock.view.CalendarView
 import liang.lollipop.electronicclock.widget.info.CalendarPanelInfo
 import liang.lollipop.electronicclock.widget.panel.CalendarPanel
 import liang.lollipop.widget.widget.PanelInfo
@@ -17,6 +18,13 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
 
     private val calendarPanelInfo = CalendarPanelInfo()
     private val calendarPanel = CalendarPanel(calendarPanelInfo)
+
+    companion object {
+        private val typeValues = intArrayOf(
+            R.string.calendar_type_month,
+            R.string.calendar_type_week,
+            R.string.calendar_type_day)
+    }
 
     override fun getPanelView(): View {
         return calendarPanel.createView(context!!)
@@ -144,13 +152,32 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
             select {
                 key = CalendarPanelInfo.CALENDAR_TYPE
                 title = getString(R.string.title_calendar_type)
-                addItem(
-                    getString(R.string.calendar_type_month),
-                    getString(R.string.calendar_type_week),
-                    getString(R.string.calendar_type_day)
-                )
+                selectBy(calendarPanelInfo.calendarType.typeToString())
+                for (strId in typeValues) {
+                    addItem(getString(strId))
+                }
             }
         )
+    }
+
+    private fun CalendarView.Type.typeToString(): String {
+        return when (this) {
+            CalendarView.Type.Month -> getString(R.string.calendar_type_month)
+            CalendarView.Type.Week -> getString(R.string.calendar_type_week)
+            CalendarView.Type.Day -> getString(R.string.calendar_type_day)
+        }
+    }
+
+    private fun Int.indexToType() : CalendarView.Type {
+        if (this < 0 || this >= typeValues.size) {
+            return CalendarView.Type.Month
+        }
+        return when (typeValues[this]) {
+            R.string.calendar_type_month -> CalendarView.Type.Month
+            R.string.calendar_type_week -> CalendarView.Type.Week
+            R.string.calendar_type_day -> CalendarView.Type.Day
+            else -> CalendarView.Type.Month
+        }
     }
 
     override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
@@ -231,6 +258,10 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 } else if (newValue is ArrayList<*> && newValue.size > 0) {
                     option.auspiciousPointColor = newValue[0] as? Int ?: option.auspiciousPointColor
                 }
+            }
+            CalendarPanelInfo.CALENDAR_TYPE             -> {
+                val index = newValue.optInt(0)
+                calendarPanelInfo.calendarType = index.indexToType()
             }
         }
         calendarPanel.onInfoChange()

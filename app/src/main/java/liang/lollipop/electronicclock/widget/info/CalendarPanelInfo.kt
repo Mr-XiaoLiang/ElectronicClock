@@ -32,11 +32,6 @@ class CalendarPanelInfo: PanelInfo() {
         const val AUSPICIOUS_POINT_COLOR      = "AUSPICIOUS_POINT_COLOR"
 
         const val CALENDAR_TYPE               = "CALENDAR_TYPE"
-
-        val CALENDAR_TYPE_ARRAY = intArrayOf(
-            CalendarView.Type.Month.value,
-            CalendarView.Type.Week.value,
-            CalendarView.Type.Day.value)
     }
 
     val calendarOptions = CalendarView.Options()
