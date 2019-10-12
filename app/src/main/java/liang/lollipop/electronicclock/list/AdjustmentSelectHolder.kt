@@ -35,7 +35,7 @@ class AdjustmentSelectHolder(view: View): AdjustmentHolder<AdjustmentSelect>(vie
                     .selectedTo(info.selectedIndex)
                     .onItemSelected { dialog, index, value ->
                         bindInfo?.selectedIndex = index
-                        onValueChangeListener?.onValueChange(this, value)
+                        onValueChangeListener?.onValueChange(this, index)
                         dialog.dismiss()
                     }.show()
             }
