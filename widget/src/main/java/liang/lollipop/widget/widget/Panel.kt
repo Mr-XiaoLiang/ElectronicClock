@@ -21,7 +21,7 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
      * 面板的View
      */
     var view: View? = null
-        private set
+        protected set
 
     /**
      * 最小的宽度
@@ -148,9 +148,12 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     open fun onSizeChange(width: Int, height: Int) {}
 
     protected inline fun <reified T> tryMyView(run: (T) -> Unit) {
-        val myView = view?:return
-        if (myView is T) {
-            run(myView)
+        view?.tryMyView(run)
+    }
+
+    protected inline fun <reified T> View.tryMyView(run: (T) -> Unit) {
+        if (this is T) {
+            run(this)
         }
     }
 

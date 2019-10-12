@@ -28,12 +28,15 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
     }
 
     fun createView(context: Context): View {
-        return CalendarView(context)
+        val view = CalendarView(context)
+        this.view = view
+        return view
     }
 
     override fun onInfoChange() {
         tryMyView<CalendarView> {
-            it.options = panelInfo.calendarOptions
+            it.changeOptions(panelInfo.calendarOptions)
+            it.calendarType = panelInfo.calendarType
         }
         onUpdate()
     }
@@ -43,6 +46,7 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
         tryMyView<CalendarView> {
             LunarCalendar.getMonth(System.currentTimeMillis()) { year, month ->
                 it.dateChange(year, month)
+                it.notifyDataChange()
             }
         }
     }

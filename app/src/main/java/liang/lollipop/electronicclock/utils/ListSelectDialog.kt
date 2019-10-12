@@ -119,6 +119,11 @@ class ListSelectDialog (private val builder: Builder) : Dialog(builder.context) 
             return this
         }
 
+        fun setTitle(value: String): Builder {
+            title = value
+            return this
+        }
+
         fun selectedTo(index: Int): Builder {
             this.selected = index
             return this

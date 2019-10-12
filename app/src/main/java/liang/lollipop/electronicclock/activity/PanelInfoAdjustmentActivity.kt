@@ -87,12 +87,8 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
             }
         }
         invertedBtn.setOnClickListener {
-            if (isInvertedColor) {
-                previewGroup.setBackgroundColor(Color.TRANSPARENT)
-            } else {
-                previewGroup.setBackgroundColor(Color.WHITE)
-            }
             isInvertedColor = !isInvertedColor
+            onPreviewBackgroundChange()
         }
         bindSeekBarAnimation()
         spanXSeekBar.min = 1F
@@ -103,6 +99,19 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         spanYSeekBar.onProgressChangeListener = this
 
         setPanelSize(1, 1)
+    }
+
+    private fun onPreviewBackgroundChange() {
+        previewGroup.setBackgroundColor(getPreviewBackgroundColor(isInvertedColor))
+        adjustmentFragment?.onBackgroundColorChange(getPreviewBackgroundColor(!isInvertedColor))
+    }
+
+    private fun getPreviewBackgroundColor(isInverted: Boolean): Int {
+        return if (isInverted) {
+            Color.BLACK
+        } else {
+            Color.WHITE
+        }
     }
 
     private fun callSubmit() {
@@ -216,6 +225,7 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
             fragment.getPanelInfo().let {
                 setPanelSize(it.spanX, it.spanY)
             }
+            onPreviewBackgroundChange()
         }
     }
 

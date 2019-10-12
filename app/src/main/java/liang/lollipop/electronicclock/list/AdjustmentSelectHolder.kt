@@ -16,8 +16,8 @@ import liang.lollipop.electronicclock.utils.ListSelectDialog
 class AdjustmentSelectHolder(view: View): AdjustmentHolder<AdjustmentSelect>(view) {
 
     companion object {
-        fun create(inflater: LayoutInflater, group: ViewGroup): AdjustmentPaddingHolder {
-            return AdjustmentPaddingHolder(
+        fun create(inflater: LayoutInflater, group: ViewGroup): AdjustmentSelectHolder {
+            return AdjustmentSelectHolder(
                 inflater.inflate(R.layout.item_adjustment_select, group, false))
         }
     }
@@ -32,9 +32,11 @@ class AdjustmentSelectHolder(view: View): AdjustmentHolder<AdjustmentSelect>(vie
             bindInfo?.let { info ->
                 ListSelectDialog.create(clickView.context)
                     .setData(info.itemList)
+                    .setTitle(info.title)
                     .selectedTo(info.selectedIndex)
                     .onItemSelected { dialog, index, value ->
                         bindInfo?.selectedIndex = index
+                        summaryView.text = value
                         onValueChangeListener?.onValueChange(this, index)
                         dialog.dismiss()
                     }.show()

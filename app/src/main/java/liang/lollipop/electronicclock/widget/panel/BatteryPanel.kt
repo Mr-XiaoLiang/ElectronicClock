@@ -53,6 +53,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
         batteryManager = context.getSystemService(BATTERY_SERVICE) as? BatteryManager
         val view = ImageView(context)
         view.background = batteryDrawable
+        this.view = view
         return view
     }
 
