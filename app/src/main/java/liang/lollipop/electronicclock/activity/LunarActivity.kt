@@ -1,6 +1,8 @@
 package liang.lollipop.electronicclock.activity
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.TextUtils
@@ -37,6 +39,11 @@ class LunarActivity : DialogActivity() {
 
         private const val FIRST_SHOW = "LUNAR_ACTIVITY_FIRST_SHOW"
 
+        fun startByTime(context: Context, time: Long) {
+            context.startActivity(Intent(context, LunarActivity::class.java).apply {
+                putExtra(ARG_TIME, time)
+            })
+        }
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
