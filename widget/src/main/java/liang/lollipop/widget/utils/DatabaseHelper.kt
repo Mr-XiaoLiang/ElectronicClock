@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper
 import liang.lollipop.widget.widget.PanelAdapter
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
-import java.lang.RuntimeException
 
 /**
  * @author lollipop
