@@ -18,6 +18,7 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
 
     private val calendarPanelInfo = CalendarPanelInfo()
     private val calendarPanel = CalendarPanel(calendarPanelInfo)
+    private var backgroundColor = 0
 
     companion object {
         private val typeValues = intArrayOf(
@@ -42,6 +43,12 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
         info?.let { calendarPanelInfo.copy(it) }
         putAdjustmentInfo()
         panelInitComplete()
+    }
+
+    override fun onBackgroundColorChange(color: Int) {
+        super.onBackgroundColorChange(color)
+        backgroundColor = color
+        calendarPanel.onColorChange(color, 1F)
     }
 
     private fun putAdjustmentInfo() {
@@ -152,10 +159,10 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
             select {
                 key = CalendarPanelInfo.CALENDAR_TYPE
                 title = getString(R.string.title_calendar_type)
-                selectBy(calendarPanelInfo.calendarType.typeToString())
                 for (strId in typeValues) {
                     addItem(getString(strId))
                 }
+                selectBy(calendarPanelInfo.calendarType.typeToString())
             }
         )
     }
@@ -203,6 +210,10 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
             }
             CalendarPanelInfo.IS_AUTO_TEXT_COLOR         -> {
                 calendarPanelInfo.isAutoTextColor = newValue.optBoolean(calendarPanelInfo.isAutoTextColor)
+                if (calendarPanelInfo.isAutoTextColor) {
+                    onBackgroundColorChange(backgroundColor)
+                    return
+                }
             }
             CalendarPanelInfo.TODAY_TEXT_COLOR           -> {
                 if (newValue is IntArray && newValue.size > 0) {
@@ -261,7 +272,11 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
             }
             CalendarPanelInfo.CALENDAR_TYPE             -> {
                 val index = newValue.optInt(0)
-                calendarPanelInfo.calendarType = index.indexToType()
+                val newType = index.indexToType()
+                if (newType == calendarPanelInfo.calendarType) {
+                    return
+                }
+                calendarPanelInfo.calendarType = newType
             }
         }
         calendarPanel.onInfoChange()

@@ -165,6 +165,10 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         onInfoChange(info, newValue)
     }
 
+    open fun onBackgroundColorChange(color: Int) {
+
+    }
+
     abstract fun onInfoChange(info: AdjustmentInfo, newValue: Any)
 
     /**

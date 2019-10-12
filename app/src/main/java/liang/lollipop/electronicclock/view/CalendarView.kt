@@ -78,15 +78,20 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
      * 日历展示模式
      */
     var calendarType = Type.Month
-
-    /**
-     * 参数设置
-     */
-    var options: Options = Options()
         set(value) {
             field = value
             notifyDataChange()
         }
+
+    /**
+     * 参数设置
+     */
+    val options = Options()
+
+    fun changeOptions(option: Options) {
+        options.copy(option)
+        notifyDataChange()
+    }
 
     private val weightPaddingViewHelper = WeightPaddingViewHelper()
 
@@ -136,6 +141,9 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             }
             return
         }
+        dayViewList.forEach {
+            it.isActive = false
+        }
         // 排版
         val left = paddingLeftW
         val top = paddingTopW
@@ -148,12 +156,6 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
                 day.element = lunarCalendar?.today?:emptyElement
                 layoutDayView(day, left.toInt(), top.toInt(),
                     (left + width).toInt(), (top + height).toInt())
-                for (week in weekViewList) {
-                    week.visibility = View.GONE
-                }
-                for (index in 1 until dayViewList.size) {
-                    dayViewList[index].visibility = View.GONE
-                }
             }
             // 星期模式，只展示一周的内容
             Type.Week -> {
@@ -164,7 +166,11 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
                 layoutByMonthType(left, top, width, height)
             }
         }
-
+        dayViewList.forEach {
+            if (!it.isActive) {
+                it.visibility = View.GONE
+            }
+        }
     }
 
     private fun layoutByWeekType(left: Float, top: Float, width: Float, height: Float) {
@@ -203,9 +209,6 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
                 (x + dayWidth).toInt(), (y + dayHeight).toInt())
             x += dayWidth
         }
-        for (index in (7 - startIndex) until dayViewList.size) {
-            dayViewList[index].visibility = View.GONE
-        }
     }
 
     private fun layoutByMonthType(left: Float, top: Float, width: Float, height: Float) {
@@ -233,6 +236,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         var y = weekHeight
         for (index in elementArray.indices) {
             val day = dayViewList[index]
+            day.visibility = View.VISIBLE
             day.element = elementArray[index]
             layoutDayView(day, x.toInt(), y.toInt(),
                 (x + dayWidth).toInt(), (y + dayHeight).toInt())
@@ -255,6 +259,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             val padding = (min(weekHeight, dayWidth) * 0.3F).toInt()
             // 遍历每一个星期的View
             for (week in weekViewList) {
+                week.visibility = View.VISIBLE
                 // 为他设置显示的数字
                 week.number = weekNumber % 7
                 week.setPadding(padding, padding, padding, padding)
@@ -279,6 +284,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         val padding = (min(right - left, bottom - top) * 0.06F).toInt()
         day.setPadding(padding, padding, padding, padding)
         day.layout(left, top, right, bottom)
+        day.isActive = true
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -346,6 +352,19 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         weekViewList.forEach {
             it.color = options.otherTextColor
         }
+        if (calendarType == Type.Day || !options.isShowWeek) {
+            for (week in weekViewList) {
+                if (week.visibility != View.GONE) {
+                    week.visibility = View.GONE
+                }
+            }
+        } else {
+            for (week in weekViewList) {
+                if (week.visibility != View.VISIBLE) {
+                    week.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     private class DayView(context: Context) : View(context) {
@@ -357,6 +376,8 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             }
 
         val options = Options()
+
+        var isActive = false
 
         private val bounds = RectF()
 
