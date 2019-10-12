@@ -292,6 +292,14 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
     fun notifyDataChange() {
         onDataChange()
         requestLayout()
+        invalidate()
+    }
+
+    override fun invalidate() {
+        super.invalidate()
+        for (index in 0 until childCount) {
+            getChildAt(index).invalidate()
+        }
     }
 
     /**
@@ -334,6 +342,9 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         // 为新旧view都更新一次参数
         dayViewList.forEach {
             it.options.copy(options)
+        }
+        weekViewList.forEach {
+            it.color = options.otherTextColor
         }
     }
 
