@@ -13,6 +13,8 @@ import liang.lollipop.electronicclock.view.CalendarView
 import liang.lollipop.electronicclock.widget.info.CalendarPanelInfo
 import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.PanelInfo
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * @author lollipop
@@ -50,11 +52,21 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
         if (panelInfo.isAutoTextColor) {
             tryMyView<CalendarView> {
                 it.options.apply {
-                    val inverted = if (color == Color.WHITE) { Color.BLACK } else  { Color.WHITE }
+                    val fullColor = color or 0xFF000000.toInt()
+                    val alpha = Color.alpha(color)
+                    val inverted = if (fullColor == Color.WHITE) {
+                        Color.BLACK
+                    } else  {
+                        Color.WHITE
+                    }.changeAlpha(alpha)
+                    val lightInt = max(min((light * 255).toInt(), 255), 0)
                     todayTextColor = inverted
                     todayBgColor = color
                     otherTextColor = color
                     otherBgColor = Color.TRANSPARENT
+                    auspiciousPointColor = auspiciousPointColor.changeAlpha(lightInt)
+                    lunarFestivalPointColor = lunarFestivalPointColor.changeAlpha(lightInt)
+                    solarFestivalPointColor = solarFestivalPointColor.changeAlpha(lightInt)
                 }
                 it.notifyDataChange()
             }

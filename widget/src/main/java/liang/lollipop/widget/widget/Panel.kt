@@ -154,4 +154,8 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
         }
     }
 
+    protected fun Int.changeAlpha(alpha: Int): Int {
+        return this and 0xFFFFFF or (alpha shl 24)
+    }
+
 }

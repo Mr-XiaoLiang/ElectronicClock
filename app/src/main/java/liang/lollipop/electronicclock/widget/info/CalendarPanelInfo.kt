@@ -93,7 +93,7 @@ class CalendarPanelInfo: PanelInfo() {
         jsonObj.put(CALENDAR_TYPE              , calendarType.value                     )
     }
 
-    fun parseType(value: Int) {
+    private fun parseType(value: Int) {
         calendarType = when (value) {
             CalendarView.Type.Month.value -> CalendarView.Type.Month
             CalendarView.Type.Week.value -> CalendarView.Type.Week
