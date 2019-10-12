@@ -88,9 +88,21 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
      */
     val options = Options()
 
-    fun changeOptions(option: Options) {
-        options.copy(option)
+    fun changeOptions(option: Options, isCopyTextColor: Boolean = true) {
+        options.copy(option, isCopyTextColor)
         notifyDataChange()
+    }
+
+    fun onDayViewClick(listener: OnDayViewClickListener) {
+        onDayViewClickListener = listener
+    }
+
+    fun onDayViewClick(listener: (year: Int, month: Int, day: Int) -> Unit) {
+        onDayViewClick(object : OnDayViewClickListener {
+            override fun onDayViewClick(year: Int, month: Int, day: Int) {
+                listener(year, month, day)
+            }
+        })
     }
 
     private val weightPaddingViewHelper = WeightPaddingViewHelper()
@@ -201,7 +213,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             0
         }
         var x = left + dayWidth * startIndex
-        val y = weekHeight
+        val y = weekHeight + top
         for (index in 0 until (7 - startIndex)) {
             val day = dayViewList[index]
             day.element = elementArray[startElement + index]
@@ -233,7 +245,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         // 直接开始排版
         val elementArray = calendar.elementArray
         var x = left + dayWidth * startIndex
-        var y = weekHeight
+        var y = weekHeight + top
         for (index in elementArray.indices) {
             val day = dayViewList[index]
             day.visibility = View.VISIBLE
@@ -241,7 +253,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             layoutDayView(day, x.toInt(), y.toInt(),
                 (x + dayWidth).toInt(), (y + dayHeight).toInt())
             if ((index + startIndex) % 7 == 0) {
-                x = left.toFloat()
+                x = left
                 y += dayHeight
             } else {
                 x += dayWidth
@@ -416,13 +428,14 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             mainValue = "${element.sDay}"
             // 按照优先级确认次文字是否已经占用
             var hasSecondary = false
+            secondaryValue = ""
             // 最先是节气
             if (options.isShowSolarTerms && element.solarTerms.isNotEmpty()) {
                 hasSecondary = true
                 secondaryValue = element.solarTerms
             }
             // 如果是月初，那么优先展示月份
-            if (element.lDay == 1) {
+            if (element.lDay == 1 && options.isShowLunar) {
                 hasSecondary = true
                 secondaryValue = "${element.lMonthChinese}月"
             }
@@ -623,17 +636,19 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         /** 最大的小点数量 **/
         var maxPointSize = 9
 
-        fun copy(other: Options) {
+        fun copy(other: Options, isCopyTextColor: Boolean = true) {
             isShowWeek               = other.isShowWeek
             isShowLunar              = other.isShowLunar
             isShowFestival           = other.isShowFestival
             isShowSolarTerms         = other.isShowSolarTerms
             isShowAuspicious         = other.isShowAuspicious
             isOvalBg                 = other.isOvalBg
-            todayTextColor           = other.todayTextColor
-            todayBgColor             = other.todayBgColor
-            otherTextColor           = other.otherTextColor
-            otherBgColor             = other.otherBgColor
+            if (isCopyTextColor) {
+                todayTextColor           = other.todayTextColor
+                todayBgColor             = other.todayBgColor
+                otherTextColor           = other.otherTextColor
+                otherBgColor             = other.otherBgColor
+            }
             isStartingOnSunday       = other.isStartingOnSunday
             isShowSchedule           = other.isShowSchedule
             solarFestivalPointColor  = other.solarFestivalPointColor

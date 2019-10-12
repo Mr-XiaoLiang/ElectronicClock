@@ -190,6 +190,14 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
     override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
         val option = calendarPanelInfo.calendarOptions
         when (info.key) {
+            PanelInfo.PADDING                            -> {
+                if (newValue is FloatArray) {
+                    calendarPanelInfo.padding[0] = newValue[0]
+                    calendarPanelInfo.padding[1] = newValue[1]
+                    calendarPanelInfo.padding[2] = newValue[2]
+                    calendarPanelInfo.padding[3] = newValue[3]
+                }
+            }
             CalendarPanelInfo.IS_SHOW_WEEK               -> {
                 option.isShowWeek = newValue.optBoolean(option.isShowWeek)
             }

@@ -157,7 +157,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
                     }
                 }
             }
-            PanelInfo.PADDING        -> {
+            PanelInfo.PADDING              -> {
                 if (newValue is FloatArray) {
                     batteryInfo.padding[0] = newValue[0]
                     batteryInfo.padding[1] = newValue[1]

@@ -521,6 +521,11 @@ class LunarCalendar private constructor(private val year: Int, private val month
             run(year, month)
         }
 
+        fun timeInMillis(year: Int, month: Int, day: Int): Long {
+            staticCalendar.set(year, month, day, 0, 0, 0)
+            return staticCalendar.timeInMillis
+        }
+
         /**
          * 获取日期信息的方法
          * 获取某一天的农历

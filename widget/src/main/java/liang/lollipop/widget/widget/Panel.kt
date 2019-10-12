@@ -44,6 +44,12 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     var isActive: Boolean = false
         internal set
 
+    /**
+     * 是否是编辑模式
+     */
+    var isInEditMode: Boolean = false
+        internal set
+
     fun callOnClick(v: View? = null) {
         onClick(v ?: view)
     }

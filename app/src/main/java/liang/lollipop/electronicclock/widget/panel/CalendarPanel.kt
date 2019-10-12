@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.snackbar.Snackbar
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.activity.LunarActivity
 import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.electronicclock.utils.LunarCalendar
 import liang.lollipop.electronicclock.view.CalendarView
@@ -24,10 +25,15 @@ import kotlin.math.min
 class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
 
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
-        return createView(layoutInflater.context)
+        val panelView = createView(layoutInflater.context)
+        panelView.onDayViewClick { year, month, day ->
+            LunarActivity.startByTime(layoutInflater.context,
+                LunarCalendar.timeInMillis(year, month, day))
+        }
+        return panelView
     }
 
-    fun createView(context: Context): View {
+    fun createView(context: Context): CalendarView {
         val view = CalendarView(context)
         this.view = view
         return view
@@ -35,8 +41,10 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
 
     override fun onInfoChange() {
         tryMyView<CalendarView> {
-            it.changeOptions(panelInfo.calendarOptions)
+            it.changeOptions(panelInfo.calendarOptions, !panelInfo.isAutoTextColor)
             it.calendarType = panelInfo.calendarType
+            val paddingArray = panelInfo.padding
+            it.setWeightPadding(paddingArray[0], paddingArray[1], paddingArray[2], paddingArray[3])
         }
         onUpdate()
     }
