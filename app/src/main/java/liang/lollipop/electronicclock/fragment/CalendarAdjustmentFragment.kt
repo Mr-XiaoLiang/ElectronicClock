@@ -43,6 +43,7 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
         info?.let { calendarPanelInfo.copy(it) }
         putAdjustmentInfo()
         panelInitComplete()
+        calendarPanel.onInfoChange()
     }
 
     override fun onBackgroundColorChange(color: Int) {
