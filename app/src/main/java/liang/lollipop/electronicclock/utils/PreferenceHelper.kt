@@ -70,12 +70,14 @@ object PreferenceHelper {
         private val context = group.context
 
         init {
-            group.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-            val adapter = PreferenceAdapter(infoList, LayoutInflater.from(context)) {info, newValue ->
-                onInfoChange(info, newValue)
+            group.post {
+                group.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                val adapter = PreferenceAdapter(infoList, LayoutInflater.from(context)) {info, newValue ->
+                    onInfoChange(info, newValue)
+                }
+                group.adapter = adapter
+                update()
             }
-            group.adapter = adapter
-            update()
         }
 
         fun update() {

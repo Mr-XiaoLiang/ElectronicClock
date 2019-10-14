@@ -123,9 +123,9 @@
     <string name="summary_lunar_festival_point_color">color when holiday information is omitted as a small dot </string>
     <string name="title_auspicious_point_color">Auspicious reminder color </string>
     <string name="summary_auspicious_point_color">The color of the prompt displayed on the day of the day is </string>
-    <string name="calendar">日历</string>
-    <string name="calendar_type_month">月历</string>
-    <string name="calendar_type_week">周历</string>
-    <string name="calendar_type_day">日历</string>
-    <string name="title_calendar_type">日历模式</string>
+    <string name="calendar">Calendar</string>
+    <string name="calendar_type_month">Month</string>
+    <string name="calendar_type_week">Week</string>
+    <string name="calendar_type_day">Day</string>
+    <string name="title_calendar_type">Calendar type</string>
 </resources>
