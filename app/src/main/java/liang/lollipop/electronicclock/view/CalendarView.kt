@@ -198,23 +198,28 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         val weekHeight = layoutWeek(left, top, dayWidth, dayHeight)
         // 对天进行排版
         val elementArray = calendar.elementArray
+        val weekOffset = if (options.isStartingOnSunday) { 0 } else { 6 }
         // 如果今天的不存在的，那么随便拿第一周就好了
         val todayElement = if (calendar.today != null) {
             elementArray.indexOf(calendar.today)
         } else {
             0
         }
-        // 首先拿到开始的index
-        val startIndex = if (options.isStartingOnSunday) {
-            todayElement - (todayElement + calendar.firstWeek) % 7
+        // 第几个星期
+        val weekIndex = (todayElement + calendar.firstWeek + weekOffset) / 7
+        // 首先拿到开始的index， 如果是第一周，那么直接拿第一天
+        val startIndex: Int
+        val startWeek: Int
+        if (weekIndex == 0) {
+            startIndex = 0
+            startWeek = (calendar.firstWeek + weekOffset) % 7
         } else {
-            // 为了防止出现负数，做一点处理
-            todayElement - (todayElement + calendar.firstWeek - 1 + 7) % 7
+            startIndex = todayElement - (todayElement + calendar.firstWeek + weekOffset) % 7
+            startWeek = 0
         }
-//        val startWeek =
-        var x = left + dayWidth * startIndex
+        var x = left + dayWidth * startWeek
         val y = weekHeight + top
-        for (index in 0 until (7 - startIndex)) {
+        for (index in 0 until (7 - startWeek)) {
             if (startIndex + index >= dayViewList.size) {
                 break
             }
@@ -275,6 +280,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             val padding = (min(weekHeight, dayWidth) * 0.3F).toInt()
             // 遍历每一个星期的View
             for (week in weekViewList) {
+                week.color = options.otherTextColor
                 week.visibility = View.VISIBLE
                 // 为他设置显示的数字
                 week.number = weekNumber % 7

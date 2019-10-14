@@ -207,6 +207,9 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         when (view) {
             spanXSeekBar, spanYSeekBar -> {
                 onPanelSizeChange(spanXSeekBar.progress.toInt(), spanYSeekBar.progress.toInt())
+                adjustmentFragment?.getPanelInfo()?.sizeChange(
+                    spanXSeekBar.progress.toInt(),
+                    spanYSeekBar.progress.toInt())
             }
         }
     }

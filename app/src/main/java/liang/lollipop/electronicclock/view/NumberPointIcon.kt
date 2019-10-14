@@ -105,52 +105,62 @@ class NumberPointIcon(context: Context, attrs: AttributeSet?, defStyleAttr:Int )
         var pointSize = 0
             set(value) {
                 field = value % 10
-                invalidateSelf()
+                measureRadius()
             }
 
         var weight = 1F
             set(value) {
                 field = value
-                invalidateSelf()
+                measureRadius()
             }
 
         var maxRadiusWeight = 0.4F
             set(value) {
                 field = value
-                invalidateSelf()
+                measureRadius()
             }
 
         override fun draw(canvas: Canvas) {
             // 如果是0，那么画一个圆圈
-            if (pointSize == 0) {
-                paint.style = Paint.Style.STROKE
-                val strokeWidth = radius * 0.1F * weight
-                paint.strokeWidth = strokeWidth
-                canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
-                    radius - strokeWidth / 2, paint)
-            } else if (pointSize == 1) {
-                canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
-                    pointRadius, paint)
-            } else {
-                val step = 360F / pointSize
-                canvas.save()
-                // 移动坐标点到画布中心
-                canvas.translate(bounds.exactCenterX(), bounds.exactCenterY())
-                paint.style = Paint.Style.FILL
-                for (index in 0 until pointSize) {
+            when (pointSize) {
+                0 -> {
+                    paint.style = Paint.Style.STROKE
+                    val strokeWidth = radius * 0.1F * weight
+                    paint.strokeWidth = strokeWidth
+                    canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
+                        radius - strokeWidth / 2, paint)
+                }
+                1 -> {
+                    paint.style = Paint.Style.FILL
+                    canvas.drawCircle(bounds.exactCenterX(), bounds.exactCenterY(),
+                        pointRadius, paint)
+                }
+                else -> {
+                    val step = 360F / pointSize
                     canvas.save()
-                    // 旋转角度来保证小点都是在同一个圆上
-                    canvas.rotate(step * index - 90F)
-                    canvas.drawCircle(radius, 0F, pointRadius, paint)
+                    // 移动坐标点到画布中心
+                    canvas.translate(bounds.exactCenterX(), bounds.exactCenterY())
+                    paint.style = Paint.Style.FILL
+                    for (index in 0 until pointSize) {
+                        canvas.save()
+                        // 旋转角度来保证小点都是在同一个圆上
+                        canvas.rotate(step * index - 90F)
+                        canvas.drawCircle(radius, 0F, pointRadius, paint)
+                        canvas.restore()
+                    }
                     canvas.restore()
                 }
-                canvas.restore()
             }
 
         }
 
         override fun onBoundsChange(bounds: Rect) {
             super.onBoundsChange(bounds)
+            measureRadius()
+
+        }
+
+        private fun measureRadius() {
             // 计算可用半径
             radius = min(bounds.width(), bounds.height()) * 0.5F
             // 计算小点的半径

@@ -14,7 +14,8 @@
             android:theme="@style/AppTheme">
         <activity
                 android:theme="@style/AppTheme.Transparent"
-                android:name=".activity.LunarActivity"/>
+                android:name=".activity.LunarActivity"
+                android:launchMode="singleInstance"/>
         <activity android:name=".activity.PanelInfoAdjustmentActivity" />
         <activity android:name=".activity.EditActivity" />
         <activity
@@ -23,7 +24,6 @@
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

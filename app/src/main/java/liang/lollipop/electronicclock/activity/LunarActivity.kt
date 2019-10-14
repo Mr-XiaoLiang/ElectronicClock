@@ -21,6 +21,7 @@ import liang.lollipop.electronicclock.utils.LunarCalendar
 import liang.lollipop.electronicclock.utils.getPreferences
 import liang.lollipop.electronicclock.utils.putPreferences
 
+
 /**
  * 黄历，农历的Activity
  * @author Lollipop
@@ -44,6 +45,7 @@ class LunarActivity : DialogActivity() {
                 putExtra(ARG_TIME, time)
             })
         }
+
     }
 
     override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
