@@ -5,6 +5,7 @@ import java.math.BigDecimal
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.math.abs
 
 /**
  * @author lollipop
@@ -387,7 +388,6 @@ class LunarCalendar private constructor(private val year: Int, private val month
             Festival(10,1, arrayOf("国庆节", "国际音乐节", "国际老人节"), true),
             Festival(10,2,"国际减轻自然灾害日"),
             Festival(10,4,"世界动物日"),
-            Festival(10,7,"国际住房日"),
             Festival(10,8, arrayOf("世界视觉日", "全国高血压日")),
             Festival(10,9,"世界邮政日"),
             Festival(10,10, arrayOf("辛亥革命纪念日", "世界精神卫生日")),
@@ -452,20 +452,23 @@ class LunarCalendar private constructor(private val year: Int, private val month
             Festival(1,0,"除夕",true)
         )
 
-        //某月的第几个星期几; 5,6,7,8 表示到数第 1,2,3,4 个星期几
-        private val wFtv = arrayOf(
-            "0110  黑人节",
-            "0150  世界麻风日",
-            "0121  日本成人节",
-            "0520  母亲节",
-            "0530  全国助残日",
-            "0630  父亲节",
-            "0716  合作节",
-            "0730  被奴役国家周",
-            "0932  国际和平日",
-            "0940  国际聋人节 世界儿童日",
-            "1011  国际住房日",
-            "1144  感恩节"
+        /**
+         * 按星期计算的节日
+         */
+        private val internationalFestivalArray = arrayOf (
+            InternationalFestival(1, 0, 0, "黑人节"),
+            InternationalFestival(1, -1, 0, "世界麻风日"),
+            InternationalFestival(1, 1, 1, "日本成人节"),
+            InternationalFestival(5, 1, 0, "母亲节"),
+            InternationalFestival(5, 2, 0, "全国助残日"),
+            InternationalFestival(6, 2, 0, "父亲节"),
+            InternationalFestival(7, 0, 6, "合作节"),
+            InternationalFestival(7, 2, 0, "被奴役国家周"),
+            InternationalFestival(9, 2, 2, "国际和平日"),
+            InternationalFestival(9, 3, 0, "国际聋人节"),
+            InternationalFestival(9, 3, 0, "世界儿童日"),
+            InternationalFestival(10, 0, 1, "国际住房日"),
+            InternationalFestival(11, 3, 4, "感恩节")
         )
 
         /**
@@ -941,6 +944,26 @@ class LunarCalendar private constructor(private val year: Int, private val month
         } else {
             today = null
         }
+
+        //国际节日
+        for (festival in internationalFestivalArray) {
+            if (festival.month == month + 1) {
+                var day = 0
+                // 如果是倒数，那么倒着数
+                if (festival.weekIndex < 0) {
+                    day = elementArray.size
+                }
+                // 偏移到第几周
+                day += festival.weekIndex * 7
+                // 偏移到星期
+                day += festival.weekDay - firstWeek
+                if (day < 0) {
+                    day += 7
+                }
+                val element = elementArray[day % elementArray.size]
+                element.solarFestival.add(festival.name)
+            }
+        }
     }
 
     private class Easter constructor(y: Int, calendar: Calendar) {
@@ -1051,10 +1074,6 @@ class LunarCalendar private constructor(private val year: Int, private val month
             this.month = i
             this.day = offset + 1
         }
-
-    }
-
-    class TongShengAlmanac {
 
     }
 
@@ -1241,5 +1260,11 @@ class LunarCalendar private constructor(private val year: Int, private val month
             return result
         }
     }
+
+    /**
+     * 国际节日
+     */
+    data class InternationalFestival(val month: Int, val weekIndex: Int,
+                                     val weekDay: Int, val name: String)
 
 }

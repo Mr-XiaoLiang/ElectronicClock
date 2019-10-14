@@ -28,7 +28,7 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
         val panelView = createView(layoutInflater.context)
         panelView.onDayViewClick { year, month, day ->
             LunarActivity.startByTime(layoutInflater.context,
-                LunarCalendar.timeInMillis(year, month, day))
+                LunarCalendar.timeInMillis(year, month - 1, day))
         }
         return panelView
     }

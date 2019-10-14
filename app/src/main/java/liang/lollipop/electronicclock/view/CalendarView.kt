@@ -197,26 +197,29 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         // 对星期进行排版
         val weekHeight = layoutWeek(left, top, dayWidth, dayHeight)
         // 对天进行排版
-        // 首先拿到开始的index
-        val startIndex = if (options.isStartingOnSunday) {
-            calendar.firstWeek
-        } else {
-            // 为了防止出现负数，做一点处理
-            (calendar.firstWeek + 7 - 1) % 7
-        }
         val elementArray = calendar.elementArray
         // 如果今天的不存在的，那么随便拿第一周就好了
-        val startElement = if (calendar.today != null) {
-            val todayIndex = elementArray.indexOf(calendar.today)
-            (todayIndex + startIndex) / 7 * 7
+        val todayElement = if (calendar.today != null) {
+            elementArray.indexOf(calendar.today)
         } else {
             0
         }
+        // 首先拿到开始的index
+        val startIndex = if (options.isStartingOnSunday) {
+            todayElement - (todayElement + calendar.firstWeek) % 7
+        } else {
+            // 为了防止出现负数，做一点处理
+            todayElement - (todayElement + calendar.firstWeek - 1 + 7) % 7
+        }
+//        val startWeek =
         var x = left + dayWidth * startIndex
         val y = weekHeight + top
         for (index in 0 until (7 - startIndex)) {
+            if (startIndex + index >= dayViewList.size) {
+                break
+            }
             val day = dayViewList[index]
-            day.element = elementArray[startElement + index]
+            day.element = elementArray[startIndex + index]
             layoutDayView(day, x.toInt(), y.toInt(),
                 (x + dayWidth).toInt(), (y + dayHeight).toInt())
             x += dayWidth
@@ -242,6 +245,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             // 为了防止出现负数，做一点处理
             (calendar.firstWeek + 7 - 1) % 7
         }
+        val endIndex = if (options.isStartingOnSunday) { 6 }  else { 0 }
         // 直接开始排版
         val elementArray = calendar.elementArray
         var x = left + dayWidth * startIndex
@@ -252,7 +256,7 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             day.element = elementArray[index]
             layoutDayView(day, x.toInt(), y.toInt(),
                 (x + dayWidth).toInt(), (y + dayHeight).toInt())
-            if ((index + startIndex) % 7 == 0) {
+            if ((index + startIndex) % 7 == endIndex) {
                 x = left
                 y += dayHeight
             } else {
