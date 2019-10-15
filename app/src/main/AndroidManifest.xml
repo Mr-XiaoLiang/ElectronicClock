@@ -27,6 +27,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+                android:name=".service.ClockDreamService"
+                android:enabled="true"
+                android:exported="true"
+                android:label="@string/app_name"
+                android:permission="android.permission.BIND_DREAM_SERVICE"
+                android:process="liang.lollipop.electronicclock.dream">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Point to additional information for this dream (optional) -->
+            <meta-data
+                    android:name="android.service.dream"
+                    android:resource="@xml/dream_setting" />
+        </service>
     </application>
 
 </manifest>
