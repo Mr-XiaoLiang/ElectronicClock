@@ -14,7 +14,6 @@ import android.hardware.SensorManager
 import android.os.Handler
 import android.util.SparseArray
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
-import liang.lollipop.widget.panel.SystemWidgetPanel
 import liang.lollipop.widget.utils.*
 import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.PanelAdapter
@@ -29,12 +28,12 @@ import kotlin.math.min
  * @date 2019-07-30 20:41
  * 小部件辅助器
  */
-class WidgetHelper private constructor(private val activity: Activity,
+class WidgetHelper private constructor(private val activity: Context,
                                        private val widgetGroup: WidgetGroup,
                                        private val hostId: Int = AppWidgetHelper.DEF_HOST_ID) {
 
     companion object {
-        fun with(context: Activity, group: WidgetGroup): WidgetHelper {
+        fun with(context: Context, group: WidgetGroup): WidgetHelper {
             return WidgetHelper(context, group)
         }
 
@@ -618,8 +617,7 @@ class WidgetHelper private constructor(private val activity: Activity,
     }
 
     fun addPanel(info: PanelInfo, result: ((Panel<*>) -> Unit)? = null) {
-        if (info.id == PanelInfo.NO_ID && info.initIntent != null) {
-            pendingPanel(info)
+        if (info.id == PanelInfo.NO_ID && info.initIntent != null && pendingPanel(info)) {
             return
         }
         val panel = panelAdapter.createPanelByInfo(info)
@@ -639,10 +637,14 @@ class WidgetHelper private constructor(private val activity: Activity,
         onColorChange()
     }
 
-    private fun pendingPanel(info: PanelInfo) {
+    private fun pendingPanel(info: PanelInfo): Boolean {
         val requestId = generateRequestId()
         pendlingInfoList.append(requestId, info)
-        activity.startActivityForResult(info.initIntent, requestId)
+        if (activity is Activity) {
+            activity.startActivityForResult(info.initIntent, requestId)
+            return true
+        }
+        return false
     }
 
     private fun onPendingPanelResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {

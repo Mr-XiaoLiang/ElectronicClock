@@ -4,6 +4,7 @@ import android.app.Activity
 import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
+import android.content.Context
 import android.content.Intent
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
 
@@ -13,7 +14,7 @@ import liang.lollipop.widget.info.SystemWidgetPanelInfo
  * @date 2019-08-05 13:46
  * 系统应用的小部件的辅助类
  */
-class AppWidgetHelper(private val activity: Activity, hostId: Int = DEF_HOST_ID) {
+class AppWidgetHelper(private val activity: Context, hostId: Int = DEF_HOST_ID) {
 
     companion object {
         const val DEF_HOST_ID = 104096
@@ -42,11 +43,15 @@ class AppWidgetHelper(private val activity: Activity, hostId: Int = DEF_HOST_ID)
         appWidgetHost.stopListening()
     }
 
-    fun selectAppWidget() {
-        val pickIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_PICK)
-        val newId = appWidgetHost.allocateAppWidgetId()
-        pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, newId)
-        activity.startActivityForResult(pickIntent, REQUEST_SELECT_WIDGET)
+    fun selectAppWidget(): Boolean {
+        if (activity is Activity) {
+            val pickIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_PICK)
+            val newId = appWidgetHost.allocateAppWidgetId()
+            pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, newId)
+            activity.startActivityForResult(pickIntent, REQUEST_SELECT_WIDGET)
+            return true
+        }
+        return false
     }
 
     fun onSelectWidgetError(lis: () -> Unit) {
@@ -89,10 +94,12 @@ class AppWidgetHelper(private val activity: Activity, hostId: Int = DEF_HOST_ID)
         val appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
         // 如果有有参数配置页面，那么跳转过去
         if (appWidgetProviderInfo.configure != null) {
-            val configureIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
-            configureIntent.component = appWidgetProviderInfo.configure
-            configureIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            activity.startActivityForResult(configureIntent, REQUEST_CREATE_WIDGET)
+            if (activity is Activity) {
+                val configureIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+                configureIntent.component = appWidgetProviderInfo.configure
+                configureIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                activity.startActivityForResult(configureIntent, REQUEST_CREATE_WIDGET)
+            }
             return
         }
         // 如果没有配置的页面，那么认为直接创建成功了

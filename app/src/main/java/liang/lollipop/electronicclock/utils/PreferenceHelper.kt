@@ -1,6 +1,5 @@
 package liang.lollipop.electronicclock.utils
 
-import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.preference.PreferenceManager
@@ -47,7 +46,7 @@ object PreferenceHelper {
         return PreferenceHelperImpl(group)
     }
 
-    fun createWidgetHelper(activity: Activity, widgetGroup: WidgetGroup): WidgetHelper {
+    fun createWidgetHelper(activity: Context, widgetGroup: WidgetGroup): WidgetHelper {
         return WidgetHelper.with(activity, widgetGroup).let {
             it.dragStrokeWidth = activity.resources.dp(20F)
             it.selectedBorderWidth = activity.resources.dp(2F)
