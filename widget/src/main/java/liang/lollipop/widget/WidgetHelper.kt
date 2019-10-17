@@ -3,6 +3,7 @@ package liang.lollipop.widget
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -322,16 +323,22 @@ class WidgetHelper private constructor(private val activity: Context,
             existedList.addAll(panelList)
             // 新的，需要待添加的集合
             val newList = ArrayList<PanelInfo>()
+            // 是否需要重新排版
+            var isNeedRelayout = false
             // 添加新的小部件，移除不需要的，并且更新现有的
             tmpInfoList.forEach { info ->
                 val panel = findPanelByInfo(existedList, info)
                 if (panel != null) {
                     // 如果面板是存在的，并且是有效的，那么只更新数据状态
                     panel.panelInfo.copy(info)
+                    if (!isNeedRelayout) {
+                        isNeedRelayout = true
+                    }
                     // 这是一个有意义的面板，因此从集合中移除
                     existedList.remove(panel)
                 } else {
                     // 没有从现存的面板中找到有效的面板，那么加入新的集合
+                    isNeedRelayout = false
                     newList.add(info)
                 }
             }
@@ -347,7 +354,7 @@ class WidgetHelper private constructor(private val activity: Context,
                 }
                 // 如果没有小部件发生变更，那么手动触发一次排版动作
                 // 因为添加或者移除面板，会自动触发面板的更新，因此不做额外的触发
-                if (existedList.isEmpty() && newList.isEmpty()) {
+                if (isNeedRelayout) {
                     widgetGroup.notifyInfoChange()
                     widgetGroup.requestLayout()
                 }
@@ -688,6 +695,18 @@ class WidgetHelper private constructor(private val activity: Context,
         widgetGroup.selectedPanel?.let { panel ->
             removePanel(panel)
         }
+    }
+
+    fun postOnConfigurationChanged(newConfig: Configuration,
+                                   run: (helper: WidgetHelper) -> Unit,
+                                   delay: Long = 50) {
+        widgetGroup.postDelayed({
+            val type = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT
+            if (isPortrait != type) {
+                isPortrait = type
+                run(this)
+            }
+        }, delay)
     }
 
     enum class LoadStatus {
