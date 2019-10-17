@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.service
 
+import android.content.res.Configuration
 import android.service.dreams.DreamService
 import android.view.View
 import android.view.WindowInsets
@@ -72,7 +73,7 @@ class ClockDreamService: DreamService() {
         widgetGroup?.post {
             widgetGroup?.let {
                 val clockPanelInfo = ClockPanelInfo()
-                clockPanelInfo.sizeChange(it.spanCountX, it.spanCountY)
+                clockPanelInfo.sizeChange(it.spanCountX, 1)
                 clockPanelInfo.offset(0, 0)
                 widgetHelper?.addPanel(clockPanelInfo)
             }
@@ -91,6 +92,7 @@ class ClockDreamService: DreamService() {
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        widgetHelper = null
     }
 
     private fun insetListener(group: View, onInsetChange: (insets: WindowInsets) -> Unit) {
@@ -99,5 +101,12 @@ class ClockDreamService: DreamService() {
             onInsetChange(insets)
             insets.consumeStableInsets()
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        widgetHelper?.postOnConfigurationChanged(newConfig, {
+            initData()
+        })
     }
 }

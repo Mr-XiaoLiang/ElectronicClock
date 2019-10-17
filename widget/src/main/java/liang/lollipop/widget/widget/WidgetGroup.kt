@@ -239,6 +239,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
 
     private var isActive = false
 
+    private var requestToLayout = false
+
     /**
      * 添加面板
      * 添加View的唯一途径
@@ -623,11 +625,12 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 lastBounds.top != top ||
                 lastBounds.right != right ||
                 lastBounds.bottom != bottom
-        if (gridSize.isEmpty() || measuredWidth != srcWidth || measuredHeight != srcHeight ||
+        if (requestToLayout || gridSize.isEmpty() || measuredWidth != srcWidth || measuredHeight != srcHeight ||
             isPaddingChange || isBoundsChange) {
             // 如果格子尺寸是空的，那么尝试做尺寸计算
             calculateGridSize(widthSize, heightSize)
         }
+        requestToLayout = false
         lastPadding.set(paddingLeft, paddingTop, paddingRight, paddingBottom)
         lastBounds.set(left, top, right, bottom)
         val tmpRect = getRect()
@@ -1143,6 +1146,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         panelList.forEach {
             it.onInfoChange()
         }
+    }
+
+    override fun requestLayout() {
+        super.requestLayout()
+        requestToLayout = true
     }
 
 }
