@@ -7,4 +7,5 @@ package liang.lollipop.configurableview
  * 将承担解析和输出的任务，以及View转Json的工作
  */
 object ConfigurableView {
+
 }
