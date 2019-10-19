@@ -1,1 +1,1 @@
-include ':app', ':widget', ':guidelinesView'
+include ':app', ':widget', ':guidelinesView', ':configurableView'
