@@ -1,17 +1,17 @@
 package liang.lollipop.configurableview.util
 
-import android.view.View
-import android.view.ViewGroup
 import org.json.JSONArray
 import org.json.JSONObject
-import java.lang.Exception
+import java.util.*
 
 /**
  * @author lollipop
  * @date 2019-10-20 00:36
  * 配置信息
  */
-open class ConfigInfo (protected val info: JSONObject) {
+open class ConfigInfo (protected val parent: ConfigInfo? = null) {
+
+    protected val info: JSONObject = parent?.info?: JSONObject()
 
     companion object {
         private fun createJsonObject(json: String): JSONObject {
@@ -28,36 +28,57 @@ open class ConfigInfo (protected val info: JSONObject) {
         const val KEY_CLASS = "class"
         const val KEY_WIDTH = "width"
         const val KEY_HEIGHT = "height"
-
-
     }
 
-    constructor(json: String): this(createJsonObject(json))
+    fun parse(obj: JSONObject) {
+        val keys = obj.keys()
+        for (key in keys) {
+            info.put(key, obj.opt(key))
+        }
+    }
+
 
     fun optConfig(name: String): ConfigInfo {
-        return ConfigInfo(info.optJSONObject(name)?:JSONObject())
+        return ConfigInfo().apply {
+            info.optJSONObject(name)?.let {
+                parse(it)
+            }
+        }
     }
 
     fun optConfigArray(name: String): Array<ConfigInfo> {
         val objArray = info.optJSONArray(name)?: JSONArray()
         return Array(objArray.length()) {index ->
-            ConfigInfo(objArray.optJSONObject(index)?:JSONObject())
+            ConfigInfo().apply {
+                objArray.optJSONObject(index)?.let {
+                    parse(it)
+                }
+            }
         }
     }
 
-    val clazz: String
+    var clazz: String
         get() {
             return opt(KEY_CLASS, "")
         }
+        set(value) {
+            put(KEY_CLASS, value)
+        }
 
-    val width: Int
+    var width: Int
         get() {
             return opt(KEY_WIDTH, 0)
         }
+        set(value) {
+            put(KEY_WIDTH, value)
+        }
 
-    val height: Int
+    var height: Int
         get() {
             return opt(KEY_HEIGHT, 0)
+        }
+        set(value) {
+            put(KEY_HEIGHT, value)
         }
 
     protected inline fun <reified T> opt(name: String, def: T): T {
@@ -84,9 +105,8 @@ open class ConfigInfo (protected val info: JSONObject) {
         }
     }
 
-    enum class LayoutSize(val tag: String, val value: Int) {
-        Wrap("wrap", ViewGroup.LayoutParams.WRAP_CONTENT),
-        Match("match", ViewGroup.LayoutParams.MATCH_PARENT)
+    protected fun put(name: String, value: Any) {
+        info.put(name, value)
     }
 
 }
