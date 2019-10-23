@@ -17,6 +17,7 @@ class CTextView(context: Context): TextView(context) {
         companion object {
             const val TEXT = "TEXT"
             const val TEXT_COLOR = "TEXT_COLOR"
+            const val TEXT_SIZE = "TEXT_SIZE"
         }
 
         var text: String
@@ -33,6 +34,13 @@ class CTextView(context: Context): TextView(context) {
             }
             get() {
                 return opt(TEXT_COLOR, Color.BLACK)
+            }
+        var textSize: Float
+            set(value) {
+                put(TEXT_SIZE, value)
+            }
+            get() {
+                return opt(TEXT_SIZE, 16F)
             }
 
     }
