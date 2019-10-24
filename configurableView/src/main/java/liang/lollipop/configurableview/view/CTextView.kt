@@ -10,10 +10,24 @@ import liang.lollipop.configurableview.util.ConfigInfo
  * @date 2019-10-21 23:56
  * 可配置的TextView
  */
-class CTextView(context: Context): TextView(context) {
+class CTextView(context: Context): TextView(context), ConfigurableViewInterface {
+
+    private val viewConfigInfo = TextConfigInfo()
+
+    override fun bindData(info: ConfigInfo) {
+        viewConfigInfo.parse(info)
+        text = viewConfigInfo.text
+        setTextColor(viewConfigInfo.textColor)
+        textSize = viewConfigInfo.textSize
+    }
+
+    override fun serializat(): ConfigInfo {
+        return viewConfigInfo
+    }
 
 
-    class TextConfigInfo(configInfo: ConfigInfo): ConfigInfo(configInfo) {
+    class TextConfigInfo(configInfo: ConfigInfo? = null): ConfigInfo(configInfo) {
+
         companion object {
             const val TEXT = "TEXT"
             const val TEXT_COLOR = "TEXT_COLOR"
