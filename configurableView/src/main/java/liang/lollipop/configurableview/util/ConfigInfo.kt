@@ -42,6 +42,10 @@ open class ConfigInfo (protected val parent: ConfigInfo? = null) {
 
     val children = ArrayList<ConfigInfo>()
 
+    fun parse(info: ConfigInfo) {
+        parse(info.info)
+    }
+
     fun parse(obj: JSONObject) {
         val keys = obj.keys()
         for (key in keys) {
