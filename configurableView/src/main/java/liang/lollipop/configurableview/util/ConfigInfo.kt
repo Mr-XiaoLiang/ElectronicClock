@@ -1,5 +1,7 @@
 package liang.lollipop.configurableview.util
 
+import android.view.View
+import android.view.ViewGroup
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -200,5 +202,20 @@ open class ConfigInfo (protected val parent: ConfigInfo? = null) {
     protected fun put(name: String, value: Any) {
         info.put(name, value)
     }
+
+    fun bindToView(view: View) {
+        view.layoutParams?.let {
+            it.width = width
+            it.height = height
+            if (it is ViewGroup.MarginLayoutParams) {
+                it.setMargins(marginLeft, marginTop, marginRight, marginBottom)
+            }
+        }
+        view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
+
+        onBindToView(view)
+    }
+
+    open fun onBindToView(view: View) {}
 
 }
