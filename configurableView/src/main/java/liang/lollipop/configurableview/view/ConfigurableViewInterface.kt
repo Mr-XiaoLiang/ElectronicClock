@@ -1,5 +1,6 @@
 package liang.lollipop.configurableview.view
 
+import android.view.View
 import liang.lollipop.configurableview.util.ConfigInfo
 
 /**
@@ -7,10 +8,19 @@ import liang.lollipop.configurableview.util.ConfigInfo
  * @date 2019-10-25 00:23
  * 可配置View的接口
  */
-interface ConfigurableViewInterface {
+interface ConfigurableViewInterface<T: ConfigInfo> {
 
-    fun bindData(info: ConfigInfo)
+    val viewConfigInfo: T
 
-    fun serializat(): ConfigInfo
+    fun bindData(info: ConfigInfo) {
+        viewConfigInfo.parse(info)
+        if (this is View) {
+            viewConfigInfo.bindToView(this)
+        }
+    }
+
+    fun serializat(): ConfigInfo {
+        return viewConfigInfo
+    }
 
 }
