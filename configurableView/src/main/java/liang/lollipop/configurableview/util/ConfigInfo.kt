@@ -1,5 +1,6 @@
 package liang.lollipop.configurableview.util
 
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import org.json.JSONArray
@@ -40,6 +41,9 @@ open class ConfigInfo (protected val parent: ConfigInfo? = null) {
         const val KEY_MARGIN_BOTTOM = "marginBottom"
 
         const val KEY_CHILDREN = "children"
+
+        const val KEY_GRAVITY = "gravity"
+        const val KEY_LAYOUT_GRAVITY = "layoutGravity"
     }
 
     val children = ArrayList<ConfigInfo>()
@@ -175,6 +179,22 @@ open class ConfigInfo (protected val parent: ConfigInfo? = null) {
             put(KEY_MARGIN_BOTTOM, value)
         }
 
+    var gravity: Int
+        get() {
+            return opt(KEY_GRAVITY, 0)
+        }
+        set(value) {
+            put(KEY_GRAVITY, value)
+        }
+
+    var layoutGravity: Int
+        get() {
+            return opt(KEY_LAYOUT_GRAVITY, 0)
+        }
+        set(value) {
+            put(KEY_LAYOUT_GRAVITY, value)
+        }
+
     protected inline fun <reified T> opt(name: String, def: T): T {
         return when (def) {
             is String -> {
@@ -212,7 +232,6 @@ open class ConfigInfo (protected val parent: ConfigInfo? = null) {
             }
         }
         view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
-
         onBindToView(view)
     }
 

@@ -64,6 +64,7 @@ class CTextView(context: Context): TextView(context),
                 view.text = text
                 view.setTextColor(textColor)
                 view.textSize = textSize
+                view.gravity = gravity
                 if (fontPath.isNotEmpty()) {
                     val fontFile = File(fontPath)
                     if (fontFile.exists() && fontFile.canRead()) {
