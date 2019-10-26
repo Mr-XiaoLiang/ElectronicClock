@@ -9,11 +9,4 @@ import liang.lollipop.configurableview.util.ConfigInfo
  */
 interface ConfigurableLayoutInterface<T: ConfigInfo> : ConfigurableViewInterface<T> {
 
-    override fun bindData(info: ConfigInfo) {
-        super.bindData(info)
-
-    }
-
-//    fun generateLayoutConfig():
-
 }
