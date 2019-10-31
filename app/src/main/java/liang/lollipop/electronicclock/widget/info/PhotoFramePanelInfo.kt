@@ -13,9 +13,12 @@ class PhotoFramePanelInfo: PanelInfo() {
 
     companion object {
         const val KEY_IMAGES = "KEY_IMAGES"
+        const val KEY_TEXT_GRADLE = "KEY_TEXT_GRADLE"
     }
 
     val images = ArrayList<String>()
+
+    var textGradle = 0
 
     override fun parse(jsonObj: JSONObject) {
         super.parse(jsonObj)
@@ -27,6 +30,7 @@ class PhotoFramePanelInfo: PanelInfo() {
                 images.add(img)
             }
         }
+        textGradle = jsonObj.optInt(KEY_TEXT_GRADLE)
     }
 
     override fun serialize(jsonObj: JSONObject) {
@@ -36,6 +40,7 @@ class PhotoFramePanelInfo: PanelInfo() {
             imageArray.put(img)
         }
         jsonObj.put(KEY_IMAGES, imageArray)
+        jsonObj.put(KEY_TEXT_GRADLE, textGradle)
     }
 
 }
