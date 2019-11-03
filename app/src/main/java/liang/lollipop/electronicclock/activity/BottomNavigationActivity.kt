@@ -2,14 +2,9 @@ package liang.lollipop.electronicclock.activity
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.activity_bottom_navigation.*
 import liang.lollipop.electronicclock.R
@@ -30,6 +25,20 @@ open class BottomNavigationActivity: BaseActivity() {
     protected open val floatingViewId = 0
 
     protected open val layoutId = DEF_LAYOUT_ID
+
+    protected var subtitle: CharSequence
+        set(value) {
+            if (layoutId == DEF_LAYOUT_ID) {
+                appBarLayout.subtitle = value
+            }
+        }
+        get() {
+            return if (layoutId == DEF_LAYOUT_ID) {
+                appBarLayout.subtitle
+            } else {
+                ""
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
