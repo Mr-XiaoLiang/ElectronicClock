@@ -1,13 +1,21 @@
 package liang.lollipop.electronicclock.activity
 
+import android.animation.Animator
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import liang.lollipop.electronicclock.R
+import liang.lollipop.guidelinesview.util.*
 
 
 /**
@@ -17,7 +25,7 @@ import liang.lollipop.electronicclock.R
 class ImageSelectActivity : BottomNavigationActivity() {
 
     companion object {
-        private val LOADER_ID = 456
+        private const val LOADER_ID = 456
     }
 
     override val contentViewId: Int
@@ -104,4 +112,72 @@ class ImageSelectActivity : BottomNavigationActivity() {
 
     private data class ImageBean(val uri: Uri, val name: String)
 
+    private class ImageHolder
+        private constructor(view: View,
+                            private val isChecked: (ImageHolder) -> Boolean,
+                            private val onClick: (ImageHolder) -> Boolean): RecyclerView.ViewHolder(view) {
+        companion object {
+            fun createHolder(layoutInflater: LayoutInflater, parent: ViewGroup,
+                             isChecked: (ImageHolder) -> Boolean,
+                             onClick: (ImageHolder) -> Boolean): ImageHolder {
+                return ImageHolder(layoutInflater.inflate(
+                    R.layout.item_image_select, parent, false), isChecked, onClick)
+            }
+        }
+
+        private val photoView: ImageView = view.findViewById(R.id.photoView)
+        private val checkboxView: View = view.findViewById(R.id.checkboxView)
+
+        init {
+            view.setOnClickListener {
+                if (onClick(this)) {
+                    startAnimation()
+                }
+            }
+        }
+
+        private var animator: Animator? = null
+
+        fun onBind(bean: ImageBean) {
+            Glide.with(photoView).load(bean.uri).into(photoView)
+            cancelAnimation()
+            checkboxView.visibility = if (isChecked(this)) {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
+        }
+
+        private fun cancelAnimation() {
+            animator?.cancel()
+            animator = null
+        }
+
+        private fun startAnimation() {
+            animator = if (checkboxView.visibility == View.VISIBLE) {
+                checkboxView.revealCloseWith(checkboxView) {
+                    onEnd {
+                        checkboxView.visibility = View.INVISIBLE
+                        removeThis(it)
+                    }
+                    onCancel {
+                        removeThis(it)
+                    }
+                }
+            } else {
+                checkboxView.revealOpenWith(checkboxView) {
+                    onStart {
+                        checkboxView.visibility = View.VISIBLE
+                    }
+                    onEnd {
+                        removeThis(it)
+                    }
+                    onCancel {
+                        removeThis(it)
+                    }
+                }
+            }
+        }
+
+    }
 }
