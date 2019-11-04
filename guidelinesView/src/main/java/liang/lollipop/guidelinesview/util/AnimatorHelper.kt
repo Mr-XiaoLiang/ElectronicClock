@@ -99,7 +99,7 @@ fun ViewPropertyAnimator.lifecycleBinding(listener: (AnimatorListenerImpl.() -> 
     return this
 }
 
-fun View.revealOpenWith(anchorView: View, listener: (AnimatorListenerImpl.() -> Unit)? = null) {
+fun View.revealOpenWith(anchorView: View, listener: (AnimatorListenerImpl.() -> Unit)? = null): Animator {
     val myLoc = IntArray(2)
     this.getLocationInWindow(myLoc)
     val anchorLoc = IntArray(2)
@@ -112,9 +112,10 @@ fun View.revealOpenWith(anchorView: View, listener: (AnimatorListenerImpl.() -> 
     reveal.lifecycleBinding(listener)
     reveal.duration = AnimatorHelper.animatorDuration
     reveal.start()
+    return reveal
 }
 
-fun View.revealCloseWith(anchorView: View, listener: (AnimatorListenerImpl.() -> Unit)? = null) {
+fun View.revealCloseWith(anchorView: View, listener: (AnimatorListenerImpl.() -> Unit)? = null): Animator {
     val myLoc = IntArray(2)
     this.getLocationInWindow(myLoc)
     val anchorLoc = IntArray(2)
@@ -127,4 +128,5 @@ fun View.revealCloseWith(anchorView: View, listener: (AnimatorListenerImpl.() ->
     reveal.addListener(AnimatorListenerImpl().apply { listener?.invoke(this) })
     reveal.duration = AnimatorHelper.animatorDuration
     reveal.start()
+    return reveal
 }
