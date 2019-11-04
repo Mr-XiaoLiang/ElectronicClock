@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<liang.lollipop.electronicclock.view.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <ImageView
+            android:id="@+id/photoView"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    <ImageView
+            android:visibility="invisible"
+            android:background="#9000"
+            android:src="@drawable/ic_done_black_24dp"
+            android:tint="@android:color/white"
+            android:scaleType="centerInside"
+            android:id="@+id/checkboxView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+</liang.lollipop.electronicclock.view.SquareLayout>

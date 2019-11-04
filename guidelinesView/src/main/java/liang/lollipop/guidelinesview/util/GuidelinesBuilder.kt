@@ -1,11 +1,9 @@
 package liang.lollipop.guidelinesview.util
 
 import android.app.Activity
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.appcompat.widget.ContentFrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import liang.lollipop.guidelinesview.view.GuidelinesView
