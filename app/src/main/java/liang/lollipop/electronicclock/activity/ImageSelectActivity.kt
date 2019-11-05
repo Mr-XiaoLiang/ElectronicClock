@@ -130,6 +130,7 @@ class ImageSelectActivity : BottomNavigationActivity() {
                     }
                     putExtra(ARG_RESULT_URI, uris)
                 })
+                onBackPressed()
             }
         }
 
@@ -226,14 +227,25 @@ class ImageSelectActivity : BottomNavigationActivity() {
 
     private fun onLoaded() {
         stopContentLoading()
-        adapter.notifyDataSetChanged()
         if (imageList.isEmpty()) {
             emptyIcon.visibility = View.VISIBLE
             emptyText.visibility = View.VISIBLE
         } else {
             emptyIcon.visibility = View.INVISIBLE
             emptyText.visibility = View.INVISIBLE
+
+            imageListView.layoutManager?.let { manager ->
+                if (manager is GridLayoutManager) {
+                    manager.spanCount = when {
+                        imageList.size < 10 -> 2
+                        imageList.size < 100 -> 3
+                        imageList.size < 200 -> 4
+                        else -> 5
+                    }
+                }
+            }
         }
+        adapter.notifyDataSetChanged()
     }
 
     private fun clearList() {
