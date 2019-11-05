@@ -123,4 +123,8 @@
     <string name="calendar_type_week">周历</string>
     <string name="calendar_type_day">日历</string>
     <string name="title_calendar_type">日历模式</string>
+    <string name="toast_already_max">已经达到最大数量了</string>
+    <string name="toast_result_empty">您未选择任何内容</string>
+    <string name="have_no_pictures_yet">您还没有图片</string>
+    <string name="refuse_read_picture">很遗憾，由于您拒绝了权限，我们无法为您提供图片选择服务</string>
 </resources>

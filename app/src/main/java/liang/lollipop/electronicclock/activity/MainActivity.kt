@@ -31,7 +31,8 @@ class MainActivity : BottomNavigationActivity() {
         window.statusBarColor = Color.BLACK
         showFAB(R.drawable.ic_play_arrow_black_24dp) {
             it.setOnClickListener {
-                startActivity(Intent(this, WidgetActivity::class.java))
+//                startActivity(Intent(this, WidgetActivity::class.java))
+                ImageSelectActivity.selectedForResult(this, 234)
             }
         }
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
