@@ -6,6 +6,31 @@
         android:layout_height="match_parent"
         tools:context=".activity.ImageSelectActivity">
 
+    <ImageView
+            android:visibility="invisible"
+            android:id="@+id/emptyIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/ic_wallpaper_black_24dp"
+            android:tint="@android:color/darker_gray"/>
+
+    <TextView
+            android:visibility="invisible"
+            android:id="@+id/emptyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/emptyIcon"
+            app:layout_constraintLeft_toLeftOf="@id/emptyIcon"
+            app:layout_constraintRight_toRightOf="@id/emptyIcon"
+            android:layout_margin="20dp"
+            android:textColor="@android:color/darker_gray"
+            android:text="@string/have_no_pictures_yet"
+            android:textSize="18sp"/>
+
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/imageListView"
             android:layout_width="match_parent"
