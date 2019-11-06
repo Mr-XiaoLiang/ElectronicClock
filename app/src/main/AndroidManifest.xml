@@ -14,7 +14,9 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".activity.ImageSelectActivity"></activity>
+        <activity
+                android:name=".activity.ImageSelectActivity"
+                android:label="@string/app_name"/>
         <activity
                 android:name=".activity.LunarActivity"
                 android:launchMode="singleInstance"

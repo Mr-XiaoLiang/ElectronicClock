@@ -22,23 +22,7 @@ open class BottomNavigationActivity: BaseActivity() {
 
     protected open val contentViewId = 0
 
-    protected open val floatingViewId = 0
-
     protected open val layoutId = DEF_LAYOUT_ID
-
-    protected var subtitle: CharSequence
-        set(value) {
-            if (layoutId == DEF_LAYOUT_ID) {
-                appBarLayout.subtitle = value
-            }
-        }
-        get() {
-            return if (layoutId == DEF_LAYOUT_ID) {
-                appBarLayout.subtitle
-            } else {
-                ""
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
