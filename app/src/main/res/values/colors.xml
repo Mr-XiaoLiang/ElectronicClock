@@ -13,4 +13,6 @@
 
     <color name="colorFestivalGregorian">#4E808B</color>
     <color name="colorFestivalLunar">#750000</color>
+
+    <color name="navigationBarColor">#2D2D2D</color>
 </resources>
