@@ -6,6 +6,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_bottom_navigation.*
 import liang.lollipop.electronicclock.R
 
@@ -65,6 +66,21 @@ open class BottomNavigationActivity: BaseActivity() {
         run?.invoke(fab)
     }
 
+    protected fun getFab(run: (FloatingActionButton?) -> Unit) {
+        run(if (layoutId == DEF_LAYOUT_ID) { fab } else { null })
+    }
+
+    protected fun Snackbar.avoidWeight(): Snackbar {
+        if (layoutId == DEF_LAYOUT_ID) {
+            if (fab.isShown) {
+                this.anchorView = fab
+            } else {
+                this.anchorView = appBarLayout
+            }
+        }
+        return this
+    }
+
     protected fun startContentLoading() {
         contentLoading.show()
     }
@@ -85,7 +101,7 @@ open class BottomNavigationActivity: BaseActivity() {
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = 0
-        window.navigationBarColor = Color.BLACK
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.navigationBarColor)
     }
 
 }

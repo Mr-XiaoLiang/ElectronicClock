@@ -128,7 +128,7 @@
     <string name="calendar_type_week">Week</string>
     <string name="calendar_type_day">Day</string>
     <string name="title_calendar_type">Calendar type</string>
-    <string name="toast_already_max">Has reached the maximum number了</string>
+    <string name="toast_already_max">Has reached the maximum number</string>
     <string name="toast_result_empty">You have not selected anything</string>
     <string name="have_no_pictures_yet">You have no pictures yet</string>
     <string name="refuse_read_picture">Unfortunately, we were unable to provide you with an image selection service because you denied permission.</string>

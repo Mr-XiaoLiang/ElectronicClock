@@ -24,6 +24,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_bottom_navigation.*
 import kotlinx.android.synthetic.main.activity_select.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.guidelinesview.util.*
@@ -210,7 +211,8 @@ class ImageSelectActivity : BottomNavigationActivity() {
             selectedChange()
             return true
         }
-        Snackbar.make(imageListView, R.string.toast_already_max, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(imageListView, R.string.toast_already_max, Snackbar.LENGTH_LONG).avoidWeight().show()
+
         return false
     }
 
