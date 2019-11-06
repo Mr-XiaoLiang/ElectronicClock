@@ -20,6 +20,9 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_select.*
 import liang.lollipop.electronicclock.R
@@ -212,7 +215,7 @@ class ImageSelectActivity : BottomNavigationActivity() {
     }
 
     private fun selectedChange() {
-        subtitle = if (maxSize > 0) {
+        sizeView.text = if (maxSize > 0) {
             "${selectedList.size} / $maxSize"
         } else {
             "${selectedList.size}"
@@ -288,6 +291,9 @@ class ImageSelectActivity : BottomNavigationActivity() {
                 return ImageHolder(layoutInflater.inflate(
                     R.layout.item_image_select, parent, false), isChecked, onClick)
             }
+
+            private val glideOption = RequestOptions().error(R.drawable.ic_broken_image_white_24dp)
+            private val fadeFactory = DrawableCrossFadeFactory.Builder(300).setCrossFadeEnabled(true).build();
         }
 
         private val photoView: ImageView = view.findViewById(R.id.photoView)
@@ -304,7 +310,11 @@ class ImageSelectActivity : BottomNavigationActivity() {
         private var animator: Animator? = null
 
         fun onBind(bean: ImageBean) {
-            Glide.with(photoView).load(bean.uri).into(photoView)
+            Glide.with(photoView)
+                .load(bean.uri)
+                .apply(glideOption)
+                .transition(DrawableTransitionOptions.with(fadeFactory))
+                .into(photoView)
             cancelAnimation()
             checkboxView.visibility = if (isChecked(this)) {
                 View.VISIBLE
