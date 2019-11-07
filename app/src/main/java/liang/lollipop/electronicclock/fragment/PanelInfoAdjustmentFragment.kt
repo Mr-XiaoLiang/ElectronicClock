@@ -1,6 +1,7 @@
 package liang.lollipop.electronicclock.fragment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -80,9 +81,11 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView.layoutManager = LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
-        adapter = AdjustmentAdapter(adjustmentInfoList, LayoutInflater.from(context)) { info, newValue ->
+        adapter = AdjustmentAdapter(adjustmentInfoList, LayoutInflater.from(context), { info, newValue ->
             infoChange(info, newValue)
-        }
+        }, { intent, requestCode ->
+            infoLoadCallback?.requestActivityForResult(intent, requestCode)
+        })
         recyclerView.adapter = adapter
         notifyDataSetChanged()
     }
@@ -199,6 +202,13 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     protected abstract fun initInfoByValue(info: String)
 
+    fun resultFromActivity(requestId: Int, resultId: Int, data: Intent?): Boolean {
+        if (adapter?.onActivityResult(requestId, resultId, data) == true) {
+            return true
+        }
+        return false
+    }
+
     /**
      * 当面板初始化完成时，调用方法出发完成事件
      */
@@ -243,6 +253,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         fun onInfoLoadStatusChange(isLoading: Boolean)
         fun onPanelInitComplete()
         fun getSizeChangeCallback(): PanelSizeChangeCallback
+        fun requestActivityForResult(intent: Intent, requestId: Int)
     }
 
     interface PanelSizeChangeCallback {

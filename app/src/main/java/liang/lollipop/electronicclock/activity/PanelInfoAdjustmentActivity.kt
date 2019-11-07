@@ -249,4 +249,13 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         sizeValueView.text = "$x * $y"
     }
 
+    override fun requestActivityForResult(intent: Intent, requestId: Int) {
+        startActivityForResult(intent, requestId)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        adjustmentFragment?.resultFromActivity(requestCode, resultCode, data)
+    }
+
 }
