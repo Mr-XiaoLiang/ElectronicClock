@@ -3,6 +3,7 @@ package liang.lollipop.electronicclock.activity
 import android.Manifest
 import android.animation.Animator
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
@@ -46,9 +47,13 @@ class ImageSelectActivity : BottomNavigationActivity() {
         private const val ARG_RESULT_URI = "ARG_RESULT_URI"
 
         fun selectedForResult(activity: Activity, requestId: Int, maxSize: Int = -1) {
-            activity.startActivityForResult(Intent(activity, ImageSelectActivity::class.java).apply {
+            activity.startActivityForResult(createIntent(activity, maxSize), requestId)
+        }
+
+        fun createIntent(context: Context, maxSize: Int = -1): Intent {
+            return Intent(context, ImageSelectActivity::class.java).apply {
                 putExtra(ARG_MAX_SIZE, maxSize)
-            }, requestId)
+            }
         }
 
         fun getUriList(data: Intent?): Array<Uri> {
