@@ -156,6 +156,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
                 // 使用过则移除
                 resultMap.remove(key)
                 requestMap.remove(key)
+                return
             }
         }
     }

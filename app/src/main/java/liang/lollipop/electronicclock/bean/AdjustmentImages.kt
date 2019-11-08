@@ -21,6 +21,11 @@ class AdjustmentImages(run: AdjustmentImages.() -> Unit):
         images.addAll(p)
     }
 
+    fun reset(p: Array<Uri>) {
+        images.clear()
+        images.addAll(p)
+    }
+
     override fun copy(info: AdjustmentInfo) {
         super.copy(info)
         if (info is AdjustmentImages) {
