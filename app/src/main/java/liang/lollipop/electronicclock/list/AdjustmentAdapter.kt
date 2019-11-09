@@ -44,6 +44,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
             TYPE_COLOR -> AdjustmentColorHolder.create(inflater, parent)
             TYPE_PADDING -> AdjustmentPaddingHolder.create(inflater, parent)
             TYPE_LIST -> AdjustmentSelectHolder.create(inflater, parent)
+            TYPE_PHOTOS -> AdjustmentPhotosHolder.create(inflater, parent)
             else -> throw RuntimeException("unknown the viewType:$viewType")
         }
         holder.onValueChangeListener = this
@@ -120,6 +121,9 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
                 holder.onBind(info)
             }
             is AdjustmentSelectHolder -> if (info is AdjustmentSelect) {
+                holder.onBind(info)
+            }
+            is AdjustmentPhotosHolder -> if (info is AdjustmentImages) {
                 holder.onBind(info)
             }
         }

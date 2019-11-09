@@ -280,6 +280,10 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         return AdjustmentSelect(run)
     }
 
+    fun photos(run: AdjustmentImages.() -> Unit): AdjustmentImages {
+        return AdjustmentImages(run)
+    }
+
     protected fun Any.optBoolean(def: Boolean): Boolean {
         if (this is Boolean) {
             return this
