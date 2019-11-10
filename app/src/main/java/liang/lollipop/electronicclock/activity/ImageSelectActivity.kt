@@ -300,7 +300,7 @@ class ImageSelectActivity : BottomNavigationActivity() {
             }
 
             private val glideOption = RequestOptions().error(R.drawable.ic_broken_image_white_24dp)
-            private val fadeFactory = DrawableCrossFadeFactory.Builder(300).setCrossFadeEnabled(true).build();
+            private val fadeFactory = DrawableCrossFadeFactory.Builder(300).setCrossFadeEnabled(true).build()
         }
 
         private val photoView: ImageView = view.findViewById(R.id.photoView)

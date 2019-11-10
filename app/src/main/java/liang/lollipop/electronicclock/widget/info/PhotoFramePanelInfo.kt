@@ -13,9 +13,15 @@ class PhotoFramePanelInfo: PanelInfo() {
 
     companion object {
         const val KEY_IMAGES = "KEY_IMAGES"
+        const val KEY_ELEVATION = "KEY_ELEVATION"
+        const val KEY_RADIUS = "KEY_RADIUS"
     }
 
     val images = ArrayList<String>()
+
+    var elevation = 0F
+
+    var radius = 0F
 
     override fun parse(jsonObj: JSONObject) {
         super.parse(jsonObj)
@@ -27,6 +33,8 @@ class PhotoFramePanelInfo: PanelInfo() {
                 images.add(img)
             }
         }
+        elevation = jsonObj.optDouble(KEY_ELEVATION, 0.0).toFloat()
+        radius = jsonObj.optDouble(KEY_RADIUS, 0.0).toFloat()
     }
 
     override fun serialize(jsonObj: JSONObject) {
@@ -36,6 +44,8 @@ class PhotoFramePanelInfo: PanelInfo() {
             imageArray.put(img)
         }
         jsonObj.put(KEY_IMAGES, imageArray)
+        jsonObj.put(KEY_ELEVATION, elevation)
+        jsonObj.put(KEY_RADIUS, radius)
     }
 
 }
