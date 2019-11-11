@@ -12,6 +12,8 @@ class AdjustmentImages(run: AdjustmentImages.() -> Unit):
 
     val images = ArrayList<Uri>()
 
+    var maxSize = -1
+
     init {
         run(this)
     }
@@ -19,6 +21,13 @@ class AdjustmentImages(run: AdjustmentImages.() -> Unit):
     fun reset(p: ArrayList<Uri>) {
         images.clear()
         images.addAll(p)
+    }
+
+    fun resetFromString(p: ArrayList<String>) {
+        images.clear()
+        p.forEach {
+            images.add(Uri.parse(it))
+        }
     }
 
     fun reset(p: Array<Uri>) {
