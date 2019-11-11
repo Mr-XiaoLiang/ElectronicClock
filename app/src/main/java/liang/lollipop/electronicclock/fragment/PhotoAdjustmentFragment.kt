@@ -32,8 +32,29 @@ class PhotoAdjustmentFragment: PanelInfoAdjustmentFragment() {
     }
 
     private fun putAdjustmentInfo() {
+        val context = context!!
+        val density = context.resources.displayMetrics.density
         addAdjustmentInfo(
-
+            photos {
+                title = "图片选择"
+                summary = "图片将会以翻页的形式展示"
+                maxSize = 36
+                resetFromString(photoInfo.images)
+            },
+            seekBar {
+                title = "海拔高度"
+                summary = "海拔越高，阴影越大，但是也越淡"
+                max = 50
+                min = 0
+                value = (photoInfo.elevation / density).toInt()
+            },
+            seekBar {
+                title = "圆角大小"
+                summary = "过大的圆角，可能导致意料之外的情况"
+                max = 50
+                min = 0
+                value = (photoInfo.radius / density).toInt()
+            }
         )
     }
 

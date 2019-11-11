@@ -42,7 +42,7 @@ class AdjustmentPhotosHolder(view: View): AdjustmentHolder<AdjustmentImages>(vie
             requestCallback?.invoke(this,
                 ImageSelectActivity.createIntent(
                     view.context,
-                    36),
+                    bindInfo?.maxSize?:36),
                 REQUEST_CODE)
         }
     }
