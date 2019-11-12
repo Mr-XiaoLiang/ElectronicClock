@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.fragment
 
 import android.util.Log
 import android.view.View
+import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
 import liang.lollipop.electronicclock.widget.info.PhotoFramePanelInfo
 import liang.lollipop.electronicclock.widget.panel.PhotoFramePanel
@@ -36,21 +37,24 @@ class PhotoAdjustmentFragment: PanelInfoAdjustmentFragment() {
         val density = context.resources.displayMetrics.density
         addAdjustmentInfo(
             photos {
-                title = "图片选择"
-                summary = "图片将会以翻页的形式展示"
+                title = getString(R.string.title_select_photo)
+                summary = getString(R.string.summary_select_photo)
+                key = PhotoFramePanelInfo.KEY_IMAGES
                 maxSize = 36
                 resetFromString(photoInfo.images)
             },
             seekBar {
-                title = "海拔高度"
-                summary = "海拔越高，阴影越大，但是也越淡"
+                title = getString(R.string.title_elevation)
+                summary = getString(R.string.summary_elevation)
+                key = PhotoFramePanelInfo.KEY_ELEVATION
                 max = 50
                 min = 0
                 value = (photoInfo.elevation / density).toInt()
             },
             seekBar {
-                title = "圆角大小"
-                summary = "过大的圆角，可能导致意料之外的情况"
+                title = getString(R.string.title_radius)
+                summary = getString(R.string.summary_radius)
+                key = PhotoFramePanelInfo.KEY_RADIUS
                 max = 50
                 min = 0
                 value = (photoInfo.radius / density).toInt()
@@ -65,7 +69,15 @@ class PhotoAdjustmentFragment: PanelInfoAdjustmentFragment() {
     override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
         Log.d("Lollipop", "onInfoChange(${info.key})")
         when (info.key) {
+            PhotoFramePanelInfo.KEY_IMAGES -> {
 
+            }
+            PhotoFramePanelInfo.KEY_ELEVATION -> {
+
+            }
+            PhotoFramePanelInfo.KEY_RADIUS -> {
+
+            }
         }
         photoPanel.onInfoChange()
     }
