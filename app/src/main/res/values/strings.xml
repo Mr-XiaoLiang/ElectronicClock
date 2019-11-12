@@ -132,4 +132,10 @@
     <string name="toast_result_empty">You have not selected anything</string>
     <string name="have_no_pictures_yet">You have no pictures yet</string>
     <string name="refuse_read_picture">Unfortunately, we were unable to provide you with an image selection service because you denied permission.</string>
+    <string name="title_select_photo">Picture selection </string>
+    <string name="summary_select_photo">The image will be displayed as a page flip </string>
+    <string name="title_elevation">altitude </string>
+    <string name="summary_elevation">The higher the altitude, the bigger the shadow, but the lighter it is </string>
+    <string name="title_radius">rounding size </string>
+    <string name="summary_radius"> too large rounded corners, may lead to unexpected situations </string>
 </resources>

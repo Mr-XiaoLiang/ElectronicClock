@@ -127,4 +127,10 @@
     <string name="toast_result_empty">您未选择任何内容</string>
     <string name="have_no_pictures_yet">您还没有图片</string>
     <string name="refuse_read_picture">很遗憾，由于您拒绝了权限，我们无法为您提供图片选择服务</string>
+    <string name="title_select_photo">图片选择</string>
+    <string name="summary_select_photo">图片将会以翻页的形式展示</string>
+    <string name="title_elevation">海拔高度</string>
+    <string name="summary_elevation">海拔越高，阴影越大，但是也越淡</string>
+    <string name="title_radius">圆角大小</string>
+    <string name="summary_radius">过大的圆角，可能导致意料之外的情况</string>
 </resources>
