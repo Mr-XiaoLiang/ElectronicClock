@@ -33,6 +33,9 @@ object PanelInfoAdjustmentHelper {
             PanelType.Calendar.value -> {
                 CalendarAdjustmentFragment().bindId(infoId)
             }
+            PanelType.Photo.value -> {
+                PhotoAdjustmentFragment().bindId(infoId)
+            }
             else -> {
                 EmptyAdjustmentFragment.getInstance()
             }
