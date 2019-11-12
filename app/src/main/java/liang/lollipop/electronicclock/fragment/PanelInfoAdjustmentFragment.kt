@@ -298,6 +298,16 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         return def
     }
 
+    protected fun Any.optFloat(def: Float): Float {
+        if (this is Int) {
+            return this.toFloat()
+        }
+        if (this is Float) {
+            return this
+        }
+        return def
+    }
+
     protected fun Any.optUnpackingToFloat(def: Float): Float {
         return optInt((def * 100).toInt()) * 0.01F
     }

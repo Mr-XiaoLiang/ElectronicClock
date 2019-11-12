@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.fragment
 
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import liang.lollipop.electronicclock.R
@@ -33,8 +34,7 @@ class PhotoAdjustmentFragment: PanelInfoAdjustmentFragment() {
     }
 
     private fun putAdjustmentInfo() {
-        val context = context!!
-        val density = context.resources.displayMetrics.density
+        val density = context!!.resources.displayMetrics.density
         addAdjustmentInfo(
             photos {
                 title = getString(R.string.title_select_photo)
@@ -68,15 +68,25 @@ class PhotoAdjustmentFragment: PanelInfoAdjustmentFragment() {
 
     override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
         Log.d("Lollipop", "onInfoChange(${info.key})")
+        val density = context!!.resources.displayMetrics.density
         when (info.key) {
             PhotoFramePanelInfo.KEY_IMAGES -> {
-
+                if (newValue is Array<*>) {
+                    photoInfo.images.clear()
+                    newValue.forEach { uri ->
+                        if (uri is Uri) {
+                            photoInfo.images.add(uri.toString())
+                        } else if (uri is String) {
+                            photoInfo.images.add(uri)
+                        }
+                    }
+                }
             }
             PhotoFramePanelInfo.KEY_ELEVATION -> {
-
+                photoInfo.elevation = newValue.optFloat(photoInfo.elevation) * density
             }
             PhotoFramePanelInfo.KEY_RADIUS -> {
-
+                photoInfo.radius = newValue.optFloat(photoInfo.radius) * density
             }
         }
         photoPanel.onInfoChange()
