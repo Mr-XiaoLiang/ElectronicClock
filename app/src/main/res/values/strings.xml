@@ -138,4 +138,5 @@
     <string name="summary_elevation">The higher the altitude, the bigger the shadow, but the lighter it is </string>
     <string name="title_radius">rounding size </string>
     <string name="summary_radius"> too large rounded corners, may lead to unexpected situations </string>
+    <string name="photo">Photo</string>
 </resources>
