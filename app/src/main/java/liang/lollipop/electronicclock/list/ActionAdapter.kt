@@ -10,7 +10,7 @@ import liang.lollipop.electronicclock.bean.ActionInfo
  * @date 2019-08-08 12:44
  * action按钮的适配器
  */
-class ActionAdapter(private val data: ArrayList<ActionInfo>,
+class ActionAdapter<T: ActionInfo>(private val data: ArrayList<T>,
                     private val layoutInflater: LayoutInflater,
                     private val isAction: Boolean = true,
                     private val clickListener: (ActionHolder) -> Unit):

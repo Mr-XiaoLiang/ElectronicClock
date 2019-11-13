@@ -12,7 +12,7 @@ import liang.lollipop.widget.widget.PanelInfo
  */
 object PanelInfoAdjustmentHelper {
 
-    var defInfoType = PanelType.Battery.value
+    private val defInfoType = PanelType.Empty.value
 
     enum class PanelType(val value: Int) {
         Empty(0),
