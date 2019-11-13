@@ -25,7 +25,7 @@ class AdjustmentPhotosHolder(view: View): AdjustmentHolder<AdjustmentImages>(vie
                 inflater.inflate(R.layout.item_adjustment_photos, group, false))
         }
 
-        private const val REQUEST_CODE = 104069
+        private const val REQUEST_CODE = 4069
     }
 
     private val titleView: TextView = view.findViewById(R.id.titleView)

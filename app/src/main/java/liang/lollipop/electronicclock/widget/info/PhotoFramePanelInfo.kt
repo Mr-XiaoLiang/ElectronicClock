@@ -1,5 +1,7 @@
 package liang.lollipop.electronicclock.widget.info
 
+import android.content.Intent
+import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONArray
 import org.json.JSONObject
@@ -23,6 +25,10 @@ class PhotoFramePanelInfo: PanelInfo() {
 
     var radius = 0F
 
+    init {
+        needInit()
+    }
+
     override fun parse(jsonObj: JSONObject) {
         super.parse(jsonObj)
         val imageArray = jsonObj.optJSONArray(KEY_IMAGES)
@@ -35,6 +41,12 @@ class PhotoFramePanelInfo: PanelInfo() {
         }
         elevation = jsonObj.optDouble(KEY_ELEVATION, 0.0).toFloat()
         radius = jsonObj.optDouble(KEY_RADIUS, 0.0).toFloat()
+
+        tryUpdateIntent()
+    }
+
+    override fun getIntent(): Intent? {
+        return PanelInfoAdjustmentActivity.getIntent(this)
     }
 
     override fun serialize(jsonObj: JSONObject) {

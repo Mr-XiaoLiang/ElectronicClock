@@ -31,7 +31,7 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
     }
 
     fun createView(context: Context): View {
-        val cardView = MaterialCardView(context)
+        val cardView = FullCardView(context)
         val recyclerView = RecyclerView(context)
         cardView.addView(recyclerView,
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -42,13 +42,15 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
         photoAdapter = PhotoAdapter(panelInfo.images, context)
         recyclerView.adapter = photoAdapter
 
+        recyclerView.setBackgroundColor(0x30FF0000)
+
         PagerSnapHelper().attachToRecyclerView(recyclerView)
         return cardView
     }
 
     override fun onInfoChange() {
         super.onInfoChange()
-        tryMyView<MaterialCardView> {
+        tryMyView<FullCardView> {
             it.radius = panelInfo.radius
             it.cardElevation = panelInfo.elevation
             photoAdapter?.notifyDataSetChanged()
@@ -102,6 +104,16 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
                 .into(view)
         }
 
+    }
+
+    private class FullCardView(context: Context): MaterialCardView(context) {
+        override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+            val childWidth = right - left
+            val childHeight = bottom - top
+            for (index in 0 until childCount) {
+                getChildAt(index).layout(0, 0, childWidth, childHeight)
+            }
+        }
     }
 
 }
