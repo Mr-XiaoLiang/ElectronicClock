@@ -32,7 +32,7 @@ class LPanelProviders: PanelProviders {
         return when (name) {
             BatteryPanelInfo::class.java.name -> BatteryPanelInfo()
             CalendarPanelInfo::class.java.name -> CalendarPanelInfo()
-            PhotoFramePanelInfo::class.java.name -> CalendarPanelInfo()
+            PhotoFramePanelInfo::class.java.name -> PhotoFramePanelInfo()
             else -> null
         }
     }

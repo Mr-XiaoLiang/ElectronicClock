@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.widget.info
 
+import android.content.Intent
 import android.graphics.Color
 import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.electronicclock.view.CalendarView
@@ -41,7 +42,7 @@ class CalendarPanelInfo: PanelInfo() {
     var calendarType = CalendarView.Type.Month
 
     init {
-        initIntent = PanelInfoAdjustmentActivity.getIntent(this)
+        needInit()
     }
 
     override fun parse(jsonObj: JSONObject) {
@@ -67,9 +68,11 @@ class CalendarPanelInfo: PanelInfo() {
 
         // 如果初始化的intent没有被置空， 并且ID是有效ID，
         // 那么就重新生成一个带有新数据的intent
-        if (initIntent != null && id != NO_ID) {
-            initIntent = PanelInfoAdjustmentActivity.getIntent(this)
-        }
+        tryUpdateIntent()
+    }
+
+    override fun getIntent(): Intent? {
+        return PanelInfoAdjustmentActivity.getIntent(this)
     }
 
     override fun serialize(jsonObj: JSONObject) {

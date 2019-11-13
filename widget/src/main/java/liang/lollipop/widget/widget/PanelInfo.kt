@@ -133,4 +133,18 @@ open class PanelInfo {
         return obj.toString()
     }
 
+    protected fun tryUpdateIntent(intent: (() -> Intent)? = null) {
+        if (initIntent != null && id != NO_ID) {
+            initIntent = intent?.invoke()?:getIntent()
+        }
+    }
+
+    open fun getIntent(): Intent? {
+        return null
+    }
+
+    protected fun needInit() {
+        initIntent = getIntent()
+    }
+
 }
