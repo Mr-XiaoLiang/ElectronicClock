@@ -16,15 +16,15 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_edit.*
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.bean.ActionInfo
+import liang.lollipop.electronicclock.bean.WidgetInfo
+import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.utils.*
-import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
-import liang.lollipop.electronicclock.widget.info.CalendarPanelInfo
 import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
 import liang.lollipop.widget.utils.Utils
+import liang.lollipop.widget.widget.PanelAdapter
 
 /**
  * 编辑用的Activity
@@ -74,18 +74,6 @@ class EditActivity : BaseActivity() {
         const val RESET = 6
     }
 
-    /**
-     * 小部件的ID
-     */
-    private object WidgetId {
-        /** 数字时钟 **/
-        const val CLOCK = 0
-        /** 电池 **/
-        const val BATTERY = 1
-        /** 日历 **/
-        const val CALENDAR = 2
-    }
-
     private val logger = Utils.loggerI("EditActivity")
 
     /**
@@ -117,7 +105,7 @@ class EditActivity : BaseActivity() {
 
     private val actionInfoArray = ArrayList<ActionInfo>()
 
-    private val widgetInfoArray = ArrayList<ActionInfo>()
+    private val widgetInfoArray = ArrayList<WidgetInfo>()
 
     private lateinit var widgetHelper: WidgetHelper
 
@@ -269,31 +257,10 @@ class EditActivity : BaseActivity() {
     }
 
     private fun initWidgets() {
-        widgetInfoArray.add(
-            ActionInfo(
-                WidgetId.CLOCK,
-                R.drawable.ic_access_time_black_24dp,
-                R.string.widget_clock
-            )
-        )
-        widgetInfoArray.add(
-            ActionInfo(
-                WidgetId.BATTERY,
-                R.drawable.ic_battery_60_white_24dp,
-                R.string.widget_battery
-            )
-        )
-        widgetInfoArray.add(
-            ActionInfo(
-                WidgetId.CALENDAR,
-                R.drawable.ic_event_white_24dp,
-                R.string.calendar
-            )
-        )
-
+        widgetInfoArray.addAll(LPanelProviders.getWidgetInfoList())
 
         val adapter = ActionAdapter(widgetInfoArray, layoutInflater, false) { holder ->
-            onWidgetSelected(widgetInfoArray[holder.adapterPosition].action)
+            onWidgetSelected(widgetInfoArray[holder.adapterPosition])
         }
         val orientation = if (isPortrait) { RecyclerView.HORIZONTAL } else { RecyclerView.VERTICAL }
         widgetList.layoutManager = StaggeredGridLayoutManager(2, orientation)
@@ -416,18 +383,8 @@ class EditActivity : BaseActivity() {
      * 当小部件列表被点击的时候，用于处理事件的方法
      * 一般情况为添加一个小部件到屏幕
      */
-    private fun onWidgetSelected(action: Int) {
-        when (action) {
-            WidgetId.CLOCK -> {
-                widgetHelper.addPanel(ClockPanelInfo())
-            }
-            WidgetId.BATTERY -> {
-                widgetHelper.addPanel(BatteryPanelInfo())
-            }
-            WidgetId.CALENDAR -> {
-                widgetHelper.addPanel(CalendarPanelInfo())
-            }
-        }
+    private fun onWidgetSelected(info: WidgetInfo) {
+        widgetHelper.addPanel(PanelAdapter.newInfo(info.infoName))
     }
 
     private fun isPreview(value: Boolean) {
