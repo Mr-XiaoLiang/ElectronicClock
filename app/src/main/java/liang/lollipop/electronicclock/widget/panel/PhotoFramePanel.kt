@@ -26,11 +26,7 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
 
     private var photoAdapter: PhotoAdapter? = null
 
-    override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
-        return createView(layoutInflater.context)
-    }
-
-    fun createView(context: Context): View {
+    override fun createView(context: Context): View {
         val cardView = FullCardView(context)
         val recyclerView = RecyclerView(context)
         cardView.addView(recyclerView,
@@ -41,9 +37,6 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
             RecyclerView.HORIZONTAL, false)
         photoAdapter = PhotoAdapter(panelInfo.images, context)
         recyclerView.adapter = photoAdapter
-
-        recyclerView.setBackgroundColor(0x30FF0000)
-
         PagerSnapHelper().attachToRecyclerView(recyclerView)
         return cardView
     }
@@ -54,6 +47,7 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
             it.radius = panelInfo.radius
             it.cardElevation = panelInfo.elevation
             photoAdapter?.notifyDataSetChanged()
+            it.requestLayout()
         }
     }
 
@@ -114,6 +108,14 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
                 getChildAt(index).layout(0, 0, childWidth, childHeight)
             }
         }
+
+        override fun requestLayout() {
+            super.requestLayout()
+            for (index in 0 until childCount) {
+                getChildAt(index).requestLayout()
+            }
+        }
+
     }
 
 }

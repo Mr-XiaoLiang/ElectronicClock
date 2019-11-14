@@ -45,11 +45,7 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
         updateAnimation(isActive)
     }
 
-    override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
-        return createView(layoutInflater.context)
-    }
-
-    fun createView(context: Context): View {
+    override fun createView(context: Context): View {
         batteryManager = context.getSystemService(BATTERY_SERVICE) as? BatteryManager
         val view = ImageView(context)
         view.background = batteryDrawable

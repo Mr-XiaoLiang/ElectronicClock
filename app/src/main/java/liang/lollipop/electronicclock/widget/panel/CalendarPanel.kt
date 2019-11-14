@@ -26,14 +26,16 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
 
     override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
         val panelView = createView(layoutInflater.context)
-        panelView.onDayViewClick { year, month, day ->
-            LunarActivity.startByTime(layoutInflater.context,
-                LunarCalendar.timeInMillis(year, month - 1, day))
+        if (!isInEditMode) {
+            (panelView as CalendarView).onDayViewClick { year, month, day ->
+                LunarActivity.startByTime(layoutInflater.context,
+                    LunarCalendar.timeInMillis(year, month - 1, day))
+            }
         }
         return panelView
     }
 
-    fun createView(context: Context): CalendarView {
+    override fun createView(context: Context): View {
         val view = CalendarView(context)
         this.view = view
         return view

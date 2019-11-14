@@ -1,5 +1,6 @@
 package liang.lollipop.widget.widget
 
+import android.content.Context
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
@@ -74,8 +75,11 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     }
 
     fun create(layoutInflater: LayoutInflater, parent: WidgetGroup): View {
-        val v = onCreateView(layoutInflater, parent)
+        val v = createView(layoutInflater.context)?:onCreateView(layoutInflater, parent)
         view = v
+        if (v == null) {
+            throw RuntimeException("view is null: mast be override onCreateView(Context) or onCreateView(LayoutInflater, ViewGroup)")
+        }
         viewIsInitializer = true
         onViewCreated(v)
         onInfoChange()
@@ -86,7 +90,20 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     /**
      * 构造方法
      */
-    abstract fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View
+    open fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View? {
+        return null
+    }
+
+    open fun createView(context: Context): View? {
+        return null
+    }
+
+    fun getView(context: Context): View {
+        if (view == null) {
+            view = createView(context)
+        }
+        return view!!
+    }
 
     /**
      * View构造完成时

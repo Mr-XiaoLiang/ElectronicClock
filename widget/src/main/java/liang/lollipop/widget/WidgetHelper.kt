@@ -180,6 +180,15 @@ class WidgetHelper private constructor(private val activity: Context,
     var isPortrait = true
 
     /**
+     * 是否是编辑模式
+     */
+    var isInEditMode = false
+        set(value) {
+            field = value
+            widgetGroup.isInEngineeringMode = value
+        }
+
+    /**
      * 上一分钟，用于选择性的懒更新部分小部件
      */
     private var lastMinute = 0L
@@ -628,6 +637,7 @@ class WidgetHelper private constructor(private val activity: Context,
             return
         }
         val panel = panelAdapter.createPanelByInfo(info)
+        panel.isInEditMode = isInEditMode
         addPanel(panel)
         panel.onInfoChange()
         result?.invoke(panel)

@@ -20,7 +20,7 @@ class PhotoAdjustmentFragment: PanelInfoAdjustmentFragment() {
     private val photoPanel = PhotoFramePanel(photoInfo)
 
     override fun getPanelView(): View {
-        return photoPanel.createView(context!!)
+        return photoPanel.getView(context!!)
     }
 
     override fun initInfoByValue(info: String) {
