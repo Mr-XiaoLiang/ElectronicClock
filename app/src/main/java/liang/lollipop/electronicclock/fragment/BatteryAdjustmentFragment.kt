@@ -19,7 +19,7 @@ class BatteryAdjustmentFragment: PanelInfoAdjustmentFragment() {
     private val batteryPanel = BatteryPanel(batteryInfo)
 
     override fun getPanelView(): View {
-        return batteryPanel.createView(context!!)
+        return batteryPanel.getView(context!!)
     }
 
     override fun initInfoByValue(info: String) {

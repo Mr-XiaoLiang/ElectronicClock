@@ -241,6 +241,8 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
 
     private var requestToLayout = false
 
+    var isInEngineeringMode = false
+
     /**
      * 添加面板
      * 添加View的唯一途径
@@ -300,7 +302,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
         event?:return super.onTouchEvent(event)
         // 如果不在拖拽模式，那么放弃手势处理
-        if (!isDragState || dragMode == DragMode.None || activeActionId == NO_ID) {
+        if (!isInEngineeringMode && (!isDragState || dragMode == DragMode.None || activeActionId == NO_ID)) {
             return super.onTouchEvent(event)
         }
         when (event.actionMasked){
@@ -330,6 +332,10 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         return (isDragState && dragMode != DragMode.None) || super.onTouchEvent(event)
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        return isInEngineeringMode || super.dispatchTouchEvent(ev)
+    }
+
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         if (lockedTouch) {
             return true
@@ -339,7 +345,7 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
         ev?:return super.onInterceptTouchEvent(ev)
         // 如果不在拖拽模式，那么放弃拦截任何手势
-        if (!isDragState) {
+        if (!isInEngineeringMode && !isDragState) {
             logger("onInterceptTouchEvent, isDragState = false, break")
             return super.onInterceptTouchEvent(ev)
         }

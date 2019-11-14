@@ -28,7 +28,7 @@ class CalendarAdjustmentFragment: PanelInfoAdjustmentFragment() {
     }
 
     override fun getPanelView(): View {
-        return calendarPanel.createView(context!!)
+        return calendarPanel.getView(context!!)
     }
 
     override fun getPanelInfo(): PanelInfo {

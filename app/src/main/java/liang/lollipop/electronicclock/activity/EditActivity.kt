@@ -170,6 +170,7 @@ class EditActivity : BaseActivity() {
         widgetHelper = PreferenceHelper.createWidgetHelper(this, widgetGroup).let {
             it.isAutoInverted = false
             it.canDrag = true
+            it.isInEditMode = true
             it
         }.onCantLayout {
             // 当出现无法排版的面板时
