@@ -319,7 +319,6 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
      */
     fun notifyDataChange() {
         onDataChange()
-        requestLayout()
         invalidate()
     }
 
@@ -387,6 +386,8 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
                 }
             }
         }
+        TODO("requestLayout()")
+
     }
 
     private class DayView(context: Context) : View(context) {
