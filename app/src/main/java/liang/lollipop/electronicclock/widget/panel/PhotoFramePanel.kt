@@ -47,7 +47,6 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
             it.radius = panelInfo.radius
             it.cardElevation = panelInfo.elevation
             photoAdapter?.notifyDataSetChanged()
-            it.requestLayout()
         }
     }
 

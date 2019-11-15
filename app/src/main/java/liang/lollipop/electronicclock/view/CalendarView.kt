@@ -387,7 +387,9 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             }
         }
         TODO("requestLayout()")
-
+        // 频繁layout
+        // 事件拦截和分发
+        // 相册小部件无法显示
     }
 
     private class DayView(context: Context) : View(context) {
