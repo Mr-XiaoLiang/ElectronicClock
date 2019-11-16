@@ -98,6 +98,8 @@ class PanelInfoAdjustmentActivity : BottomNavigationActivity(),
         spanXSeekBar.onProgressChangeListener = this
         spanYSeekBar.onProgressChangeListener = this
 
+        previewGroup.setPadding(30F)
+
         setPanelSize(1, 1)
     }
 
