@@ -32,6 +32,8 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
         cardView.addView(recyclerView,
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT)
+        cardView.radius = panelInfo.radius
+        cardView.cardElevation = panelInfo.elevation
 
         recyclerView.layoutManager = LinearLayoutManager(context,
             RecyclerView.HORIZONTAL, false)
