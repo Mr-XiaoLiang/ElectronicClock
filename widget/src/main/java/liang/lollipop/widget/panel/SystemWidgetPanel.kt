@@ -1,8 +1,10 @@
 package liang.lollipop.widget.panel
 
+import android.annotation.SuppressLint
 import android.appwidget.AppWidgetHostView
+import android.appwidget.AppWidgetManager
 import android.content.Context
-import android.graphics.Color
+import android.content.Intent
 import android.graphics.PointF
 import android.view.*
 import android.widget.FrameLayout
@@ -80,6 +82,19 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
         }
     }
 
+    fun callWidgetClick() {
+        val configure = widgetView.appWidgetInfo.configure
+        if (isInEditMode && configure != null) {
+            widgetView.context.startActivity(Intent().apply {
+                component = configure
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetView.appWidgetId)
+            })
+            return
+        }
+        widgetView.callOnClick()
+    }
+
     private class LongPressGroup(context: Context): FrameLayout(context) {
 
         private val logger = Utils.loggerI("LongPressGroup")
@@ -149,6 +164,7 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
             return false
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         override fun onTouchEvent(ev: MotionEvent?): Boolean {
             when (ev?.action) {
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {

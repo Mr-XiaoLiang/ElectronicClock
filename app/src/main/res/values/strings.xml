@@ -139,4 +139,7 @@
     <string name="title_radius">rounding size </string>
     <string name="summary_radius"> too large rounded corners, may lead to unexpected situations </string>
     <string name="photo">Photo</string>
+    <string name="action_adjustment">Adjustment</string>
+    <string name="must_place_widget">You must place a widget</string>
+    <string name="no_adjusted_panels">This widget has no adjusted panels</string>
 </resources>
