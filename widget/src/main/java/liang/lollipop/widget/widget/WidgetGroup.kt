@@ -332,10 +332,6 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         return (isDragState && dragMode != DragMode.None) || super.onTouchEvent(event)
     }
 
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        return isInEngineeringMode || super.dispatchTouchEvent(ev)
-    }
-
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         if (lockedTouch) {
             return true
@@ -355,10 +351,12 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
                 pendingTouchRequest = false
                 // 检查按下事件是否符合要求，如果符合，那么认为开始拖拽
                 touchDown.set(ev.x, ev.y)
+                checkDragStatus(ev)
                 if (touchInSelectedPanel(touchDown.x.toInt(), touchDown.y.toInt())) {
                     activeActionId = ev.getPointerId(0)
                     logger("onInterceptTouchEvent, ACTION_DOWN -> activeActionId = $activeActionId, dragMode = $dragMode")
-                } else {
+                    return true
+                } else if (isDragState) {
                     cancelSelected()
                     logger("onInterceptTouchEvent, ACTION_DOWN -> cancelSelected()")
                     return true
@@ -389,11 +387,12 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             return true
         }
         // 只要是拖拽的激活状态，那么就必须要拦截全部手势
-        return isDragState || super.onInterceptTouchEvent(ev)
+        return isDragState || super.onInterceptTouchEvent(ev) || isInEngineeringMode
     }
 
     private fun onDrag(offsetX: Float, offsetY: Float): Boolean {
         val panel = selectedPanel?:return false
+        logger("onDrag: $dragMode, offsetX: $offsetX, offsetY: $offsetY")
         val offX = offsetX.toInt()
         val offY = offsetY.toInt()
         when (dragMode) {
@@ -504,6 +503,26 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         }
         tmp.recycle()
         return p
+    }
+
+    private fun checkDragStatus(ev: MotionEvent) {
+        if (!isInEngineeringMode) {
+            selectedPanel = null
+            return
+        }
+        val x = ev.x
+        val y = ev.y
+        for (index in 0 until childCount) {
+            val child = getChildAt(index)
+            if (child.left <= x && child.right >= x &&
+                    child.top <= y && child.bottom >= y) {
+                val focusChild = panelList.filter { it.view == child }
+                if (focusChild.isNotEmpty()) {
+                    selectedPanel = focusChild[0]
+                    return
+                }
+            }
+        }
     }
 
     private fun onPointerUp(ev: MotionEvent): Boolean {

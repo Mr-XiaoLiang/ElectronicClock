@@ -23,6 +23,7 @@ import liang.lollipop.electronicclock.utils.*
 import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
+import liang.lollipop.widget.panel.SystemWidgetPanel
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.PanelAdapter
 
@@ -72,6 +73,8 @@ class EditActivity : BaseActivity() {
         const val AUTO_LIGHT = 5
         /** 重置 **/
         const val RESET = 6
+        /** 调整 **/
+        const val ADJUSTMENT = 7
     }
 
     private val logger = Utils.loggerI("EditActivity")
@@ -196,51 +199,42 @@ class EditActivity : BaseActivity() {
                 ActionId.BACK,
                 R.drawable.ic_arrow_back_black_24dp,
                 R.string.action_back
-            )
-        )
-        actionInfoArray.add(
+            ),
             ActionInfo(
                 ActionId.DONE,
                 R.drawable.ic_done_black_24dp,
                 R.string.action_done
-            )
-        )
-        actionInfoArray.add(
+            ),
+            ActionInfo(
+                ActionId.ADJUSTMENT,
+                R.drawable.ic_settings_black_24dp,
+                R.string.action_adjustment
+            ),
             ActionInfo(
                 ActionId.DELETE,
                 R.drawable.ic_delete_black_24dp,
                 R.string.action_delete
-            )
-        )
-        actionInfoArray.add(
+            ),
             ActionInfo(
                 ActionId.WIDGET,
                 R.drawable.ic_dashboard_black_24dp,
                 R.string.action_widget
-            )
-        )
-        actionInfoArray.add(
+            ),
             ActionInfo(
                 ActionId.PREVIEW,
                 R.drawable.ic_visibility_black_24dp,
                 R.string.action_preview
-            )
-        )
-        actionInfoArray.add(
+            ),
             ActionInfo(
                 ActionId.INVERTED,
                 R.drawable.ic_invert_colors_black_24dp,
                 R.string.action_inverted
-            )
-        )
-        actionInfoArray.add(
+            ),
             ActionInfo(
                 ActionId.AUTO_LIGHT,
                 R.drawable.ic_brightness_auto_black_24dp,
                 R.string.action_auto_light
-            )
-        )
-        actionInfoArray.add(
+            ),
             ActionInfo(
                 ActionId.RESET,
                 R.drawable.ic_replay_black_24dp,
@@ -377,6 +371,24 @@ class EditActivity : BaseActivity() {
                     show()
                 }
             }
+            // 调整小部件
+            ActionId.ADJUSTMENT -> {
+                val selectedPanel = widgetGroup.selectedPanel
+                if (selectedPanel == null) {
+                    Snackbar.make(widgetGroup, R.string.must_place_widget, Snackbar.LENGTH_LONG).show()
+                    return
+                }
+                if (selectedPanel is SystemWidgetPanel) {
+                    selectedPanel.callWidgetClick()
+                    return
+                }
+                val intent = selectedPanel.panelInfo.getIntent()
+                if (intent == null) {
+                    Snackbar.make(widgetGroup, R.string.no_adjusted_panels, Snackbar.LENGTH_LONG).show()
+                    return
+                }
+                startActivity(intent)
+            }
         }
     }
 
@@ -479,6 +491,10 @@ class EditActivity : BaseActivity() {
                     loadProgressBar.isIndeterminate = false
                 }
             }).start()
+    }
+
+    private fun <T> ArrayList<T>.add(vararg values: T) {
+        this.addAll(values)
     }
 
 }
