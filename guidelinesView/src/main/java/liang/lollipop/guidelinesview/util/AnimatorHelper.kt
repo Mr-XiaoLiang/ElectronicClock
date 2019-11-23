@@ -2,6 +2,7 @@ package liang.lollipop.guidelinesview.util
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.ViewPropertyAnimator
@@ -125,7 +126,7 @@ fun View.revealCloseWith(anchorView: View, listener: (AnimatorListenerImpl.() ->
     val centerY = min(max(anchorLoc[1] + anchorView.height / 2 - myLoc[1], 0), this.height)
     val endRadius = AnimatorHelper.getDiam(this.width,this.height)
     val reveal = ViewAnimationUtils.createCircularReveal(this, centerX, centerY, endRadius, 0F)
-    reveal.addListener(AnimatorListenerImpl().apply { listener?.invoke(this) })
+    reveal.lifecycleBinding(listener)
     reveal.duration = AnimatorHelper.animatorDuration
     reveal.start()
     return reveal
