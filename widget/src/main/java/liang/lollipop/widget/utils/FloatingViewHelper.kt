@@ -1,6 +1,7 @@
 package liang.lollipop.widget.utils
 
 import android.content.Context
+import android.util.Log
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Interpolator
@@ -71,9 +72,10 @@ class FloatingViewHelper private constructor(private val anchorView: View,
         floatingView.onCallBack {
             close()
         }
-        floatingView.postOnAttached {
+        floatingView.onAttached {
             animationIn(animationType)
         }
+        floatingView.hide()
         viewGroup.addView(floatingView,
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT)
@@ -95,7 +97,12 @@ class FloatingViewHelper private constructor(private val anchorView: View,
         lastAnimationType = animationType
         when (animationType) {
             AnimationType.CircularReveal -> {
-                floatingView.revealOpenWith(anchorView)
+                floatingView.revealOpenWith(anchorView) {
+                    onStart {
+                        floatingView.show()
+                        removeThis(it)
+                    }
+                }
             }
             AnimationType.Left, AnimationType.Right -> {
                 val direction = if (animationType == AnimationType.Left) {
@@ -108,6 +115,12 @@ class FloatingViewHelper private constructor(private val anchorView: View,
                     it.cancel()
                     it.translationX(0F)
                     it.interpolator = interpolator
+                    it.lifecycleBinding {
+                        onStart {
+                            floatingView.show()
+                            removeThis(it)
+                        }
+                    }
                     it.start()
                 }
             }
@@ -122,6 +135,12 @@ class FloatingViewHelper private constructor(private val anchorView: View,
                     it.cancel()
                     it.translationY(0F)
                     it.interpolator = interpolator
+                    it.lifecycleBinding {
+                        onStart {
+                            floatingView.show()
+                            removeThis(it)
+                        }
+                    }
                     it.start()
                 }
             }
@@ -214,33 +233,6 @@ class FloatingViewHelper private constructor(private val anchorView: View,
         return group
     }
 
-    private fun View.postOnAttached(run: () -> Unit) {
-        this.addOnAttachStateChangeListener(ViewAttachStateChangeListener(true, run))
-    }
-
-    private fun View.postOnDetached(run: () -> Unit) {
-        this.addOnAttachStateChangeListener(ViewAttachStateChangeListener(true, null, run))
-    }
-
-    private class ViewAttachStateChangeListener(
-        private val ones: Boolean,
-        private val onAttached: (() -> Unit)? = null,
-        private val onDetached: (() -> Unit)? = null) : View.OnAttachStateChangeListener {
-        override fun onViewDetachedFromWindow(v: View?) {
-            onAttached?.invoke()
-            if (ones && onDetached == null) {
-                v?.removeOnAttachStateChangeListener(this)
-            }
-        }
-
-        override fun onViewAttachedToWindow(v: View?) {
-            onDetached?.invoke()
-            if (ones) {
-                v?.removeOnAttachStateChangeListener(this)
-            }
-        }
-    }
-
     enum class AnimationType {
         None,
         CircularReveal,
@@ -251,11 +243,6 @@ class FloatingViewHelper private constructor(private val anchorView: View,
     }
 
     private class FloatingGroup(context: Context): FrameLayout(context) {
-        init {
-            isFocusable = true
-            isFocusableInTouchMode = true
-            requestFocus()
-        }
 
         var isAutoClose = true
 
@@ -272,11 +259,55 @@ class FloatingViewHelper private constructor(private val anchorView: View,
                 onCloseListener?.invoke()
                 return true
             }
-            return super.onKeyDown(keyCode, event)
+            return true//super.onKeyDown(keyCode, event)
+        }
+
+        fun onAttached(lis: (() -> Unit)?) {
+            onAttachedListener = lis
+        }
+
+        fun onDetached(lis: (() -> Unit)?) {
+            onDetachedListener = lis
+        }
+
+        override fun onAttachedToWindow() {
+            super.onAttachedToWindow()
+            post {
+                bindFocus()
+                onAttachedListener?.invoke()
+                if (isOnce) {
+                    onAttachedListener = null
+                }
+            }
+        }
+
+        override fun onDetachedFromWindow() {
+            super.onDetachedFromWindow()
+            post {
+                onDetachedListener?.invoke()
+                if (isOnce) {
+                    onDetachedListener = null
+                }
+            }
         }
 
         fun onCallBack(lis: (() -> Unit)?) {
             onCloseListener = lis
+        }
+
+        fun hide() {
+            visibility = View.INVISIBLE
+        }
+
+        fun show() {
+            visibility = View.VISIBLE
+            bindFocus()
+        }
+
+        fun bindFocus() {
+            isFocusable = true
+            isFocusableInTouchMode = true
+            requestFocus()
         }
 
     }

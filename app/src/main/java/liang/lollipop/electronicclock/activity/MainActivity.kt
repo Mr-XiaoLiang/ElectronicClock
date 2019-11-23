@@ -5,12 +5,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_bottom_navigation.*
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.utils.*
 import liang.lollipop.guidelinesview.Guidelines
+import liang.lollipop.widget.utils.FloatingViewHelper
 
 
 /**
@@ -29,8 +31,8 @@ class MainActivity : BottomNavigationActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.statusBarColor = Color.BLACK
-        showFAB(R.drawable.ic_play_arrow_black_24dp) {
-            it.setOnClickListener {
+        showFAB(R.drawable.ic_play_arrow_black_24dp) { fab ->
+            fab.setOnClickListener {
                 startActivity(Intent(this, WidgetActivity::class.java))
             }
         }
