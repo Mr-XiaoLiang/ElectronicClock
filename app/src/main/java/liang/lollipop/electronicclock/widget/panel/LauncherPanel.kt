@@ -9,4 +9,5 @@ import liang.lollipop.widget.widget.Panel
  * 启动器面板
  */
 class LauncherPanel(info: LauncherPanelInfo): Panel<LauncherPanelInfo>(info) {
+
 }
