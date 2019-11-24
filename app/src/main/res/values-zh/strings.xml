@@ -137,4 +137,6 @@
     <string name="action_adjustment">调整</string>
     <string name="must_place_widget">您必须选中一个小部件</string>
     <string name="no_adjusted_panels">这个小部件没有调整的面板</string>
+    <string name="launcher">启动器</string>
+    <string name="add_private">添加</string>
 </resources>

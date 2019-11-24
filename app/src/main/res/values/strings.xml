@@ -142,4 +142,6 @@
     <string name="action_adjustment">Adjustment</string>
     <string name="must_place_widget">You must place a widget</string>
     <string name="no_adjusted_panels">This widget has no adjusted panels</string>
+    <string name="launcher">Launcher</string>
+    <string name="add_private">Add</string>
 </resources>
