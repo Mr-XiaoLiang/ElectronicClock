@@ -17,7 +17,7 @@ import liang.lollipop.guidelinesview.util.*
  * @date 2019-11-23 12:18
  * 悬浮的View的辅助类
  */
-class FloatingViewHelper private constructor(private val anchorView: View,
+class FloatingViewHelper private constructor(val anchorView: View,
                          private val floatingView: FloatingGroup) {
 
     companion object {
@@ -37,9 +37,24 @@ class FloatingViewHelper private constructor(private val anchorView: View,
 
     private var lastAnimationType: AnimationType = AnimationType.CircularReveal
 
+    private var onShowListener: (() -> Unit)? = null
+
     var interpolator: Interpolator = AccelerateDecelerateInterpolator()
 
     var autoClose = true
+
+    val contentView: View
+        get() {
+            return floatingView.getChildAt(0)
+        }
+
+    fun <T: View> findFromContent(id: Int): T {
+        return contentView.findViewById(id)
+    }
+
+    fun onShow(lis: (() -> Unit)?) {
+        onShowListener = lis
+    }
 
     fun showNearby(animationType: AnimationType = AnimationType.CircularReveal) {
         showOnAnchorParent(animationType, true)
@@ -95,6 +110,7 @@ class FloatingViewHelper private constructor(private val anchorView: View,
 
     private fun animationIn(animationType: AnimationType) {
         lastAnimationType = animationType
+        onShowListener?.invoke()
         when (animationType) {
             AnimationType.CircularReveal -> {
                 floatingView.revealOpenWith(anchorView) {

@@ -5,12 +5,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
-import android.widget.Toast
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.activity_bottom_navigation.*
 import kotlinx.android.synthetic.main.activity_main.*
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.utils.*
+import liang.lollipop.electronicclock.utils.PreferenceHelper
+import liang.lollipop.electronicclock.utils.getPreferences
+import liang.lollipop.electronicclock.utils.putPreferences
+import liang.lollipop.electronicclock.widget.panel.LauncherPanel
 import liang.lollipop.guidelinesview.Guidelines
 import liang.lollipop.widget.utils.FloatingViewHelper
 
@@ -32,9 +34,10 @@ class MainActivity : BottomNavigationActivity() {
         super.onCreate(savedInstanceState)
         window.statusBarColor = Color.BLACK
         showFAB(R.drawable.ic_play_arrow_black_24dp) { fab ->
-            fab.setOnClickListener {
-                startActivity(Intent(this, WidgetActivity::class.java))
-            }
+//            fab.setOnClickListener {
+//                startActivity(Intent(this, WidgetActivity::class.java))
+//            }
+            LauncherPanel.AppPanel(fab)
         }
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
 

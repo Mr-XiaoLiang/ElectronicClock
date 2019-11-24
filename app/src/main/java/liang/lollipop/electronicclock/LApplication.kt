@@ -3,6 +3,7 @@ package liang.lollipop.electronicclock
 import android.app.Application
 import android.graphics.Color
 import androidx.core.content.ContextCompat
+import liang.lollipop.electronicclock.utils.LauncherHelper
 import liang.lollipop.guidelinesview.Guidelines
 
 /**
@@ -12,6 +13,8 @@ import liang.lollipop.guidelinesview.Guidelines
  */
 class LApplication: Application() {
 
+    private val launcherHelper = LauncherHelper()
+
     override fun onCreate() {
         super.onCreate()
         Guidelines.global {
@@ -20,6 +23,7 @@ class LApplication: Application() {
             panelColor = ContextCompat.getColor(this@LApplication, R.color.colorPrimary)
             backgroundColor = changeAlpha(Color.BLACK, 200)
         }
+        launcherHelper.registerReceiver(this)
     }
 
 }
