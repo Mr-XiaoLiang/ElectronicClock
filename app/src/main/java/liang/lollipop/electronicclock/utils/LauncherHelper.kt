@@ -7,7 +7,7 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.activity.MainActivity
+import liang.lollipop.electronicclock.activity.PrivateAppsSettingActivity
 
 
 /**
@@ -48,7 +48,8 @@ class LauncherHelper {
                     val appInfo = AppInfo(
                         info.activityInfo.loadLabel(packageManager).toString(),
                         intent,
-                        info.loadIcon(packageManager)
+                        info.loadIcon(packageManager),
+                        packageName
                     )
                     if (privatePkgs.contains(packageName)) {
                         privateAppInfoList.add(appInfo)
@@ -56,8 +57,6 @@ class LauncherHelper {
                         publicAppInfoList.add(appInfo)
                     }
                 }
-
-                privateAppInfoList.add(getSettingBtn(context))
             }
 
             publicInfoList.clear()
@@ -77,7 +76,7 @@ class LauncherHelper {
             return Array(packages.size) { i -> packages[i] }
         }
 
-        private fun setPrivatePackages(context: Context, array: Array<String>) {
+        fun setPrivatePackages(context: Context, array: Array<String>) {
             isPackageChange = true
             val builder = StringBuilder()
             for (index in array.indices) {
@@ -97,11 +96,11 @@ class LauncherHelper {
             return context.packageManager.getLaunchIntentForPackage(packageName)
         }
 
-        private fun getSettingBtn(context: Context): AppInfo {
+        fun getSettingBtn(context: Context): AppInfo {
             return AppInfo(context.resources.getString(R.string.add_private),
-                Intent(context, MainActivity::class.java),
+                Intent(context, PrivateAppsSettingActivity::class.java),
                 TintUtil.tintDrawable(context, R.drawable.ic_add_black_24dp)
-                    .setColor(Color.WHITE).mutate().tint())
+                    .setColor(Color.WHITE).mutate().tint(), "")
         }
 
         private val packageChangeListenerList = ArrayList<PackageChangeListener>()
@@ -145,6 +144,6 @@ class LauncherHelper {
         fun onPackageChanged()
     }
 
-    data class AppInfo(val name: String, val intent: Intent, val icon: Drawable)
+    data class AppInfo(val name: String, val intent: Intent, val icon: Drawable, val packageName: String)
 
 }

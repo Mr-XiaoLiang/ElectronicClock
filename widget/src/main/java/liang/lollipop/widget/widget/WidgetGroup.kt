@@ -15,6 +15,7 @@ import liang.lollipop.widget.utils.dp
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
+import kotlin.math.min
 
 /**
  * @author lollipop
@@ -236,6 +237,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
         get() {
             return gridPaint.color
         }
+
+    /**
+     * 是否是方形格子
+     */
+    var isSquareGrid = true
 
     private var isActive = false
 
@@ -704,10 +710,19 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     private fun Panel<*>.layoutByGrid(x: Int, y: Int, spanX: Int, spanY: Int) {
+        val offsetX: Int
+        val offsetY: Int
+        if (isSquareGrid) {
+            offsetX = (width - paddingLeft - paddingRight - (gridSize.width * spanCountX)) / 2
+            offsetY = (height - paddingTop - paddingBottom - (gridSize.height * spanCountY)) / 2
+        } else {
+            offsetX = 0
+            offsetY = 0
+        }
         val panelWidth = spanX * gridSize.width
         val panelHeight = spanY * gridSize.height
-        val left = x * gridSize.width + paddingLeft
-        val top = y * gridSize.height + paddingTop
+        val left = x * gridSize.width + paddingLeft + offsetX
+        val top = y * gridSize.height + paddingTop + offsetY
         this.layout(left, top, panelWidth + left, panelHeight + top)
         this.saveGridLocation(x, y, spanX, spanY)
         selectedPanelChange(this)
@@ -781,12 +796,21 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             drawSelectedPanelListener?.invoke(it, dragMode, canvas)
         }
         if (drawGrid) {
+            val offsetX: Int
+            val offsetY: Int
+            if (isSquareGrid) {
+                offsetX = (width - paddingLeft - paddingRight - (gridSize.width * spanCountX)) / 2
+                offsetY = (height - paddingTop - paddingBottom - (gridSize.height * spanCountY)) / 2
+            } else {
+                offsetX = 0
+                offsetY = 0
+            }
             for (x in 0 .. spanCountX) {
-                val left = (x * gridSize.width).toFloat()
+                val left = (x * gridSize.width + offsetX).toFloat()
                 canvas.drawLine(left, 0F, left, height.toFloat(), gridPaint)
             }
             for (y in 0 .. spanCountY) {
-                val top = (y * gridSize.height).toFloat()
+                val top = (y * gridSize.height + offsetY).toFloat()
                 canvas.drawLine(0F, top, width.toFloat(), top, gridPaint)
             }
         }
@@ -811,6 +835,11 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
             spanCountY = gridCount
             xSize = calculateScale(w, ySize)
             spanCountX = w / xSize
+        }
+        if (isSquareGrid) {
+            val same = min(xSize, ySize)
+            gridSize = Size(same, same)
+            return
         }
         gridSize = Size(xSize, ySize)
     }
@@ -974,6 +1003,9 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     private fun setChildLongClick(panel: Panel<*>) {
+        if (panel.customClick) {
+            return
+        }
         val listener = childLongClickListener
         if (listener != null) {
             panel.view?.setOnLongClickListener{ listener(panel) }
@@ -990,6 +1022,9 @@ class WidgetGroup(context: Context, attr: AttributeSet?, defStyleAttr: Int, defS
     }
 
     private fun setChildClick(panel: Panel<*>) {
+        if (panel.customClick) {
+            return
+        }
         panel.view?.setOnClickListener{
             if (childClickListener?.invoke(panel) != true) {
                 panel.callOnClick(it)

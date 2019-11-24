@@ -139,4 +139,13 @@
     <string name="no_adjusted_panels">这个小部件没有调整的面板</string>
     <string name="launcher">启动器</string>
     <string name="add_private">添加</string>
+    <string name="title_background_color">背景色</string>
+    <string name="summary_background_color">背景的颜色</string>
+    <string name="title_foreground_color">前景色</string>
+    <string name="summary_foreground_color">图案的颜色</string>
+    <string name="title_auto_color">自动设置颜色</string>
+    <string name="summary_auto_color">开启后将根据亮度以及时间调整颜色</string>
+    <string name="pref_title_square_grid">使用方形格子</string>
+    <string name="pref_summer_t_square_grid">已启用方形格子，可能与屏幕存在边距</string>
+    <string name="pref_summer_f_square_grid">以停用方形格子，可能对某些小部件造成影响</string>
 </resources>

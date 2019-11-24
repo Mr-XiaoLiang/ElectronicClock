@@ -189,6 +189,17 @@ class WidgetHelper private constructor(private val activity: Context,
         }
 
     /**
+     * 是否是方形格子
+     */
+    var isSquareGrid: Boolean
+        get() {
+            return widgetGroup.isSquareGrid
+        }
+        set(value) {
+            widgetGroup.isSquareGrid = value
+        }
+
+    /**
      * 上一分钟，用于选择性的懒更新部分小部件
      */
     private var lastMinute = 0L

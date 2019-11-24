@@ -24,20 +24,14 @@ import kotlin.math.min
  */
 class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
 
-    override fun onCreateView(layoutInflater: LayoutInflater, parent: ViewGroup): View {
-        val panelView = createView(layoutInflater.context)
+    override fun createView(context: Context): View {
+        val view = CalendarView(context)
         if (!isInEditMode) {
-            (panelView as CalendarView).onDayViewClick { year, month, day ->
-                LunarActivity.startByTime(layoutInflater.context,
+            view.onDayViewClick { year, month, day ->
+                LunarActivity.startByTime(context,
                     LunarCalendar.timeInMillis(year, month - 1, day))
             }
         }
-        return panelView
-    }
-
-    override fun createView(context: Context): View {
-        val view = CalendarView(context)
-        this.view = view
         return view
     }
 
@@ -86,16 +80,4 @@ class CalendarPanel(info: CalendarPanelInfo): Panel<CalendarPanelInfo>(info) {
             }
         }
     }
-
-    override fun onClick(v: View?) {
-        super.onClick(v)
-        v?:return
-        val context = v.context
-        if (panelInfo.id == PanelInfo.NO_ID) {
-            Snackbar.make(v, R.string.alert_save_first, Snackbar.LENGTH_LONG).show()
-            return
-        }
-        context?.startActivity(PanelInfoAdjustmentActivity.getIntent(panelInfo))
-    }
-
 }

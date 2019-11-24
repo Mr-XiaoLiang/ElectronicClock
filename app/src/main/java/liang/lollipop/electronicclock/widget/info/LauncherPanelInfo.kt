@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.widget.info
 
 import android.content.Intent
 import android.graphics.Color
+import android.text.TextUtils
 import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONObject
@@ -57,6 +58,14 @@ class LauncherPanelInfo: PanelInfo() {
         jsonObj.put(KEY_BTN_COLOR, btnColor)
         jsonObj.put(KEY_ICON_COLOR, iconColor)
         jsonObj.put(KEY_AUTO_COLOR, isAutoColor)
+    }
+
+    override fun initData(data: Intent) {
+        super.initData(data)
+        val info = PanelInfoAdjustmentActivity.getInfo(data)
+        if (!TextUtils.isEmpty(info)) {
+            parse(JSONObject(info))
+        }
     }
 
 }

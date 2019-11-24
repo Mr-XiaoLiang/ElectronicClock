@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.widget.info
 
 import android.content.Intent
 import android.graphics.Color
+import android.text.TextUtils
 import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.electronicclock.view.CalendarView
 import liang.lollipop.widget.widget.PanelInfo
@@ -102,6 +103,14 @@ class CalendarPanelInfo: PanelInfo() {
             CalendarView.Type.Week.value -> CalendarView.Type.Week
             CalendarView.Type.Day.value -> CalendarView.Type.Day
             else -> CalendarView.Type.Month
+        }
+    }
+
+    override fun initData(data: Intent) {
+        super.initData(data)
+        val info = PanelInfoAdjustmentActivity.getInfo(data)
+        if (!TextUtils.isEmpty(info)) {
+            parse(JSONObject(info))
         }
     }
 

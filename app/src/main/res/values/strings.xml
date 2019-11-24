@@ -144,4 +144,13 @@
     <string name="no_adjusted_panels">This widget has no adjusted panels</string>
     <string name="launcher">Launcher</string>
     <string name="add_private">Add</string>
+    <string name="title_background_color">Background color</string>
+    <string name="summary_background_color">Background color</string>
+    <string name="title_foreground_color">Foreground color</string>
+    <string name="summary_foreground_color">Pattern color</string>
+    <string name="title_auto_color">Automatically set color</string>
+    <string name="summary_auto_color">Will adjust the color according to brightness and time after opening </string>
+    <string name="pref_title_square_grid">使用方形格子</string>
+    <string name="pref_summer_t_square_grid">已启用方形格子，可能与屏幕存在边距</string>
+    <string name="pref_summer_f_square_grid">以停用方形格子，可能对某些小部件造成影响</string>
 </resources>

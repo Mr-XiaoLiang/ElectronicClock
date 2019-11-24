@@ -4,6 +4,7 @@ import android.content.Intent
 import liang.lollipop.electronicclock.fragment.*
 import liang.lollipop.electronicclock.widget.info.BatteryPanelInfo
 import liang.lollipop.electronicclock.widget.info.CalendarPanelInfo
+import liang.lollipop.electronicclock.widget.info.LauncherPanelInfo
 import liang.lollipop.electronicclock.widget.info.PhotoFramePanelInfo
 import liang.lollipop.widget.widget.PanelInfo
 
@@ -19,6 +20,7 @@ object PanelInfoAdjustmentHelper {
         Battery(1),
         Calendar(2),
         Photo(3),
+        Launcher(4),
     }
 
     fun createFragmentForIntent(intent: Intent, key: String, infoId: Int): PanelInfoAdjustmentFragment {
@@ -36,6 +38,9 @@ object PanelInfoAdjustmentHelper {
             PanelType.Photo.value -> {
                 PhotoAdjustmentFragment().bindId(infoId)
             }
+            PanelType.Launcher.value -> {
+                LauncherAdjustmentFragment().bindId(infoId)
+            }
             else -> {
                 EmptyAdjustmentFragment.getInstance()
             }
@@ -47,6 +52,7 @@ object PanelInfoAdjustmentHelper {
             is BatteryPanelInfo -> PanelType.Battery.value
             is CalendarPanelInfo -> PanelType.Calendar.value
             is PhotoFramePanelInfo -> PanelType.Photo.value
+            is LauncherPanelInfo -> PanelType.Launcher.value
             else -> defInfoType
         }
     }

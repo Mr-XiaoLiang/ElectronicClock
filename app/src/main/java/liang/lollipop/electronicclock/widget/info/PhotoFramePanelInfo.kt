@@ -1,6 +1,7 @@
 package liang.lollipop.electronicclock.widget.info
 
 import android.content.Intent
+import android.text.TextUtils
 import liang.lollipop.electronicclock.activity.PanelInfoAdjustmentActivity
 import liang.lollipop.widget.widget.PanelInfo
 import org.json.JSONArray
@@ -58,6 +59,14 @@ class PhotoFramePanelInfo: PanelInfo() {
         jsonObj.put(KEY_IMAGES, imageArray)
         jsonObj.put(KEY_ELEVATION, elevation)
         jsonObj.put(KEY_RADIUS, radius)
+    }
+
+    override fun initData(data: Intent) {
+        super.initData(data)
+        val info = PanelInfoAdjustmentActivity.getInfo(data)
+        if (!TextUtils.isEmpty(info)) {
+            parse(JSONObject(info))
+        }
     }
 
 }
