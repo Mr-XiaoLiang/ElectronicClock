@@ -2,9 +2,12 @@ package liang.lollipop.electronicclock.widget.panel
 
 import android.content.Context
 import android.graphics.Color
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -33,7 +36,7 @@ class LauncherPanel(info: LauncherPanelInfo): Panel<LauncherPanelInfo>(info) {
         val cardView = MaterialCardView(context)
 
         val iconView = ImageView(context)
-        iconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        iconView.scaleType = ImageView.ScaleType.FIT_XY
         iconViewId = View.generateViewId()
         iconView.id = iconViewId
 
@@ -42,9 +45,15 @@ class LauncherPanel(info: LauncherPanelInfo): Panel<LauncherPanelInfo>(info) {
             .setColor(panelInfo.iconColor)
             .into(iconView)
 
-        cardView.addView(iconView,
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT)
+        val size = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            24F,
+            context.resources.displayMetrics).toInt()
+
+        val iconLayoutParams = FrameLayout.LayoutParams(size, size)
+        iconLayoutParams.gravity = Gravity.CENTER
+
+        cardView.addView(iconView, iconLayoutParams)
 
         cardView.radius = panelInfo.radius
         cardView.cardElevation = panelInfo.elevation
@@ -56,7 +65,7 @@ class LauncherPanel(info: LauncherPanelInfo): Panel<LauncherPanelInfo>(info) {
         return cardView
     }
 
-    class AppPanel(anchorView: View) {
+    private class AppPanel(anchorView: View) {
         private val floatingViewHelper = FloatingViewHelper.create(anchorView, R.layout.fragment_launcher)
         private val recyclerView: RecyclerView
 
@@ -70,10 +79,10 @@ class LauncherPanel(info: LauncherPanelInfo): Panel<LauncherPanelInfo>(info) {
         private val itemWidth = context.resources.getDimensionPixelSize(R.dimen.launcher_item_width)
 
         init {
-            recyclerView = floatingViewHelper.findFromContent(R.id.recyclerView)
+            recyclerView = floatingViewHelper.findFromContent(R.id.recyclerView)!!
 
             val bottomSheetBehavior = BottomSheetBehavior.from(
-                floatingViewHelper.findFromContent<View>(R.id.sheetGroup))
+                floatingViewHelper.findFromContent(R.id.sheetGroup)!!)
 
             bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {}
@@ -121,6 +130,7 @@ class LauncherPanel(info: LauncherPanelInfo): Panel<LauncherPanelInfo>(info) {
             }
             doAsync {
                 LauncherHelper.getAppList(context, publicAppList, privateAppList)
+                privateAppList.add(LauncherHelper.getSettingBtn(context))
                 uiThread {
                     appList.clear()
                     if (isPrivate) {

@@ -29,6 +29,7 @@ object PreferenceHelper {
     const val KEY_INVERTED = "KEY_INVERTED"
     const val KEY_GRID_SIZE = "KEY_GRID_SIZE"
     const val KEY_ORIENTATION = "KEY_ORIENTATION"
+    const val KEY_SQUARE_GRID = "KEY_SQUARE_GRID"
 
     const val ORIENTATION_AUTO = 0
     const val ORIENTATION_PORTRAIT = 1
@@ -59,6 +60,7 @@ object PreferenceHelper {
             it.isAutoInverted = activity.isAutoInverted
             it.isAutoLight = activity.isAutoLight
             it.isInverted = activity.isInverted
+            it.isSquareGrid = activity.isSquareGrid
             it
         }
     }
@@ -97,6 +99,10 @@ object PreferenceHelper {
                 KEY_INVERTED -> {
                     val v = newValue as? Boolean ?: true
                     context.isInverted = v
+                }
+                KEY_SQUARE_GRID -> {
+                    val v = newValue as? Boolean ?: true
+                    context.isSquareGrid = v
                 }
                 KEY_GRID_SIZE -> {
                     val v = newValue as? Int ?: DEF_GRID_SIZE
@@ -137,6 +143,13 @@ object PreferenceHelper {
             title = context.getString(R.string.pref_title_inverted)
             summerOfTrue = context.getString(R.string.pref_summer_t_inverted)
             summerOfFalse = context.getString(R.string.pref_summer_f_inverted)
+        })
+        list.add(PreferenceBoolean().apply {
+            key = KEY_SQUARE_GRID
+            value = context.isSquareGrid
+            title = context.getString(R.string.pref_title_square_grid)
+            summerOfTrue = context.getString(R.string.pref_summer_t_square_grid)
+            summerOfFalse = context.getString(R.string.pref_summer_f_square_grid)
         })
         list.add(PreferenceNumber().apply {
             key = KEY_GRID_SIZE
@@ -190,6 +203,14 @@ var Context.isInverted: Boolean
     }
     set(value) {
         putPreferences(PreferenceHelper.KEY_INVERTED, value)
+    }
+
+var Context.isSquareGrid: Boolean
+    get() {
+        return getPreferences(PreferenceHelper.KEY_SQUARE_GRID, true)
+    }
+    set(value) {
+        putPreferences(PreferenceHelper.KEY_SQUARE_GRID, value)
     }
 
 var Context.gridSize: Int

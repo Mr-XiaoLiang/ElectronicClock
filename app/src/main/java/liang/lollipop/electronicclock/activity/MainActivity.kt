@@ -34,10 +34,9 @@ class MainActivity : BottomNavigationActivity() {
         super.onCreate(savedInstanceState)
         window.statusBarColor = Color.BLACK
         showFAB(R.drawable.ic_play_arrow_black_24dp) { fab ->
-//            fab.setOnClickListener {
-//                startActivity(Intent(this, WidgetActivity::class.java))
-//            }
-            LauncherPanel.AppPanel(fab)
+            fab.setOnClickListener {
+                startActivity(Intent(this, WidgetActivity::class.java))
+            }
         }
         PreferenceHelper.bindPreferenceGroup(preferenceGroup)
 

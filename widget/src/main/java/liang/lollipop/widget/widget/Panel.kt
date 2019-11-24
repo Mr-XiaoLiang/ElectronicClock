@@ -51,6 +51,11 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     var isInEditMode: Boolean = false
         internal set
 
+    /**
+     * 是否自定义点击事件
+     */
+    var customClick = true
+
     fun callOnClick(v: View? = null) {
         onClick(v ?: view)
     }

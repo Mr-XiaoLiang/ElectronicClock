@@ -48,7 +48,7 @@ class FloatingViewHelper private constructor(val anchorView: View,
             return floatingView.getChildAt(0)
         }
 
-    fun <T: View> findFromContent(id: Int): T {
+    fun <T: View> findFromContent(id: Int): T? {
         return contentView.findViewById(id)
     }
 

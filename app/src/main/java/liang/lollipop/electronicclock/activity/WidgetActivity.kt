@@ -66,6 +66,7 @@ class WidgetActivity : BaseActivity() {
                 widgetHelper.removePanel(panel)
             }
         }
+        widgetHelper.isInEditMode = false
     }
 
     private fun setScreenOrientation() {
