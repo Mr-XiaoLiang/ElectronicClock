@@ -38,7 +38,7 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
 
     private fun nextPage() {
         tryMyView<FullCardView> {
-            if (!isTouched) {
+            if (!isTouched && panelInfo.images.isNotEmpty()) {
                 val recyclerView = it.getChildAt(0) as? RecyclerView
                 recyclerView?.layoutManager?.let { layoutManager ->
                     if (layoutManager is LinearLayoutManager) {
