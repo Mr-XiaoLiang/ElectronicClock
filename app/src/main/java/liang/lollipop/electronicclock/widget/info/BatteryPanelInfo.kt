@@ -87,7 +87,7 @@ class BatteryPanelInfo: PanelInfo() {
     var animationDelay = 5
 
     init {
-        initIntent = PanelInfoAdjustmentActivity.getIntent(this)
+        needInit()
     }
 
     override fun parse(jsonObj: JSONObject) {
@@ -112,11 +112,11 @@ class BatteryPanelInfo: PanelInfo() {
         arcWidth = jsonObj.optDouble(ARC_WIDTH, 0.3).toFloat()
         animationDelay = jsonObj.optInt(ANIMATION_DELAY)
 
-        // 如果初始化的intent没有被置空， 并且ID是有效ID，
-        // 那么就重新生成一个带有新数据的intent
-        if (initIntent != null && id != NO_ID) {
-            initIntent = PanelInfoAdjustmentActivity.getIntent(this)
-        }
+        tryUpdateIntent()
+    }
+
+    override fun getIntent(): Intent? {
+        return PanelInfoAdjustmentActivity.getIntent(this)
     }
 
     override fun serialize(jsonObj: JSONObject) {

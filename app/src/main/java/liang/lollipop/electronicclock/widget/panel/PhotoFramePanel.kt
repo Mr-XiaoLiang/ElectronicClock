@@ -26,6 +26,35 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
 
     private var photoAdapter: PhotoAdapter? = null
 
+    private var isTouched = false
+
+    companion object {
+        private const val UPDATE_DELAY = 5 * 1000L
+    }
+
+    private val updateTask = Runnable {
+        nextPage()
+    }
+
+    private fun nextPage() {
+        tryMyView<FullCardView> {
+            if (!isTouched) {
+                val recyclerView = it.getChildAt(0) as? RecyclerView
+                recyclerView?.layoutManager?.let { layoutManager ->
+                    if (layoutManager is LinearLayoutManager) {
+                        val position = layoutManager.findFirstVisibleItemPosition()
+                        if (position < panelInfo.images.size - 1) {
+                            recyclerView.smoothScrollToPosition(position + 1)
+                        } else {
+                            recyclerView.smoothScrollToPosition(0)
+                        }
+                    }
+                }
+            }
+            it.postDelayed(updateTask, UPDATE_DELAY)
+        }
+    }
+
     override fun createView(context: Context): View {
         val cardView = FullCardView(context)
         val recyclerView = RecyclerView(context)
@@ -39,6 +68,12 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
             RecyclerView.HORIZONTAL, false)
         photoAdapter = PhotoAdapter(panelInfo.images, context)
         recyclerView.adapter = photoAdapter
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                isTouched = newState == RecyclerView.SCROLL_STATE_DRAGGING
+            }
+        })
         PagerSnapHelper().attachToRecyclerView(recyclerView)
         return cardView
     }
@@ -57,6 +92,16 @@ class PhotoFramePanel(info: PhotoFramePanelInfo): Panel<PhotoFramePanelInfo>(inf
         tryMyView<MaterialCardView> {
             it.setCardBackgroundColor(color)
         }
+    }
+
+    override fun onPageStart() {
+        super.onPageStart()
+        view?.postDelayed(updateTask, UPDATE_DELAY)
+    }
+
+    override fun onPageStop() {
+        super.onPageStop()
+        view?.removeCallbacks(updateTask)
     }
 
     private class PhotoAdapter(private val data: ArrayList<String>,
