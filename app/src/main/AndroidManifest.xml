@@ -3,8 +3,7 @@
         package="liang.lollipop.electronicclock">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
             android:name=".LApplication"
@@ -14,28 +13,37 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".activity.PrivateAppsSettingActivity"/>
+        <service
+                android:name=".service.WidgetWallpaper"
+                android:enabled="true"
+                android:exported="true"></service>
+
+        <activity android:name=".activity.PrivateAppsSettingActivity" />
         <activity
                 android:name=".activity.ImageSelectActivity"
-                android:label="@string/app_name"/>
+                android:label="@string/app_name" />
         <activity
                 android:name=".activity.LunarActivity"
                 android:launchMode="singleInstance"
                 android:theme="@style/AppTheme.Transparent" />
         <activity android:name=".activity.PanelInfoAdjustmentActivity" />
         <activity android:name=".activity.EditActivity" />
-        <activity android:name=".activity.WidgetActivity"
-                android:launchMode="singleInstance" >
+        <activity
+                android:name=".activity.WidgetActivity"
+                android:launchMode="singleInstance">
             <intent-filter>
-                <category android:name="android.intent.category.HOME"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.MONKEY"/>
+
+                <category android:name="android.intent.category.MONKEY" />
             </intent-filter>
         </activity>
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
