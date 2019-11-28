@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Point
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Size
 import android.view.*
@@ -40,18 +41,14 @@ class OffScreenEngine(private val context: Context) {
     fun onHide() {
     }
 
-    interface Painter {
-        fun onSizeChange(left: Int, top: Int, right: Int, bottom: Int)
-    }
-
-    data class ViewSize(var width: Int, var height: Int) {
+    private data class ViewSize(var width: Int, var height: Int) {
         fun reset(width: Int, height: Int) {
             this.width = width
             this.height = height
         }
     }
 
-    data class Inset(var left: Int, var top: Int,var right: Int, var bottom: Int) {
+    private data class Inset(var left: Int, var top: Int,var right: Int, var bottom: Int) {
         fun reset(left: Int, top: Int, right: Int, bottom: Int) {
             this.left = left
             this.top = top
