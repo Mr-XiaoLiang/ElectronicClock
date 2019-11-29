@@ -11,4 +11,6 @@ interface Painter {
     fun setInvalidateCallback()
     fun onSizeChange(left: Int, top: Int, right: Int, bottom: Int)
     fun draw(canvas: Canvas)
+    fun onShow()
+    fun onHide()
 }
