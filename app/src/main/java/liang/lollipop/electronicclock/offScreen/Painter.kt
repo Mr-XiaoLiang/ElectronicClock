@@ -8,8 +8,9 @@ import android.graphics.Canvas
  * 绘制者的接口
  */
 interface Painter {
-    fun setInvalidateCallback()
-    fun onSizeChange(left: Int, top: Int, right: Int, bottom: Int)
+    fun setInvalidateCallback(callback: InvalidateCallback)
+    fun onSizeChange(width: Int, height: Int)
+    fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int)
     fun draw(canvas: Canvas)
     fun onShow()
     fun onHide()
