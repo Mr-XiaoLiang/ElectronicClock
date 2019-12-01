@@ -203,7 +203,11 @@ class BatteryPanel(info: BatteryPanelInfo): Panel<BatteryPanelInfo>(info) {
             }
 
             if (info.colorArray.size > 0) {
-                val colorArray = IntArray(info.colorArray.size + 1)
+                val colorArray = if (info.isArc) {
+                    IntArray(info.colorArray.size + 1)
+                } else {
+                    IntArray(info.colorArray.size)
+                }
                 for (i in colorArray.indices) {
                     colorArray[i] = info.colorArray[i % info.colorArray.size]
                 }
