@@ -1,16 +1,11 @@
 package liang.lollipop.electronicclock.offScreen
 
-import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Point
 import android.graphics.Rect
-import android.graphics.drawable.Drawable
-import android.os.Bundle
-import android.util.Size
-import android.view.*
-import android.view.accessibility.AccessibilityEvent
-import android.widget.FrameLayout
-import java.util.concurrent.Executors
+import android.os.Handler
+import android.os.HandlerThread
+import android.view.Surface
+import kotlin.math.max
 
 /**
  * @author lollipop
@@ -23,7 +18,17 @@ class OffScreenEngine(private val painter: Painter) {
         var DEF_FPS = 60
     }
 
+    private var frameInterval = 1000L / DEF_FPS
+
     var fps = DEF_FPS
+        set(value) {
+            field = value
+            frameInterval = if (value <= 0) {
+                0
+            } else {
+                1000L / value
+            }
+        }
 
     private var surface: Surface? = null
 
@@ -33,18 +38,88 @@ class OffScreenEngine(private val painter: Painter) {
 
     private var isStop = false
 
-    private val executors = Executors.newSingleThreadExecutor()
+    private var isDestroy = false
+
+    private var isShown = false
+
+    private val tmpRect = Rect()
+
+    private var isPersistence = false
+
+    private val handlerThread: HandlerThread by lazy {
+        HandlerThread("OffScreenEngine")
+    }
+
+    private val handler: Handler by lazy {
+        Handler(handlerThread.looper)
+    }
 
     private val drawingTask = Runnable {
-
-        while (!isStop) {
-
+        if (isStop) {
+            return@Runnable
         }
+        val startTime = System.currentTimeMillis()
+        if (viewSize.isEmpty || surface == null) {
+            nextFrame(startTime)
+            return@Runnable
+        }
+        surface?.let { s ->
+            val canvas = s.lockCanvas(tmpRect)
+            draw(canvas)
+            s.unlockCanvasAndPost(canvas)
+        }
+        if (isPersistence) {
+            surface?.let { s ->
+                val canvas = s.lockCanvas(tmpRect)
+                draw(canvas)
+                s.unlockCanvasAndPost(canvas)
+            }
+            isPersistence = false
+            return@Runnable
+        }
+        nextFrame(startTime)
+    }
+
+    init {
+        painter.setInvalidateCallback(object : InvalidateCallback {
+            override fun requestInvalidate() {
+                nextFrame()
+            }
+
+            override fun drawingEnd() {
+                isPersistence = true
+                nextFrame()
+            }
+        })
+    }
+
+    private fun nextFrame(startTime: Long = 0L) {
+        if (isStop) {
+            return
+        }
+        pauseDraw()
+        val delayed = if (startTime == 0L || frameInterval == 0L) {
+            0L
+        } else  {
+            val now = System.currentTimeMillis()
+            frameInterval - now + startTime
+        }
+        handler.postDelayed(drawingTask, max(delayed, 0))
+    }
+
+    private fun pauseDraw() {
+        handler.removeCallbacks(drawingTask)
     }
 
     fun setSize(width: Int, height: Int) {
         viewSize.reset(width, height)
+        tmpRect.set(0, 0, width, height)
+        painter.onSizeChange(viewSize.width, viewSize.height)
+    }
 
+    private fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int) {
+        padding.reset(left, top, right, bottom)
+        painter.onInsetChange(left, top, right, bottom)
     }
 
     fun draw(canvas: Canvas) {
@@ -52,62 +127,42 @@ class OffScreenEngine(private val painter: Painter) {
     }
 
     fun onShow() {
+        if (isDestroy) {
+            throw RuntimeException("OffScreenEngine is DESTROY")
+        }
+        isShown = true
         painter.onShow()
+        if (!isStop) {
+            nextFrame()
+        }
     }
 
     fun onHide() {
+        isShown = false
         painter.onHide()
+        pauseDraw()
     }
 
     fun stop() {
         isStop = true
+        pauseDraw()
     }
 
     fun start() {
+        if (isDestroy) {
+            throw RuntimeException("OffScreenEngine is DESTROY")
+        }
         isStop = false
-    }
-
-    private fun onSizeChange() {
-        painter.onSizeChange(padding.left, padding.top,
-            viewSize.width - padding.right,
-            viewSize.height - padding.bottom)
-    }
-
-    private data class ViewSize(var width: Int, var height: Int) {
-        fun reset(width: Int, height: Int): Boolean {
-            val isChanged = isChange(width, height)
-            this.width = width
-            this.height = height
-            return isChanged
-        }
-        fun isChange(width: Int, height: Int): Boolean {
-            return width != this.width || height != this.height
+        if (isShown) {
+            nextFrame()
         }
     }
 
-    private data class Inset(var left: Int, var top: Int,var right: Int, var bottom: Int) {
-        fun reset(left: Int, top: Int, right: Int, bottom: Int): Boolean {
-            val isChanged = isChange(left, top, right, bottom)
-            this.left = left
-            this.top = top
-            this.right = right
-            this.bottom = bottom
-            return isChanged
-        }
-        fun isChange(left: Int, top: Int, right: Int, bottom: Int): Boolean {
-            return left != this.left || top != this.top || right != this.right || bottom != this.bottom
-        }
+    fun destroy() {
+        stop()
+        isDestroy = true
     }
 
-    private class DrawingTask(private val isStop: () -> Boolean): Runnable {
 
-        var frameInterval = 0L
-        var surfaceHolder: SurfaceHolder? = null
-
-        override fun run() {
-
-        }
-
-    }
 
 }
