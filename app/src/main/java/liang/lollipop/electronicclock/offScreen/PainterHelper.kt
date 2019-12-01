@@ -6,4 +6,29 @@ package liang.lollipop.electronicclock.offScreen
  * 绘制者的辅助类
  */
 class PainterHelper {
+
+    val viewSize = ViewSize(0, 0)
+    val padding = Inset(0, 0, 0, 0)
+    private var invalidateCallback: InvalidateCallback? = null
+
+    fun onSizeChange(width: Int, height: Int) {
+        viewSize.reset(width, height)
+    }
+
+    fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int) {
+        padding.reset(left, top, right, bottom)
+    }
+
+    fun setInvalidateCallback(callback: InvalidateCallback) {
+        invalidateCallback = callback
+    }
+
+    fun callInvalidate() {
+        invalidateCallback?.requestInvalidate()
+    }
+
+    fun callDrawingEnd() {
+        invalidateCallback?.drawingEnd()
+    }
+
 }
