@@ -2,14 +2,13 @@ package liang.lollipop.electronicclock.drawable
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.ColorFilter
-import android.graphics.Rect
+import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import liang.lollipop.electronicclock.offScreen.InvalidateCallback
 import liang.lollipop.electronicclock.offScreen.Painter
 import liang.lollipop.electronicclock.offScreen.PainterHelper
+import java.util.*
 import kotlin.math.max
 
 /**
@@ -27,9 +26,17 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         private const val HOUR = 3
         private const val MINUTE = 4
         private const val SECOND = 5
+
+        private const val TYPED_A = 1F
+        private const val TYPED_B = -1F
+
+        private const val ONE_SECOND = 1000L
+        private const val ONE_MINUTE = ONE_SECOND * 60
+        private const val ONE_HOUR = ONE_MINUTE * 60
+        private const val ONE_DAY = ONE_HOUR * 24
     }
 
-    private var typeValue = 1F
+    private var typeValue = TYPED_A
 
     private val isTypedA: Boolean
         get() {
@@ -40,7 +47,36 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
 
     val paddings = FloatArray(4)
 
+    var radiusSize = 3
+
+    var arcWeight = 2F
+
+    /**
+     * 仿真模式
+     */
+    var simulation = false
+
+    private val paint = Paint().apply {
+        isAntiAlias = true
+        isDither = true
+        color = Color.BLACK
+    }
+
+    var color: Int
+        set(value) {
+            paint.color = value
+        }
+        get() {
+            return paint.color
+        }
+
+
+
     private val painterHelper = PainterHelper(this)
+
+    private val calendar: Calendar by lazy {
+        Calendar.getInstance()
+    }
 
     private val animator: ValueAnimator by lazy {
         ValueAnimator()
@@ -82,6 +118,53 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    private fun drawMonth(canvas: Canvas) {
+        val index = numberIndex[MONTH]
+        if (index < 0) {
+            return
+        }
+        val stepAngle = 360F / (12 * arcWeight)
+        val offsetAngle = stepAngle * getAngleOffset(MONTH)
+
+    }
+
+    private fun getAngleOffset(type: Int): Float {
+        val now = System.currentTimeMillis()
+        calendar.timeInMillis = now
+        return when(type) {
+            MONTH -> if (simulation) {
+                val day = calendar.get(Calendar.DAY_OF_MONTH)
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.add(Calendar.MONTH, 1)
+                calendar.add(Calendar.DAY_OF_MONTH, -1)
+                val allDay = calendar.get(Calendar.DAY_OF_MONTH)
+                day * 1F / allDay
+            } else {
+                0F
+            }
+            DAY, WEEK -> if (simulation) {
+                val newTime = calendar.timeZone.getOffset(now) + now
+                newTime % ONE_DAY / ONE_HOUR / 24F
+            } else {
+                0F
+            }
+            HOUR -> if (simulation) {
+                now % ONE_HOUR / ONE_MINUTE / 60F
+            } else {
+                0F
+            }
+            MINUTE -> if (simulation) {
+                now % ONE_MINUTE / ONE_SECOND / 60F
+            } else {
+                0F
+            }
+            SECOND -> {
+                now % ONE_SECOND / 1000F
+            }
+            else -> 0F
+        }
+    }
+
     override fun onBoundsChange(bounds: Rect?) {
         super.onBoundsChange(bounds)
         updateLocation()
@@ -105,7 +188,11 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         val allLength = monthLength + dayLength + weekLength + hourLength + minuteLength + secondLength + 5
         val width = bounds.width() * (1 - paddings[0] - paddings[2])
         val step = width / allLength
-        var lastIndex = putIndex(MONTH, step, monthLength, 0)
+
+        paint.textSize = step
+
+        var lastIndex = radiusSize
+        lastIndex = putIndex(MONTH, step, monthLength, lastIndex)
         lastIndex = putIndex(DAY, step, dayLength, lastIndex)
         lastIndex = putIndex(WEEK, step, weekLength, lastIndex)
         lastIndex = putIndex(HOUR, step, hourLength, lastIndex)
