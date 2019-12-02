@@ -1,9 +1,15 @@
 package liang.lollipop.electronicclock.drawable
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.ColorFilter
+import android.graphics.Rect
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
+import liang.lollipop.electronicclock.offScreen.InvalidateCallback
+import liang.lollipop.electronicclock.offScreen.Painter
+import liang.lollipop.electronicclock.offScreen.PainterHelper
 import kotlin.math.max
 
 /**
@@ -11,8 +17,56 @@ import kotlin.math.max
  * @date 2019-12-02 00:08
  * 滚轮时间的绘制器
  */
-class WhellTimerDrawable: Drawable() {
+class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
+    Painter, Animatable {
+
+    companion object {
+        private const val MONTH = 0
+        private const val DAY = 1
+        private const val WEEK = 2
+        private const val HOUR = 3
+        private const val MINUTE = 4
+        private const val SECOND = 5
+    }
+
+    private var typeValue = 1F
+
+    private val isTypedA: Boolean
+        get() {
+            return typeValue >= 0
+        }
+
+    private val numberIndex = IntArray(6)
+
+    val paddings = FloatArray(4)
+
+    private val painterHelper = PainterHelper(this)
+
+    private val animator: ValueAnimator by lazy {
+        ValueAnimator()
+    }
+
+    override fun setInvalidateCallback(callback: InvalidateCallback) {
+        painterHelper.setInvalidateCallback(callback)
+    }
+
+    override fun onSizeChange(width: Int, height: Int) {
+        painterHelper.onSizeChange(width, height)
+    }
+
+    override fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int) {
+        painterHelper.onInsetChange(left, top, right, bottom)
+    }
+
     override fun draw(canvas: Canvas) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onShow() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onHide() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -28,6 +82,59 @@ class WhellTimerDrawable: Drawable() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun onBoundsChange(bounds: Rect?) {
+        super.onBoundsChange(bounds)
+        updateLocation()
+    }
+
+    fun notifyValueChange() {
+        updateLocation()
+    }
+
+    private fun updateLocation() {
+        if (bounds.isEmpty) {
+            return
+        }
+        val monthLength = valueProvider.monthMaxLength
+        val dayLength = valueProvider.dayMaxLength
+        val weekLength = valueProvider.weekMaxLength
+        val hourLength = valueProvider.hourMaxLength
+        val minuteLength = valueProvider.minuteMaxLength
+        val secondLength = valueProvider.secondMaxLength
+
+        val allLength = monthLength + dayLength + weekLength + hourLength + minuteLength + secondLength + 5
+        val width = bounds.width() * (1 - paddings[0] - paddings[2])
+        val step = width / allLength
+        var lastIndex = putIndex(MONTH, step, monthLength, 0)
+        lastIndex = putIndex(DAY, step, dayLength, lastIndex)
+        lastIndex = putIndex(WEEK, step, weekLength, lastIndex)
+        lastIndex = putIndex(HOUR, step, hourLength, lastIndex)
+        lastIndex = putIndex(MINUTE, step, minuteLength, lastIndex)
+        putIndex(SECOND, step, secondLength, lastIndex)
+
+        painterHelper.callInvalidate()
+    }
+
+    private fun putIndex(type: Int, step: Float, length: Int, last: Int): Int {
+        if (length <= 0) {
+            numberIndex[type] = -1
+            return last
+        }
+        if (last > 0) {
+            numberIndex[type] = (last + step).toInt()
+        } else {
+            numberIndex[type] = 0
+        }
+        return (numberIndex[type] + length * step).toInt()
+    }
+
+    private fun getValue(index: Int, arrayA: ValueArray, arrayB: ValueArray): String {
+        return if (isTypedA) {
+            arrayA[index]
+        } else {
+            arrayB[index]
+        }
+    }
 
     class ValueProvider {
 
@@ -152,6 +259,18 @@ class WhellTimerDrawable: Drawable() {
             maxLength = 0
         }
 
+    }
+
+    override fun isRunning(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun start() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun stop() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }
