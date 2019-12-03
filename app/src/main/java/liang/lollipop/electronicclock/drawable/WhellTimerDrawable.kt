@@ -5,9 +5,6 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
-import liang.lollipop.electronicclock.offScreen.InvalidateCallback
-import liang.lollipop.electronicclock.offScreen.Painter
-import liang.lollipop.electronicclock.offScreen.PainterHelper
 import java.util.*
 import kotlin.math.max
 
@@ -17,8 +14,8 @@ import kotlin.math.max
  * @date 2019-12-02 00:08
  * 滚轮时间的绘制器
  */
-class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
-    Painter, Animatable {
+class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), Animatable,
+    ValueAnimator.AnimatorUpdateListener {
 
     companion object {
         private const val MONTH = 0
@@ -52,12 +49,17 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
 
     var arcWeight = 2F
 
+    var typeChangeKey = 10
+        set(value) {
+            field = value % 60
+        }
+
     private var fontOffsetY = 0F
 
     /**
      * 仿真模式
      */
-    var simulation = false
+    var simulation = true
 
     private val paint = Paint().apply {
         isAntiAlias = true
@@ -74,9 +76,9 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
             return paint.color
         }
 
-    private var circleCenter = PointF(0F, 0F)
+    private var isAnimationEnable = false
 
-    private val painterHelper = PainterHelper(this)
+    private var circleCenter = PointF(0F, 0F)
 
     private val calendar: Calendar by lazy {
         Calendar.getInstance()
@@ -86,33 +88,14 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         ValueAnimator()
     }
 
-    override fun setInvalidateCallback(callback: InvalidateCallback) {
-        painterHelper.setInvalidateCallback(callback)
-    }
-
-    override fun onSizeChange(width: Int, height: Int) {
-        painterHelper.onSizeChange(width, height)
-    }
-
-    override fun onInsetChange(left: Int, top: Int, right: Int, bottom: Int) {
-        painterHelper.onInsetChange(left, top, right, bottom)
-    }
-
     override fun draw(canvas: Canvas) {
+        checkType()
         drawMonth(canvas)
         drawDay(canvas)
         drawWeek(canvas)
         drawHour(canvas)
         drawMinute(canvas)
         drawSecond(canvas)
-    }
-
-    override fun onShow() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun onHide() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun setAlpha(alpha: Int) {
@@ -127,6 +110,14 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         paint.colorFilter = colorFilter
     }
 
+    private fun checkType() {
+        // 每隔一段时间，更新一次类型，更新类型的同时，更新排版
+        if ((System.currentTimeMillis() % ONE_HOUR / ONE_MINUTE) % typeChangeKey == 0L) {
+            typeValue = if (isTypedA) { TYPED_B } else { TYPED_A }
+            updateLocation()
+        }
+    }
+
     private fun drawMonth(canvas: Canvas) {
         calendar.timeInMillis = System.currentTimeMillis()
         val position = calendar.get(Calendar.MONTH)
@@ -136,7 +127,8 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
     private fun drawDay(canvas: Canvas) {
         calendar.timeInMillis = System.currentTimeMillis()
         val position = calendar.get(Calendar.DAY_OF_MONTH) - 1
-        drawValue(canvas, DAY, 31, position, valueProvider.dayValueA, valueProvider.dayValueB)
+        val dayCount = getDayCountByMonth(System.currentTimeMillis())
+        drawValue(canvas, DAY, dayCount, position, valueProvider.dayValueA, valueProvider.dayValueB)
     }
 
     private fun drawWeek(canvas: Canvas) {
@@ -161,7 +153,8 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         drawValue(canvas, SECOND, 60, position, valueProvider.secondValueA, valueProvider.secondValueB)
     }
 
-    private fun drawValue(canvas: Canvas, type: Int, itemCount: Int, position: Int, arrayA: ValueArray, arrayB: ValueArray) {
+    private fun drawValue(canvas: Canvas, type: Int, itemCount: Int,
+                          position: Int, arrayA: ValueArray, arrayB: ValueArray) {
         val index = numberIndex[type]
         if (index < 0) {
             return
@@ -172,8 +165,10 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         drawText(canvas, getValue(position, arrayA, arrayB), index.toFloat(), offsetAngle)
         for (i in 1 until count) {
             val off = i * stepAngle
-            drawText(canvas, getValue(position + i, arrayA, arrayB), index.toFloat(), offsetAngle + off)
-            drawText(canvas, getValue(position - i, arrayA, arrayB), index.toFloat(), offsetAngle - off)
+            drawText(canvas, getValue((position + i) % itemCount, arrayA, arrayB),
+                index.toFloat(), offsetAngle + off)
+            drawText(canvas, getValue((position - i) % itemCount, arrayA, arrayB),
+                index.toFloat(), offsetAngle - off)
         }
     }
 
@@ -185,16 +180,24 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         canvas.restore()
     }
 
+    private fun getDayCountByMonth(time: Long): Int {
+        calendar.timeInMillis = time
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.add(Calendar.MONTH, 1)
+        calendar.add(Calendar.DAY_OF_MONTH, -1)
+        return calendar.get(Calendar.DAY_OF_MONTH)
+    }
+
     private fun getAngleOffset(type: Int): Float {
+        if (!isAnimationEnable) {
+            return 0F
+        }
         val now = System.currentTimeMillis()
         calendar.timeInMillis = now
         return when(type) {
             MONTH -> if (simulation) {
                 val day = calendar.get(Calendar.DAY_OF_MONTH)
-                calendar.set(Calendar.DAY_OF_MONTH, 1)
-                calendar.add(Calendar.MONTH, 1)
-                calendar.add(Calendar.DAY_OF_MONTH, -1)
-                val allDay = calendar.get(Calendar.DAY_OF_MONTH)
+                val allDay = getDayCountByMonth(now)
                 day * 1F / allDay
             } else {
                 0F
@@ -235,12 +238,12 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         if (bounds.isEmpty) {
             return
         }
-        val monthLength = valueProvider.monthMaxLength
-        val dayLength = valueProvider.dayMaxLength
-        val weekLength = valueProvider.weekMaxLength
-        val hourLength = valueProvider.hourMaxLength
-        val minuteLength = valueProvider.minuteMaxLength
-        val secondLength = valueProvider.secondMaxLength
+        val monthLength = valueProvider.monthMaxLength(isTypedA)
+        val dayLength = valueProvider.dayMaxLength(isTypedA)
+        val weekLength = valueProvider.weekMaxLength(isTypedA)
+        val hourLength = valueProvider.hourMaxLength(isTypedA)
+        val minuteLength = valueProvider.minuteMaxLength(isTypedA)
+        val secondLength = valueProvider.secondMaxLength(isTypedA)
 
         val allLength = monthLength + dayLength + weekLength + hourLength + minuteLength + secondLength + 5
         val width = bounds.width() * (1 - paddings[0] - paddings[2])
@@ -262,7 +265,7 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         val fm = paint.fontMetrics
         fontOffsetY = (fm.descent - fm.ascent) / 2 - fm.descent
 
-        painterHelper.callInvalidate()
+        invalidateSelf()
     }
 
     private fun putIndex(type: Int, step: Float, length: Int, last: Int): Int {
@@ -292,6 +295,32 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
             StringBuilder()
         }
 
+        private fun getValueByArray(values: Array<ValueArray>, index: Int, delimiter: String): String {
+            tmpStringBuilder.setLength(0)
+            for (arrayIndex in values.indices) {
+                val array = values[arrayIndex]
+                if (arrayIndex != 0) {
+                    tmpStringBuilder.append(delimiter)
+                }
+                tmpStringBuilder.append(array[index % array.size])
+            }
+            return tmpStringBuilder.toString()
+        }
+
+        private fun getStringArrays(context: Context, vararg arrayIds: Int): Array<ValueArray> {
+            val res = context.resources
+            return Array(arrayIds.size) { index ->
+                ValueArray.copy(res.getStringArray(arrayIds[index]))
+            }
+        }
+
+        fun copyValueFromRes(context: Context, valueArray: ValueArray, vararg arrayIds: Int) {
+            val stringArrays = getStringArrays(context, *arrayIds)
+            for (i in valueArray.indices) {
+                valueArray[i] = getValueByArray(stringArrays, i, delimiter)
+            }
+        }
+
         val monthValueA = ValueArray(12)
         val monthValueB = ValueArray(12)
 
@@ -312,60 +341,37 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
 
         var delimiter = " "
 
-        val monthMaxLength: Int
-            get() {
-                return max(monthValueA.maxLength, monthValueB.maxLength)
-            }
-
-        val dayMaxLength: Int
-            get() {
-                return max(dayValueA.maxLength, dayValueB.maxLength)
-            }
-
-        val weekMaxLength: Int
-            get() {
-                return max(weekValueA.maxLength, weekValueB.maxLength)
-            }
-
-        val hourMaxLength: Int
-            get() {
-                return max(hourValueA.maxLength, hourValueB.maxLength)
-            }
-
-        val minuteMaxLength: Int
-            get() {
-                return max(minuteValueA.maxLength, minuteValueB.maxLength)
-            }
-
-        val secondMaxLength: Int
-            get() {
-                return max(secondValueA.maxLength, secondValueB.maxLength)
-            }
-
-        fun copyValueFromRes(context: Context, valueArray: ValueArray, vararg arrayIds: Int) {
-            val stringArrays = getStringArrays(context, *arrayIds)
-            for (i in valueArray.indices) {
-                valueArray[i] = getValueByArray(stringArrays, i, delimiter)
+        private fun getArrayByType(isA: Boolean,arrayA: ValueArray,
+                                   arrayB: ValueArray): ValueArray {
+            return if (isA) {
+                arrayA
+            } else {
+                arrayB
             }
         }
 
-        private fun getValueByArray(values: Array<ValueArray>, index: Int, delimiter: String): String {
-            tmpStringBuilder.setLength(0)
-            for (arrayIndex in values.indices) {
-                val array = values[arrayIndex]
-                if (arrayIndex != 0) {
-                    tmpStringBuilder.append(delimiter)
-                }
-                tmpStringBuilder.append(array[index % array.size])
-            }
-            return tmpStringBuilder.toString()
+        fun monthMaxLength(isA: Boolean): Int {
+            return getArrayByType(isA, monthValueA, monthValueB).maxLength
         }
 
-        private fun getStringArrays(context: Context, vararg arrayIds: Int): Array<ValueArray> {
-            val res = context.resources
-            return Array(arrayIds.size) { index ->
-                ValueArray.copy(res.getStringArray(arrayIds[index]))
-            }
+        fun dayMaxLength(isA: Boolean): Int {
+            return getArrayByType(isA, dayValueA, dayValueB).maxLength
+        }
+
+        fun weekMaxLength(isA: Boolean): Int {
+            return getArrayByType(isA, weekValueA, weekValueB).maxLength
+        }
+
+        fun hourMaxLength(isA: Boolean): Int {
+            return getArrayByType(isA, hourValueA, hourValueB).maxLength
+        }
+
+        fun minuteMaxLength(isA: Boolean): Int {
+            return getArrayByType(isA, minuteValueA, minuteValueB).maxLength
+        }
+
+        fun secondMaxLength(isA: Boolean): Int {
+            return getArrayByType(isA, secondValueA, secondValueB).maxLength
         }
 
     }
@@ -412,15 +418,24 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
     }
 
     override fun isRunning(): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return isAnimationEnable && animator.isRunning
     }
 
     override fun start() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        isAnimationEnable = true
+        animator.setFloatValues(0F, 1F)
+        animator.duration = 1000L
+        animator.repeatCount = ValueAnimator.INFINITE
+        animator.start()
     }
 
     override fun stop() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        isAnimationEnable = false
+        animator.cancel()
+    }
+
+    override fun onAnimationUpdate(animation: ValueAnimator?) {
+        invalidateSelf()
     }
 
 }
