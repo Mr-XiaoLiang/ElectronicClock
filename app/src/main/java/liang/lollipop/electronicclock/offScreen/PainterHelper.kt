@@ -13,6 +13,9 @@ class PainterHelper(private val drawable: Drawable? = null) {
     val padding = Inset(0, 0, 0, 0)
     private var invalidateCallback: InvalidateCallback? = null
 
+    var isShown = false
+        private set
+
     fun onSizeChange(width: Int, height: Int) {
         viewSize.reset(width, height)
         setBounds()
@@ -39,6 +42,14 @@ class PainterHelper(private val drawable: Drawable? = null) {
 
     fun callDrawingEnd() {
         invalidateCallback?.drawingEnd()
+    }
+
+    fun onShow() {
+        isShown = true
+    }
+
+    fun onHide() {
+        isShown = false
     }
 
 }

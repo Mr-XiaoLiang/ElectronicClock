@@ -150,7 +150,180 @@
     <string name="summary_foreground_color">Pattern color</string>
     <string name="title_auto_color">Automatically set color</string>
     <string name="summary_auto_color">Will adjust the color according to brightness and time after opening </string>
-    <string name="pref_title_square_grid">使用方形格子</string>
-    <string name="pref_summer_t_square_grid">已启用方形格子，可能与屏幕存在边距</string>
-    <string name="pref_summer_f_square_grid">以停用方形格子，可能对某些小部件造成影响</string>
+    <string name = "pref_title_square_grid"> Use square grid </ string>
+    <string name = "pref_summer_t_square_grid"> The square grid is enabled, and there may be a margin with the screen </ string>
+    <string name = "pref_summer_f_square_grid"> Disabling the square grid may affect some widgets </ string>
+
+    <string-array name="month" translatable="false">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string-array name="month_cn" translatable="false">
+        <item>一月</item>
+        <item>二月</item>
+        <item>三月</item>
+        <item>四月</item>
+        <item>五月</item>
+        <item>六月</item>
+        <item>七月</item>
+        <item>八月</item>
+        <item>九月</item>
+        <item>十月</item>
+        <item>十一月</item>
+        <item>十二月</item>
+    </string-array>
+    <string-array name="month_tr" translatable="false">
+        <item>壹月</item>
+        <item>贰月</item>
+        <item>叁月</item>
+        <item>肆月</item>
+        <item>伍月</item>
+        <item>陆月</item>
+        <item>柒月</item>
+        <item>捌月</item>
+        <item>玖月</item>
+        <item>拾月</item>
+        <item>拾壹月</item>
+        <item>拾贰月</item>
+    </string-array>
+
+    <string-array name="day_of_month" translatable="false">
+        <item>One</item>
+        <item>Two</item>
+        <item>Three</item>
+        <item>Four</item>
+        <item>Fives</item>
+        <item>Six</item>
+        <item>Seven</item>
+        <item>Eight</item>
+        <item>Nine</item>
+        <item>Ten</item>
+        <item>Eleven</item>
+        <item>Twelve</item>
+        <item>Thirteen</item>
+        <item>Fourteen</item>
+        <item>Fifteen</item>
+        <item>Sixteen</item>
+        <item>Seventeen</item>
+        <item>Eighteen</item>
+        <item>Nineteen</item>
+        <item>Twenty</item>
+        <item>TwentyOne</item>
+        <item>TwentyTwo</item>
+        <item>TwentyThree</item>
+        <item>TwentyFour</item>
+        <item>TwentyFive</item>
+        <item>TwentySix</item>
+        <item>TwentySeven</item>
+        <item>TwentyEight</item>
+        <item>TwentyNine</item>
+        <item>Thirty</item>
+        <item>ThirtyOne</item>
+    </string-array>
+    <string-array name="day_of_month_cn" translatable="false">
+        <item>〇一</item>
+        <item>〇二</item>
+        <item>〇三</item>
+        <item>〇四</item>
+        <item>〇五</item>
+        <item>〇六</item>
+        <item>〇七</item>
+        <item>〇八</item>
+        <item>〇九</item>
+        <item>〇十</item>
+        <item>十一</item>
+        <item>十二</item>
+        <item>十三</item>
+        <item>十四</item>
+        <item>十五</item>
+        <item>十六</item>
+        <item>十七</item>
+        <item>十八</item>
+        <item>十九</item>
+        <item>二十</item>
+        <item>二十一</item>
+        <item>二十二</item>
+        <item>二十三</item>
+        <item>二十四</item>
+        <item>二十五</item>
+        <item>二十六</item>
+        <item>二十七</item>
+        <item>二十八</item>
+        <item>二十九</item>
+        <item>三十</item>
+        <item>三十一</item>
+    </string-array>
+    <string-array name="day_of_month_tr" translatable="false">
+        <item>零壹</item>
+        <item>零贰</item>
+        <item>零叁</item>
+        <item>零肆</item>
+        <item>零伍</item>
+        <item>零陆</item>
+        <item>零柒</item>
+        <item>零捌</item>
+        <item>零玖</item>
+        <item>零拾</item>
+        <item>拾壹</item>
+        <item>拾贰</item>
+        <item>拾叁</item>
+        <item>拾肆</item>
+        <item>拾伍</item>
+        <item>拾陆</item>
+        <item>拾柒</item>
+        <item>拾捌</item>
+        <item>拾玖</item>
+        <item>贰拾</item>
+        <item>廿壹</item>
+        <item>廿贰</item>
+        <item>廿叁</item>
+        <item>廿肆</item>
+        <item>廿伍</item>
+        <item>廿陆</item>
+        <item>廿柒</item>
+        <item>廿捌</item>
+        <item>廿玖</item>
+        <item>叁拾</item>
+        <item>卅壹</item>
+    </string-array>
+
+    <string-array name="day_of_week" translatable="false">
+        <item>Sunday</item>
+        <item>Monday </item>
+        <item>Tuesday </item>
+        <item>Wednesday </item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+    <string-array name="day_of_week_cn" translatable="false">
+        <item>周日</item>
+        <item>周一</item>
+        <item>周二</item>
+        <item>周三</item>
+        <item>周四</item>
+        <item>周五</item>
+        <item>周六</item>
+    </string-array>
+    <string-array name="day_of_week_jp" translatable="false">
+        <item>日曜日</item>
+        <item>月曜日</item>
+        <item>火曜日</item>
+        <item>水曜日</item>
+        <item>木曜日</item>
+        <item>金曜日</item>
+        <item>土曜日</item>
+    </string-array>
+
+
 </resources>

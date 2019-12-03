@@ -16,4 +16,10 @@
             android:layout_width="0px"
             android:layout_height="0px"/>
 
+    <liang.lollipop.electronicclock.view.WhellTimerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:id="@+id/timerView"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
