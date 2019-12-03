@@ -11,6 +11,7 @@ import liang.lollipop.electronicclock.offScreen.PainterHelper
 import java.util.*
 import kotlin.math.max
 
+
 /**
  * @author lollipop
  * @date 2019-12-02 00:08
@@ -51,6 +52,8 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
 
     var arcWeight = 2F
 
+    private var fontOffsetY = 0F
+
     /**
      * 仿真模式
      */
@@ -60,6 +63,7 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         isAntiAlias = true
         isDither = true
         color = Color.BLACK
+        textAlign = Paint.Align.LEFT
     }
 
     var color: Int
@@ -70,7 +74,7 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
             return paint.color
         }
 
-
+    private var circleCenter = PointF(0F, 0F)
 
     private val painterHelper = PainterHelper(this)
 
@@ -95,7 +99,12 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
     }
 
     override fun draw(canvas: Canvas) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        drawMonth(canvas)
+        drawDay(canvas)
+        drawWeek(canvas)
+        drawHour(canvas)
+        drawMinute(canvas)
+        drawSecond(canvas)
     }
 
     override fun onShow() {
@@ -107,25 +116,73 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
     }
 
     override fun setAlpha(alpha: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        paint.alpha = alpha
     }
 
     override fun getOpacity(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return PixelFormat.TRANSPARENT
     }
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        paint.colorFilter = colorFilter
     }
 
     private fun drawMonth(canvas: Canvas) {
-        val index = numberIndex[MONTH]
+        calendar.timeInMillis = System.currentTimeMillis()
+        val position = calendar.get(Calendar.MONTH)
+        drawValue(canvas, MONTH, 12, position, valueProvider.monthValueA, valueProvider.monthValueB)
+    }
+
+    private fun drawDay(canvas: Canvas) {
+        calendar.timeInMillis = System.currentTimeMillis()
+        val position = calendar.get(Calendar.DAY_OF_MONTH) - 1
+        drawValue(canvas, DAY, 31, position, valueProvider.dayValueA, valueProvider.dayValueB)
+    }
+
+    private fun drawWeek(canvas: Canvas) {
+        calendar.timeInMillis = System.currentTimeMillis()
+        val position = calendar.get(Calendar.DAY_OF_WEEK) - 1
+        drawValue(canvas, WEEK, 7, position, valueProvider.weekValueA, valueProvider.weekValueB)
+    }
+
+    private fun drawHour(canvas: Canvas) {
+        calendar.timeInMillis = System.currentTimeMillis()
+        val position = calendar.get(Calendar.HOUR_OF_DAY)
+        drawValue(canvas, HOUR, 24, position, valueProvider.hourValueA, valueProvider.hourValueB)
+    }
+
+    private fun drawMinute(canvas: Canvas) {
+        val position = (System.currentTimeMillis() % ONE_HOUR / ONE_MINUTE).toInt()
+        drawValue(canvas, MINUTE, 60, position, valueProvider.minuteValueA, valueProvider.minuteValueB)
+    }
+
+    private fun drawSecond(canvas: Canvas) {
+        val position = (System.currentTimeMillis() % ONE_MINUTE / ONE_SECOND).toInt()
+        drawValue(canvas, SECOND, 60, position, valueProvider.secondValueA, valueProvider.secondValueB)
+    }
+
+    private fun drawValue(canvas: Canvas, type: Int, itemCount: Int, position: Int, arrayA: ValueArray, arrayB: ValueArray) {
+        val index = numberIndex[type]
         if (index < 0) {
             return
         }
-        val stepAngle = 360F / (12 * arcWeight)
-        val offsetAngle = stepAngle * getAngleOffset(MONTH)
+        val stepAngle = 360F / (itemCount * arcWeight)
+        val offsetAngle = stepAngle * getAngleOffset(type)
+        val count = (90 / stepAngle + 1).toInt()
+        drawText(canvas, getValue(position, arrayA, arrayB), index.toFloat(), offsetAngle)
+        for (i in 1 until count) {
+            val off = i * stepAngle
+            drawText(canvas, getValue(position + i, arrayA, arrayB), index.toFloat(), offsetAngle + off)
+            drawText(canvas, getValue(position - i, arrayA, arrayB), index.toFloat(), offsetAngle - off)
+        }
+    }
 
+    private fun drawText(canvas: Canvas, value: String, index: Float, angle: Float) {
+        canvas.save()
+        canvas.rotate(angle)
+        canvas.translate(circleCenter.x, circleCenter.y)
+        canvas.drawText(value, index, fontOffsetY, paint)
+        canvas.restore()
     }
 
     private fun getAngleOffset(type: Int): Float {
@@ -199,6 +256,12 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
         lastIndex = putIndex(MINUTE, step, minuteLength, lastIndex)
         putIndex(SECOND, step, secondLength, lastIndex)
 
+        val centerY = (bounds.height() - paddings[1] - paddings[3]) / 2 + bounds.top + paddings[1]
+        circleCenter.set(paddings[0], centerY)
+
+        val fm = paint.fontMetrics
+        fontOffsetY = (fm.descent - fm.ascent) / 2 - fm.descent
+
         painterHelper.callInvalidate()
     }
 
@@ -217,9 +280,9 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
 
     private fun getValue(index: Int, arrayA: ValueArray, arrayB: ValueArray): String {
         return if (isTypedA) {
-            arrayA[index]
+            arrayA[(index + arrayA.size) % arrayA.size]
         } else {
-            arrayB[index]
+            arrayB[(index + arrayB.size) % arrayB.size]
         }
     }
 
@@ -293,7 +356,7 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(),
                 if (arrayIndex != 0) {
                     tmpStringBuilder.append(delimiter)
                 }
-                tmpStringBuilder.append(array[index])
+                tmpStringBuilder.append(array[index % array.size])
             }
             return tmpStringBuilder.toString()
         }
