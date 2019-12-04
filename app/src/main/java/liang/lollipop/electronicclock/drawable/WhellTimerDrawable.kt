@@ -6,7 +6,6 @@ import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import java.util.*
-import kotlin.math.max
 
 
 /**
@@ -45,7 +44,7 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
     val paddings = FloatArray(4)
 
-    var radiusSize = 3
+    var radiusSize = 0.1F
 
     var arcWeight = 2F
 
@@ -59,7 +58,7 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
     /**
      * 仿真模式
      */
-    var simulation = true
+    var simulation = false
 
     private val paint = Paint().apply {
         isAntiAlias = true
@@ -85,7 +84,9 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
     }
 
     private val animator: ValueAnimator by lazy {
-        ValueAnimator()
+        ValueAnimator().apply {
+            addUpdateListener(this@WhellTimerDrawable)
+        }
     }
 
     override fun draw(canvas: Canvas) {
@@ -112,10 +113,10 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
     private fun checkType() {
         // 每隔一段时间，更新一次类型，更新类型的同时，更新排版
-        if ((System.currentTimeMillis() % ONE_HOUR / ONE_MINUTE) % typeChangeKey == 0L) {
-            typeValue = if (isTypedA) { TYPED_B } else { TYPED_A }
-            updateLocation()
-        }
+//        if ((System.currentTimeMillis() % ONE_HOUR / ONE_MINUTE) % typeChangeKey == 0L) {
+//            typeValue = if (isTypedA) { TYPED_B } else { TYPED_A }
+//            updateLocation()
+//        }
     }
 
     private fun drawMonth(canvas: Canvas) {
@@ -159,23 +160,49 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         if (index < 0) {
             return
         }
-        val stepAngle = 360F / (itemCount * arcWeight)
+        val stepAngle = 360F / (itemCount * arcWeight) * getAngleWeight(type)
         val offsetAngle = stepAngle * getAngleOffset(type)
         val count = (90 / stepAngle + 1).toInt()
         drawText(canvas, getValue(position, arrayA, arrayB), index.toFloat(), offsetAngle)
         for (i in 1 until count) {
             val off = i * stepAngle
             drawText(canvas, getValue((position + i) % itemCount, arrayA, arrayB),
-                index.toFloat(), offsetAngle + off)
-            drawText(canvas, getValue((position - i) % itemCount, arrayA, arrayB),
                 index.toFloat(), offsetAngle - off)
+            drawText(canvas, getValue((position - i) % itemCount, arrayA, arrayB),
+                index.toFloat(), offsetAngle + off)
+        }
+    }
+
+    private fun getAngleWeight(type: Int): Float {
+        return when (type) {
+            MONTH -> {
+                2F
+            }
+            DAY -> {
+                1.5F
+            }
+            WEEK -> {
+                1F
+            }
+            HOUR -> {
+                1F
+            }
+            MINUTE -> {
+                1F
+            }
+            SECOND -> {
+                1F
+            }
+            else -> {
+                1F
+            }
         }
     }
 
     private fun drawText(canvas: Canvas, value: String, index: Float, angle: Float) {
         canvas.save()
-        canvas.rotate(angle)
         canvas.translate(circleCenter.x, circleCenter.y)
+        canvas.rotate(-angle)
         canvas.drawText(value, index, fontOffsetY, paint)
         canvas.restore()
     }
@@ -246,12 +273,12 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         val secondLength = valueProvider.secondMaxLength(isTypedA)
 
         val allLength = monthLength + dayLength + weekLength + hourLength + minuteLength + secondLength + 5
-        val width = bounds.width() * (1 - paddings[0] - paddings[2])
+        val width = bounds.width() - bounds.width() * (paddings[0] + paddings[2] + radiusSize)
         val step = width / allLength
 
         paint.textSize = step
 
-        var lastIndex = radiusSize
+        var lastIndex = (bounds.width() * (paddings[0] + radiusSize)).toInt()
         lastIndex = putIndex(MONTH, step, monthLength, lastIndex)
         lastIndex = putIndex(DAY, step, dayLength, lastIndex)
         lastIndex = putIndex(WEEK, step, weekLength, lastIndex)
@@ -260,7 +287,7 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         putIndex(SECOND, step, secondLength, lastIndex)
 
         val centerY = (bounds.height() - paddings[1] - paddings[3]) / 2 + bounds.top + paddings[1]
-        circleCenter.set(paddings[0], centerY)
+        circleCenter.set(0F, centerY)
 
         val fm = paint.fontMetrics
         fontOffsetY = (fm.descent - fm.ascent) / 2 - fm.descent
