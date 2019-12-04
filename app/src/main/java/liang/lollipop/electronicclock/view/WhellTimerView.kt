@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import kotlinx.android.synthetic.main.activity_bottom_navigation.view.*
 import liang.lollipop.electronicclock.drawable.WhellTimerDrawable
 
 /**
@@ -21,6 +22,9 @@ class WhellTimerView(context: Context, attr: AttributeSet?,
 
     private val valueProvider = WhellTimerDrawable.ValueProvider()
     private val timerDrawable = WhellTimerDrawable(valueProvider)
+
+    private var isRun = false
+    private var isAttaToWindow = false
 
     init {
         timerDrawable.callback = this
@@ -46,6 +50,36 @@ class WhellTimerView(context: Context, attr: AttributeSet?,
         if (drawable == timerDrawable) {
             invalidate()
             invalidateOutline()
+        }
+    }
+
+    fun start() {
+        isRun = true
+        checkRuning()
+    }
+
+    fun stop() {
+        isRun = false
+        checkRuning()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        isAttaToWindow = true
+        checkRuning()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        isAttaToWindow = false
+        checkRuning()
+    }
+
+    private fun checkRuning() {
+        if (isRun && isAttaToWindow) {
+            timerDrawable.start()
+        } else {
+            timerDrawable.stop()
         }
     }
 
