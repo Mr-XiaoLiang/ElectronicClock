@@ -5,23 +5,22 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
-import kotlinx.android.synthetic.main.activity_bottom_navigation.view.*
-import liang.lollipop.electronicclock.drawable.WhellTimerDrawable
+import liang.lollipop.electronicclock.drawable.WheelTimerDrawable
 
 /**
  * @author lollipop
  * @date 2019-12-03 23:05
  * 滚轮时间的View
  */
-class WhellTimerView(context: Context, attr: AttributeSet?,
+class WheelTimerView(context: Context, attr: AttributeSet?,
                      defStyleAttr: Int, defStyleRes: Int) : View(context, attr, defStyleAttr, defStyleRes) {
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : this(context, attrs, defStyleAttr, 0)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null)
 
-    private val valueProvider = WhellTimerDrawable.ValueProvider()
-    private val timerDrawable = WhellTimerDrawable(valueProvider)
+    private val valueProvider = WheelTimerDrawable.ValueProvider()
+    private val timerDrawable = WheelTimerDrawable(valueProvider)
 
     private var isRun = false
     private var isAttaToWindow = false
@@ -135,7 +134,7 @@ class WhellTimerView(context: Context, attr: AttributeSet?,
         timerDrawable.notifyValueChange()
     }
 
-    private fun setValue(valueArray: WhellTimerDrawable.ValueArray, vararg arrayId: Int) {
+    private fun setValue(valueArray: WheelTimerDrawable.ValueArray, vararg arrayId: Int) {
         valueProvider.copyValueFromRes(context, valueArray, *arrayId)
     }
 }
