@@ -54,7 +54,7 @@ class MainActivity : BottomNavigationActivity() {
         timerView.setMinuteBValue(R.array.minute_tr)
         timerView.setSecondAValue(R.array.minute_cn)
         timerView.setSecondBValue(R.array.minute_tr)
-        timerView.notifyDatasetChange()
+        timerView.notifyDataSetChange()
         timerView.start()
     }
 
