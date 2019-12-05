@@ -13,7 +13,7 @@ import java.util.*
  * @date 2019-12-02 00:08
  * 滚轮时间的绘制器
  */
-class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), Animatable,
+class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), Animatable,
     ValueAnimator.AnimatorUpdateListener {
 
     companion object {
@@ -85,7 +85,7 @@ class WhellTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
     private val animator: ValueAnimator by lazy {
         ValueAnimator().apply {
-            addUpdateListener(this@WhellTimerDrawable)
+            addUpdateListener(this@WheelTimerDrawable)
         }
     }
 
