@@ -23,10 +23,42 @@ class WheelTimerView(context: Context, attr: AttributeSet?,
     private val timerDrawable = WheelTimerDrawable(valueProvider)
 
     private var isRun = false
-    private var isAttaToWindow = false
 
     init {
         timerDrawable.callback = this
+    }
+
+    var simulation: Boolean
+        set(value) {
+            timerDrawable.simulation = value
+        }
+        get() {
+            return timerDrawable.simulation
+        }
+
+    var radiusSize: Float
+        set(value) {
+            timerDrawable.radiusSize = value
+        }
+        get() {
+            return timerDrawable.radiusSize
+        }
+
+    var arcWeight: Float
+        set(value) {
+            timerDrawable.arcWeight = value
+        }
+        get() {
+            return timerDrawable.arcWeight
+        }
+
+    fun setPaddingWeight(left: Float, top: Float, right: Float, bottom: Float) {
+        timerDrawable.paddings.let {
+            it[0] = left
+            it[1] = top
+            it[2] = right
+            it[3] = bottom
+        }
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -54,28 +86,26 @@ class WheelTimerView(context: Context, attr: AttributeSet?,
 
     fun start() {
         isRun = true
-        checkRuning()
+        checkRunning()
     }
 
     fun stop() {
         isRun = false
-        checkRuning()
+        checkRunning()
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        isAttaToWindow = true
-        checkRuning()
+        checkRunning()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        isAttaToWindow = false
-        checkRuning()
+        checkRunning()
     }
 
-    private fun checkRuning() {
-        if (isRun && isAttaToWindow) {
+    private fun checkRunning() {
+        if (isRun && isAttachedToWindow) {
             timerDrawable.start()
         } else {
             timerDrawable.stop()
@@ -130,7 +160,7 @@ class WheelTimerView(context: Context, attr: AttributeSet?,
         setValue(valueProvider.secondValueB, *arrayId)
     }
 
-    fun notifyDatasetChange() {
+    fun notifyDataSetChange() {
         timerDrawable.notifyValueChange()
     }
 

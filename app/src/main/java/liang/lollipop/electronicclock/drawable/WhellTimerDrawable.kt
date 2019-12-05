@@ -53,6 +53,8 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             field = value % 60
         }
 
+    private var isTypedChanged = false
+
     private var fontOffsetY = 0F
 
     /**
@@ -75,6 +77,20 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             return paint.color
         }
 
+    private var dayTimeMillis = 0L
+
+    private var monthDayCount = 0
+
+    private var monthDayPosition = 0
+
+    private var monthPosition = 0
+
+    private var weekPosition = 0
+
+    private var hourPosition = 0
+
+    private var hourTimeMillis = 0L
+
     private var isAnimationEnable = false
 
     private var circleCenter = PointF(0F, 0F)
@@ -91,12 +107,15 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
     override fun draw(canvas: Canvas) {
         checkType()
+        checkDayTime()
+        checkHourTime()
         drawMonth(canvas)
         drawDay(canvas)
         drawWeek(canvas)
         drawHour(canvas)
         drawMinute(canvas)
         drawSecond(canvas)
+        canvas.drawLine(0F, circleCenter.y, bounds.right.toFloat(), circleCenter.y, paint)
     }
 
     override fun setAlpha(alpha: Int) {
@@ -113,35 +132,52 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
     private fun checkType() {
         // 每隔一段时间，更新一次类型，更新类型的同时，更新排版
-//        if ((System.currentTimeMillis() % ONE_HOUR / ONE_MINUTE) % typeChangeKey == 0L) {
-//            typeValue = if (isTypedA) { TYPED_B } else { TYPED_A }
-//            updateLocation()
-//        }
+        val isChangeType = (System.currentTimeMillis() % ONE_HOUR / ONE_MINUTE) % typeChangeKey == 0L
+        if (!isTypedChanged && isChangeType) {
+            typeValue = if (isTypedA) { TYPED_B } else { TYPED_A }
+            isTypedChanged = true
+            updateLocation()
+        } else if (!isChangeType) {
+            isTypedChanged = false
+        }
+    }
+
+    private fun checkDayTime() {
+        val now = System.currentTimeMillis()
+        if (now / ONE_DAY != dayTimeMillis) {
+            dayTimeMillis = now / ONE_DAY
+            calendar.timeInMillis = now
+            monthDayPosition = calendar.get(Calendar.DAY_OF_MONTH) - 1
+            monthPosition = calendar.get(Calendar.MONTH)
+            weekPosition = calendar.get(Calendar.DAY_OF_WEEK) - 1
+            monthDayCount = getDayCountByMonth(now)
+
+        }
+    }
+
+    private fun checkHourTime() {
+        val now = System.currentTimeMillis()
+        if (now / ONE_HOUR != hourTimeMillis) {
+            hourTimeMillis = now / ONE_HOUR
+            calendar.timeInMillis = System.currentTimeMillis()
+            hourPosition = calendar.get(Calendar.HOUR_OF_DAY)
+        }
     }
 
     private fun drawMonth(canvas: Canvas) {
-        calendar.timeInMillis = System.currentTimeMillis()
-        val position = calendar.get(Calendar.MONTH)
-        drawValue(canvas, MONTH, 12, position, valueProvider.monthValueA, valueProvider.monthValueB)
+        drawValue(canvas, MONTH, 12, monthPosition, valueProvider.monthValueA, valueProvider.monthValueB)
     }
 
     private fun drawDay(canvas: Canvas) {
-        calendar.timeInMillis = System.currentTimeMillis()
-        val position = calendar.get(Calendar.DAY_OF_MONTH) - 1
-        val dayCount = getDayCountByMonth(System.currentTimeMillis())
-        drawValue(canvas, DAY, dayCount, position, valueProvider.dayValueA, valueProvider.dayValueB)
+        drawValue(canvas, DAY, monthDayCount, monthDayPosition, valueProvider.dayValueA, valueProvider.dayValueB)
     }
 
     private fun drawWeek(canvas: Canvas) {
-        calendar.timeInMillis = System.currentTimeMillis()
-        val position = calendar.get(Calendar.DAY_OF_WEEK) - 1
-        drawValue(canvas, WEEK, 7, position, valueProvider.weekValueA, valueProvider.weekValueB)
+        drawValue(canvas, WEEK, 7, weekPosition, valueProvider.weekValueA, valueProvider.weekValueB)
     }
 
     private fun drawHour(canvas: Canvas) {
-        calendar.timeInMillis = System.currentTimeMillis()
-        val position = calendar.get(Calendar.HOUR_OF_DAY)
-        drawValue(canvas, HOUR, 24, position, valueProvider.hourValueA, valueProvider.hourValueB)
+        drawValue(canvas, HOUR, 24, hourPosition, valueProvider.hourValueA, valueProvider.hourValueB)
     }
 
     private fun drawMinute(canvas: Canvas) {
@@ -161,10 +197,10 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             return
         }
         val stepAngle = 360F / (itemCount * arcWeight) * getAngleWeight(type)
-        val offsetAngle = stepAngle * getAngleOffset(type)
+        val offsetAngle = stepAngle * (getAngleOffset(type))
         val count = (90 / stepAngle + 1).toInt()
         drawText(canvas, getValue(position, arrayA, arrayB), index.toFloat(), offsetAngle)
-        for (i in 1 until count) {
+        for (i in 1..count) {
             val off = i * stepAngle
             drawText(canvas, getValue((position + i) % itemCount, arrayA, arrayB),
                 index.toFloat(), offsetAngle - off)
@@ -188,10 +224,10 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
                 1F
             }
             MINUTE -> {
-                1F
+                1.2F
             }
             SECOND -> {
-                1F
+                1.1F
             }
             else -> {
                 1F
@@ -202,7 +238,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
     private fun drawText(canvas: Canvas, value: String, index: Float, angle: Float) {
         canvas.save()
         canvas.translate(circleCenter.x, circleCenter.y)
-        canvas.rotate(-angle)
+        canvas.rotate(angle)
         canvas.drawText(value, index, fontOffsetY, paint)
         canvas.restore()
     }
@@ -274,7 +310,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
         val allLength = monthLength + dayLength + weekLength + hourLength + minuteLength + secondLength + 5
         val width = bounds.width() - bounds.width() * (paddings[0] + paddings[2] + radiusSize)
-        val step = width / allLength
+        val step = width / allLength * 0.9F
 
         paint.textSize = step
 
@@ -292,7 +328,9 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         val fm = paint.fontMetrics
         fontOffsetY = (fm.descent - fm.ascent) / 2 - fm.descent
 
-        invalidateSelf()
+        if (!isRunning) {
+            invalidateSelf()
+        }
     }
 
     private fun putIndex(type: Int, step: Float, length: Int, last: Int): Int {
