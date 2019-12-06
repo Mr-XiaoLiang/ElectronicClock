@@ -57,7 +57,7 @@ class MainActivity : BottomNavigationActivity() {
         timerView.typeChangeKey = 2
         timerView.simulation = true
         timerView.notifyDataSetChange()
-//        timerView.start()
+        timerView.start()
     }
 
     private fun showGuidelines() {
