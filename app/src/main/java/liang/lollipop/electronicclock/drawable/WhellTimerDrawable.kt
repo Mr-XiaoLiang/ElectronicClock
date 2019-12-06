@@ -6,6 +6,7 @@ import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import java.util.*
+import kotlin.math.abs
 
 
 /**
@@ -24,6 +25,8 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         private const val MINUTE = 4
         private const val SECOND = 5
 
+        private val TYPE_ARRAY = arrayOf(MONTH, DAY, WEEK, HOUR, MINUTE, SECOND)
+
         private const val TYPED_A = 1F
         private const val TYPED_B = -1F
 
@@ -40,7 +43,9 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             return typeValue >= 0
         }
 
-    private val numberIndex = IntArray(6)
+    private val numberIndex = IntArray(TYPE_ARRAY.size)
+    private val fontSizeArray = FloatArray(TYPE_ARRAY.size)
+    private val sectorThickness = FloatArray(TYPE_ARRAY.size)
 
     val paddings = FloatArray(4)
 
@@ -50,7 +55,11 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
     var typeChangeKey = 10
         set(value) {
-            field = value % 60
+            field = if (value < 2) {
+                2
+            } else {
+                value % 60
+            }
         }
 
     private var isTypedChanged = false
@@ -62,11 +71,24 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
      */
     var simulation = false
 
+    /**
+     * 显示格子
+     */
+    var showGrid = false
+
     private val paint = Paint().apply {
         isAntiAlias = true
         isDither = true
         color = Color.BLACK
-        textAlign = Paint.Align.LEFT
+        textAlign = Paint.Align.CENTER
+    }
+
+    private val bgPaint = Paint().apply {
+        isAntiAlias = true
+        isDither = true
+        color = Color.BLACK
+        alpha = (0.2F * 255).toInt()
+        style = Paint.Style.STROKE
     }
 
     var color: Int
@@ -75,6 +97,14 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         }
         get() {
             return paint.color
+        }
+
+    var backgroundColor: Int
+        set(value) {
+            bgPaint.color = value
+        }
+        get() {
+            return bgPaint.color
         }
 
     private var dayTimeMillis = 0L
@@ -115,7 +145,6 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         drawHour(canvas)
         drawMinute(canvas)
         drawSecond(canvas)
-        canvas.drawLine(0F, circleCenter.y, bounds.right.toFloat(), circleCenter.y, paint)
     }
 
     override fun setAlpha(alpha: Int) {
@@ -165,47 +194,50 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
     }
 
     private fun drawMonth(canvas: Canvas) {
-        drawValue(canvas, MONTH, 12, monthPosition, valueProvider.monthValueA, valueProvider.monthValueB)
+        drawValue(canvas, MONTH, 12, monthPosition, valueProvider.monthArray(isTypedA))
     }
 
     private fun drawDay(canvas: Canvas) {
-        drawValue(canvas, DAY, monthDayCount, monthDayPosition, valueProvider.dayValueA, valueProvider.dayValueB)
+        drawValue(canvas, DAY, monthDayCount, monthDayPosition, valueProvider.dayArray(isTypedA))
     }
 
     private fun drawWeek(canvas: Canvas) {
-        drawValue(canvas, WEEK, 7, weekPosition, valueProvider.weekValueA, valueProvider.weekValueB)
+        drawValue(canvas, WEEK, 7, weekPosition, valueProvider.weekArray(isTypedA))
     }
 
     private fun drawHour(canvas: Canvas) {
-        drawValue(canvas, HOUR, 24, hourPosition, valueProvider.hourValueA, valueProvider.hourValueB)
+        drawValue(canvas, HOUR, 24, hourPosition, valueProvider.hourArray(isTypedA))
     }
 
     private fun drawMinute(canvas: Canvas) {
         val position = (System.currentTimeMillis() % ONE_HOUR / ONE_MINUTE).toInt()
-        drawValue(canvas, MINUTE, 60, position, valueProvider.minuteValueA, valueProvider.minuteValueB)
+        drawValue(canvas, MINUTE, 60, position, valueProvider.minuteArray(isTypedA))
     }
 
     private fun drawSecond(canvas: Canvas) {
         val position = (System.currentTimeMillis() % ONE_MINUTE / ONE_SECOND).toInt()
-        drawValue(canvas, SECOND, 60, position, valueProvider.secondValueA, valueProvider.secondValueB)
+        drawValue(canvas, SECOND, 60, position, valueProvider.secondArray(isTypedA))
     }
 
     private fun drawValue(canvas: Canvas, type: Int, itemCount: Int,
-                          position: Int, arrayA: ValueArray, arrayB: ValueArray) {
+                          position: Int, array: ValueArray) {
         val index = numberIndex[type]
         if (index < 0) {
             return
         }
+        val fontSize = fontSizeArray[type]
         val stepAngle = 360F / (itemCount * arcWeight) * getAngleWeight(type)
         val offsetAngle = stepAngle * (getAngleOffset(type))
         val count = (90 / stepAngle + 1).toInt()
-        drawText(canvas, getValue(position, arrayA, arrayB), index.toFloat(), offsetAngle)
+        val width = sectorThickness[type]
+        drawText(canvas, array[position], index.toFloat(),
+            offsetAngle, fontSize, width, stepAngle, position)
         for (i in 1..count) {
             val off = i * stepAngle
-            drawText(canvas, getValue((position + i) % itemCount, arrayA, arrayB),
-                index.toFloat(), offsetAngle - off)
-            drawText(canvas, getValue((position - i) % itemCount, arrayA, arrayB),
-                index.toFloat(), offsetAngle + off)
+            drawText(canvas, array[(position + i) % itemCount],
+                index.toFloat(), offsetAngle - off, fontSize, width, stepAngle, position + i)
+            drawText(canvas, array[(position - i) % itemCount],
+                index.toFloat(), offsetAngle + off, fontSize, width, stepAngle, position - i)
         }
     }
 
@@ -215,7 +247,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
                 2F
             }
             DAY -> {
-                1.5F
+                1.6F
             }
             WEEK -> {
                 1F
@@ -224,10 +256,10 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
                 1F
             }
             MINUTE -> {
-                1.2F
+                1.6F
             }
             SECOND -> {
-                1.1F
+                1.5F
             }
             else -> {
                 1F
@@ -235,11 +267,22 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         }
     }
 
-    private fun drawText(canvas: Canvas, value: String, index: Float, angle: Float) {
+    private fun drawText(canvas: Canvas, value: String,
+                         index: Float, angle: Float, fontSize: Float,
+                         width: Float, radian: Float, position: Int) {
+        val k = if (isTypedA) { 0 } else { 1 }
+        val drawBg = (simulation || showGrid) && (abs(position % 2) == k)
         canvas.save()
         canvas.translate(circleCenter.x, circleCenter.y)
         canvas.rotate(angle)
-        canvas.drawText(value, index, fontOffsetY, paint)
+        if (drawBg) {
+            val radius = index + (width / 2)
+            bgPaint.strokeWidth = width
+            canvas.drawArc(-radius, -radius, radius, radius,
+                radian * -0.5F, radian, false, bgPaint)
+        }
+        paint.textSize = fontSize
+        canvas.drawText(value, index + (width / 2), fontOffsetY, paint)
         canvas.restore()
     }
 
@@ -285,7 +328,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
                 now % ONE_SECOND / 1000F
             }
             else -> 0F
-        }
+        } - 0.5F
     }
 
     override fun onBoundsChange(bounds: Rect?) {
@@ -301,26 +344,39 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         if (bounds.isEmpty) {
             return
         }
-        val monthLength = valueProvider.monthMaxLength(isTypedA)
-        val dayLength = valueProvider.dayMaxLength(isTypedA)
-        val weekLength = valueProvider.weekMaxLength(isTypedA)
-        val hourLength = valueProvider.hourMaxLength(isTypedA)
-        val minuteLength = valueProvider.minuteMaxLength(isTypedA)
-        val secondLength = valueProvider.secondMaxLength(isTypedA)
+        val valueLength = IntArray(6)
+        valueLength[MONTH] = valueProvider.monthMaxLength(isTypedA)
+        valueLength[DAY] = valueProvider.dayMaxLength(isTypedA)
+        valueLength[WEEK] = valueProvider.weekMaxLength(isTypedA)
+        valueLength[HOUR] = valueProvider.hourMaxLength(isTypedA)
+        valueLength[MINUTE] = valueProvider.minuteMaxLength(isTypedA)
+        valueLength[SECOND] = valueProvider.secondMaxLength(isTypedA)
 
-        val allLength = monthLength + dayLength + weekLength + hourLength + minuteLength + secondLength + 5
+        var allLength = 5
+        valueLength.forEach {
+            allLength += it
+        }
         val width = bounds.width() - bounds.width() * (paddings[0] + paddings[2] + radiusSize)
         val step = width / allLength * 0.9F
 
-        paint.textSize = step
-
         var lastIndex = (bounds.width() * (paddings[0] + radiusSize)).toInt()
-        lastIndex = putIndex(MONTH, step, monthLength, lastIndex)
-        lastIndex = putIndex(DAY, step, dayLength, lastIndex)
-        lastIndex = putIndex(WEEK, step, weekLength, lastIndex)
-        lastIndex = putIndex(HOUR, step, hourLength, lastIndex)
-        lastIndex = putIndex(MINUTE, step, minuteLength, lastIndex)
-        putIndex(SECOND, step, secondLength, lastIndex)
+        TYPE_ARRAY.forEach {
+            lastIndex = putIndex(it, step, valueLength[it], lastIndex)
+            sectorThickness[it] = step * (valueLength[it] + 1)
+        }
+
+        fontSizeArray[MONTH] = refitText(step * valueLength[MONTH],
+            valueProvider.monthArray(isTypedA).maxLengthValue)
+        fontSizeArray[DAY] = refitText(step * valueLength[DAY],
+            valueProvider.dayArray(isTypedA).maxLengthValue)
+        fontSizeArray[WEEK] = refitText(step * valueLength[WEEK],
+            valueProvider.weekArray(isTypedA).maxLengthValue)
+        fontSizeArray[HOUR] = refitText(step * valueLength[HOUR],
+            valueProvider.hourArray(isTypedA).maxLengthValue)
+        fontSizeArray[MINUTE] = refitText(step * valueLength[MINUTE],
+            valueProvider.minuteArray(isTypedA).maxLengthValue)
+        fontSizeArray[SECOND] = refitText(step * valueLength[SECOND],
+            valueProvider.secondArray(isTypedA).maxLengthValue)
 
         val centerY = (bounds.height() - paddings[1] - paddings[3]) / 2 + bounds.top + paddings[1]
         circleCenter.set(0F, centerY)
@@ -331,6 +387,28 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         if (!isRunning) {
             invalidateSelf()
         }
+    }
+
+    private fun refitText(targetWidth: Float, text: String): Float {
+        if (text.isEmpty()) {
+            return 1F
+        }
+        val threshold = 0.5f
+        val textPaint = paint
+        var preferredTextSize = targetWidth
+        var minTextSize = 1F
+        while (preferredTextSize - minTextSize > threshold) {
+            val size = (preferredTextSize + minTextSize) / 2
+            textPaint.textSize = size
+            if (textPaint.measureText(text) >= targetWidth) {
+                // too big
+                preferredTextSize = size
+            } else {
+                // too small
+                minTextSize = size
+            }
+        }
+        return minTextSize
     }
 
     private fun putIndex(type: Int, step: Float, length: Int, last: Int): Int {
@@ -344,14 +422,6 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             numberIndex[type] = 0
         }
         return (numberIndex[type] + length * step).toInt()
-    }
-
-    private fun getValue(index: Int, arrayA: ValueArray, arrayB: ValueArray): String {
-        return if (isTypedA) {
-            arrayA[(index + arrayA.size) % arrayA.size]
-        } else {
-            arrayB[(index + arrayB.size) % arrayB.size]
-        }
     }
 
     class ValueProvider {
@@ -416,27 +486,51 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         }
 
         fun monthMaxLength(isA: Boolean): Int {
-            return getArrayByType(isA, monthValueA, monthValueB).maxLength
+            return monthArray(isA).maxLength
         }
 
         fun dayMaxLength(isA: Boolean): Int {
-            return getArrayByType(isA, dayValueA, dayValueB).maxLength
+            return dayArray(isA).maxLength
         }
 
         fun weekMaxLength(isA: Boolean): Int {
-            return getArrayByType(isA, weekValueA, weekValueB).maxLength
+            return weekArray(isA).maxLength
         }
 
         fun hourMaxLength(isA: Boolean): Int {
-            return getArrayByType(isA, hourValueA, hourValueB).maxLength
+            return hourArray(isA).maxLength
         }
 
         fun minuteMaxLength(isA: Boolean): Int {
-            return getArrayByType(isA, minuteValueA, minuteValueB).maxLength
+            return minuteArray(isA).maxLength
         }
 
         fun secondMaxLength(isA: Boolean): Int {
-            return getArrayByType(isA, secondValueA, secondValueB).maxLength
+            return secondArray(isA).maxLength
+        }
+
+        fun monthArray(isA: Boolean): ValueArray {
+            return getArrayByType(isA, monthValueA, monthValueB)
+        }
+
+        fun dayArray(isA: Boolean): ValueArray {
+            return getArrayByType(isA, dayValueA, dayValueB)
+        }
+
+        fun weekArray(isA: Boolean): ValueArray {
+            return getArrayByType(isA, weekValueA, weekValueB)
+        }
+
+        fun hourArray(isA: Boolean): ValueArray {
+            return getArrayByType(isA, hourValueA, hourValueB)
+        }
+
+        fun minuteArray(isA: Boolean): ValueArray {
+            return getArrayByType(isA, minuteValueA, minuteValueB)
+        }
+
+        fun secondArray(isA: Boolean): ValueArray {
+            return getArrayByType(isA, secondValueA, secondValueB)
         }
 
     }
@@ -454,13 +548,12 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         var maxLength = 0
             private set
 
+        var maxLengthValue = ""
+
         val indices = IntRange(0, size - 1)
 
         operator fun get(index: Int): String {
-            if (index >= size || index < 0) {
-                return ""
-            }
-            return array[index]
+            return array[(index + size) % size]
         }
 
         operator fun set(index: Int, value: String) {
@@ -470,6 +563,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             array[index] = value
             if (value.length > maxLength) {
                 maxLength = value.length
+                maxLengthValue = value
             }
         }
 
