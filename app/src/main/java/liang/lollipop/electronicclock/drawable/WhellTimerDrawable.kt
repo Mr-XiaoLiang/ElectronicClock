@@ -27,8 +27,8 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
         private val TYPE_ARRAY = arrayOf(MONTH, DAY, WEEK, HOUR, MINUTE, SECOND)
 
-        private const val TYPED_A = 1F
-        private const val TYPED_B = -1F
+        private const val TYPED_A = 1
+        private const val TYPED_B = -1
 
         private const val ONE_SECOND = 1000L
         private const val ONE_MINUTE = ONE_SECOND * 60
@@ -145,6 +145,11 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         drawHour(canvas)
         drawMinute(canvas)
         drawSecond(canvas)
+        val alpha = bgPaint.alpha
+        bgPaint.alpha = (alpha * getAngleOffset(SECOND)).toInt().range(0, 255)
+        canvas.drawLine(bounds.left.toFloat(), circleCenter.y,
+            bounds.right.toFloat(), circleCenter.y, bgPaint)
+        bgPaint.alpha = alpha
     }
 
     override fun setAlpha(alpha: Int) {
@@ -595,6 +600,20 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
     override fun onAnimationUpdate(animation: ValueAnimator?) {
         invalidateSelf()
+    }
+
+    private fun Int.range(min: Int, max: Int): Int {
+        return when {
+            this < min -> {
+                min
+            }
+            this > max -> {
+                max
+            }
+            else -> {
+                this
+            }
+        }
     }
 
 }
