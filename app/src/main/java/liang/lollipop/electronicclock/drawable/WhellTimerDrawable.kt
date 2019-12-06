@@ -145,11 +145,14 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         drawHour(canvas)
         drawMinute(canvas)
         drawSecond(canvas)
-        val alpha = bgPaint.alpha
-        bgPaint.alpha = (alpha * getAngleOffset(SECOND)).toInt().range(0, 255)
-        canvas.drawLine(bounds.left.toFloat(), circleCenter.y,
-            bounds.right.toFloat(), circleCenter.y, bgPaint)
-        bgPaint.alpha = alpha
+        if (isAnimationEnable) {
+            val alpha = paint.alpha
+            paint.alpha = abs(alpha * getAngleOffset(SECOND)).toInt().range(0, 255)
+//        bgPaint.strokeWidth = 1F
+            canvas.drawLine(bounds.left.toFloat(), circleCenter.y,
+                bounds.right.toFloat(), circleCenter.y, paint)
+            paint.alpha = alpha
+        }
     }
 
     override fun setAlpha(alpha: Int) {
