@@ -604,15 +604,9 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
 
     private fun Int.range(min: Int, max: Int): Int {
         return when {
-            this < min -> {
-                min
-            }
-            this > max -> {
-                max
-            }
-            else -> {
-                this
-            }
+            this < min -> min
+            this > max -> max
+            else -> this
         }
     }
 
