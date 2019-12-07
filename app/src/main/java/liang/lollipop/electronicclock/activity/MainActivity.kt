@@ -42,22 +42,6 @@ class MainActivity : BottomNavigationActivity() {
 
         showGuidelines()
 
-        timerView.setMonthAValue(R.array.month_cn)
-        timerView.setMonthBValue(R.array.month_en)
-        timerView.setDayAValue(R.array.day_of_month_cn)
-        timerView.setDayBValue(R.array.day_of_month_en)
-        timerView.setWeekAValue(R.array.day_of_week_cn)
-        timerView.setWeekBValue(R.array.day_of_week_en)
-        timerView.setHourAValue(R.array.hour_cn)
-        timerView.setHourBValue(R.array.hour_en)
-        timerView.setMinuteAValue(R.array.minute_cn)
-        timerView.setMinuteBValue(R.array.minute_en)
-        timerView.setSecondAValue(R.array.minute_cn)
-        timerView.setSecondBValue(R.array.minute_en)
-        timerView.typeChangeKey = 2
-        timerView.simulation = true
-        timerView.notifyDataSetChange()
-        timerView.start()
     }
 
     private fun showGuidelines() {
