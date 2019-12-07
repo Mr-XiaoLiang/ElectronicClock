@@ -37,7 +37,6 @@ class PainterHelper(private val drawable: Drawable? = null) {
 
     fun callInvalidate() {
         invalidateCallback?.requestInvalidate()
-        drawable?.invalidateSelf()
     }
 
     fun callDrawingEnd() {
