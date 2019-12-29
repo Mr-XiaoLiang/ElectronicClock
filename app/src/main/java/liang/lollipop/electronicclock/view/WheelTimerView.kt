@@ -24,8 +24,16 @@ class WheelTimerView(context: Context, attr: AttributeSet?,
 
     private var isRun = false
 
+    companion object {
+        private val EMPTY_ARRAY = IntArray(0)
+    }
+
     init {
         timerDrawable.callback = this
+    }
+
+    private val tempArray: ArrayList<Int> by lazy {
+        ArrayList<Int>()
     }
 
     var simulation: Boolean
@@ -121,58 +129,80 @@ class WheelTimerView(context: Context, attr: AttributeSet?,
     }
 
     fun setMonthAValue(vararg arrayId: Int) {
-        setValue(valueProvider.monthValueA, *arrayId)
+        setValue(valueProvider.monthValueA, arrayId)
     }
 
     fun setMonthBValue(vararg arrayId: Int) {
-        setValue(valueProvider.monthValueB, *arrayId)
+        setValue(valueProvider.monthValueB, arrayId)
     }
 
     fun setDayAValue(vararg arrayId: Int) {
-        setValue(valueProvider.dayValueA, *arrayId)
+        setValue(valueProvider.dayValueA, arrayId)
     }
 
     fun setDayBValue(vararg arrayId: Int) {
-        setValue(valueProvider.dayValueB, *arrayId)
+        setValue(valueProvider.dayValueB, arrayId)
     }
 
     fun setWeekAValue(vararg arrayId: Int) {
-        setValue(valueProvider.weekValueA, *arrayId)
+        setValue(valueProvider.weekValueA, arrayId)
     }
 
     fun setWeekBValue(vararg arrayId: Int) {
-        setValue(valueProvider.weekValueB, *arrayId)
+        setValue(valueProvider.weekValueB, arrayId)
     }
 
     fun setHourAValue(vararg arrayId: Int) {
-        setValue(valueProvider.hourValueA, *arrayId)
+        setValue(valueProvider.hourValueA, arrayId)
     }
 
     fun setHourBValue(vararg arrayId: Int) {
-        setValue(valueProvider.hourValueB, *arrayId)
+        setValue(valueProvider.hourValueB, arrayId)
     }
 
     fun setMinuteAValue(vararg arrayId: Int) {
-        setValue(valueProvider.minuteValueA, *arrayId)
+        setValue(valueProvider.minuteValueA, arrayId)
     }
 
     fun setMinuteBValue(vararg arrayId: Int) {
-        setValue(valueProvider.minuteValueB, *arrayId)
+        setValue(valueProvider.minuteValueB, arrayId)
     }
 
     fun setSecondAValue(vararg arrayId: Int) {
-        setValue(valueProvider.secondValueA, *arrayId)
+        setValue(valueProvider.secondValueA, arrayId)
     }
 
     fun setSecondBValue(vararg arrayId: Int) {
-        setValue(valueProvider.secondValueB, *arrayId)
+        setValue(valueProvider.secondValueB, arrayId)
     }
 
     fun notifyDataSetChange() {
         timerDrawable.notifyValueChange()
     }
 
-    private fun setValue(valueArray: WheelTimerDrawable.ValueArray, vararg arrayId: Int) {
-        valueProvider.copyValueFromRes(context, valueArray, *arrayId)
+    private fun setValue(valueArray: WheelTimerDrawable.ValueArray, arrayId: IntArray) {
+        if (arrayId.isEmpty()) {
+            valueArray.clean()
+            return
+        }
+        val idArray = getEffectiveId(arrayId)
+        if (idArray.isEmpty()) {
+            valueArray.clean()
+            return
+        }
+        valueProvider.copyValueFromRes(context, valueArray, *idArray)
+    }
+
+    private fun getEffectiveId(arrayId: IntArray): IntArray {
+        tempArray.clear()
+        for (id in arrayId) {
+            if (id != 0) {
+                tempArray.add(id)
+            }
+        }
+        if (tempArray.isEmpty()) {
+            return EMPTY_ARRAY
+        }
+        return IntArray(tempArray.size) { i -> tempArray[i]}
     }
 }

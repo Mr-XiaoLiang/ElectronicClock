@@ -1,6 +1,8 @@
 package liang.lollipop.electronicclock.widget.panel
 
-import liang.lollipop.electronicclock.drawable.WheelTimerDrawable
+import android.content.Context
+import android.view.View
+import liang.lollipop.electronicclock.view.WheelTimerView
 import liang.lollipop.electronicclock.widget.info.WheelTimerPanelInfo
 import liang.lollipop.widget.widget.Panel
 
@@ -10,7 +12,27 @@ import liang.lollipop.widget.widget.Panel
  */
 class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo>(panelInfo) {
 
-    private val valueProvider = WheelTimerDrawable.ValueProvider()
-    private val wheelTimerDrawable = WheelTimerDrawable(valueProvider)
+    companion object {
+        private val EMPTY_ARRAY = IntArray(0)
+    }
+
+    override fun createView(context: Context): View? {
+        return WheelTimerView(context)
+    }
+
+    override fun onInfoChange() {
+        super.onInfoChange()
+        tryMyView<WheelTimerView> {
+            it.setDayAValue(panelInfo.dayValues.valueA)
+        }
+    }
+
+    private val ArrayList<Int>.valueA: Int
+        get() {
+            if (this.isEmpty()) {
+                return 0
+            }
+            return this[0]
+        }
 
 }
