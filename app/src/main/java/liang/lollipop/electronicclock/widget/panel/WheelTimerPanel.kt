@@ -12,10 +12,6 @@ import liang.lollipop.widget.widget.Panel
  */
 class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo>(panelInfo) {
 
-    companion object {
-        private val EMPTY_ARRAY = IntArray(0)
-    }
-
     override fun createView(context: Context): View? {
         return WheelTimerView(context)
     }
@@ -24,6 +20,17 @@ class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo
         super.onInfoChange()
         tryMyView<WheelTimerView> {
             it.setDayAValue(panelInfo.dayValues.valueA)
+            it.setDayBValue(panelInfo.dayValues.valueB)
+            it.setMonthAValue(panelInfo.monthValues.valueA)
+            it.setMonthBValue(panelInfo.monthValues.valueB)
+            it.setWeekAValue(panelInfo.weekValues.valueA)
+            it.setWeekBValue(panelInfo.weekValues.valueB)
+            it.setHourAValue(panelInfo.hourValues.valueA)
+            it.setHourBValue(panelInfo.hourValues.valueB)
+            it.setMinuteAValue(panelInfo.minuteValues.valueA)
+            it.setMinuteBValue(panelInfo.minuteValues.valueB)
+            it.setSecondAValue(panelInfo.secondValues.valueA)
+            it.setSecondBValue(panelInfo.secondValues.valueB)
         }
     }
 
@@ -33,6 +40,13 @@ class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo
                 return 0
             }
             return this[0]
+        }
+    private val ArrayList<Int>.valueB: Int
+        get() {
+            if (this.size < 2) {
+                return valueA
+            }
+            return this[1]
         }
 
 }
