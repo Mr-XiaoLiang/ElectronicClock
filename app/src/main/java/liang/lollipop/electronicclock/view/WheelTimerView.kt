@@ -68,6 +68,14 @@ class WheelTimerView(context: Context, attr: AttributeSet?,
             return timerDrawable.typeChangeKey
         }
 
+    var color: Int
+        set(value) {
+            timerDrawable.color = value
+        }
+        get() {
+            return timerDrawable.color
+        }
+
     fun setPaddingWeight(left: Float, top: Float, right: Float, bottom: Float) {
         timerDrawable.paddings.let {
             it[0] = left
