@@ -34,6 +34,13 @@ class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo
         }
     }
 
+    override fun onColorChange(color: Int, light: Float) {
+        super.onColorChange(color, light)
+        tryMyView<WheelTimerView> {
+            it.color = color
+        }
+    }
+
     private val ArrayList<Int>.valueA: Int
         get() {
             if (this.isEmpty()) {

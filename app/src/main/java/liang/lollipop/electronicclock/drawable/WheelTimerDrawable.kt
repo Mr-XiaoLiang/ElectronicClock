@@ -94,6 +94,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
     var color: Int
         set(value) {
             paint.color = value
+            invalidateSelf()
         }
         get() {
             return paint.color
@@ -136,6 +137,9 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
     }
 
     override fun draw(canvas: Canvas) {
+        if (backgroundColor != 0) {
+            canvas.drawColor(backgroundColor)
+        }
         checkType()
         checkDayTime()
         checkHourTime()
