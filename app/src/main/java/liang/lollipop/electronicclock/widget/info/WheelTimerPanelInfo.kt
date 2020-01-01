@@ -16,4 +16,6 @@ class WheelTimerPanelInfo: PanelInfo() {
     val minuteValues = ArrayList<Int>()
     val secondValues = ArrayList<Int>()
 
+    var animation = true
+
 }
