@@ -31,6 +31,9 @@ class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo
             it.setMinuteBValue(panelInfo.minuteValues.valueB)
             it.setSecondAValue(panelInfo.secondValues.valueA)
             it.setSecondBValue(panelInfo.secondValues.valueB)
+            if (!panelInfo.animation) {
+                it.stop()
+            }
         }
     }
 
@@ -38,6 +41,22 @@ class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo
         super.onColorChange(color, light)
         tryMyView<WheelTimerView> {
             it.color = color
+        }
+    }
+
+    override fun onPageStart() {
+        super.onPageStart()
+        if (panelInfo.animation) {
+            tryMyView<WheelTimerView> {
+                it.start()
+            }
+        }
+    }
+
+    override fun onPageStop() {
+        super.onPageStop()
+        tryMyView<WheelTimerView> {
+            it.stop()
         }
     }
 
