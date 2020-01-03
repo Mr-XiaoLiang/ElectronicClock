@@ -8,8 +8,15 @@
             android:layout_gravity="center_horizontal"
             android:layout_width="24dp"
             android:layout_height="24dp"/>
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+    <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        <include layout="@layout/item_check_list_title"
+                android:id="@+id/floatTitle"/>
+    </FrameLayout>
+
 </LinearLayout>
