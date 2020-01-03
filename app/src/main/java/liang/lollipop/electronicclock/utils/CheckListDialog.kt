@@ -9,6 +9,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
  */
 class CheckListDialog: BottomSheetDialogFragment() {
 
+    private val selectedList = ArrayList<Info>()
 
+    private val unselectedList = ArrayList<Info>()
+
+
+
+    class Info(val name: String, val id: Int)
 
 }
