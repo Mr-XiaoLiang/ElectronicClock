@@ -150,4 +150,6 @@
     <string name="pref_summer_f_square_grid">以停用方形格子，可能对某些小部件造成影响</string>
 
     <string name="empty">什么也没有</string>
+    <string name="title_check_list_selected">已选中</string>
+    <string name="title_check_list_unselected">待选择</string>
 </resources>

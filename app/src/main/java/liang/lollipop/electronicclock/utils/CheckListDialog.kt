@@ -1,12 +1,16 @@
 package liang.lollipop.electronicclock.utils
 
+import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.android.synthetic.main.dialog_check_list.*
 import liang.lollipop.electronicclock.R
 
 /**
@@ -14,11 +18,71 @@ import liang.lollipop.electronicclock.R
  * @date 2020-01-01 15:30
  * 可以选择的列表对话框
  */
-class CheckListDialog: BottomSheetDialogFragment() {
+class CheckListDialog private constructor(private val selectedList: ArrayList<Info>,
+                      private val unselectedList: ArrayList<Info>,
+                      private val maxSize: Int,
+                      private val onCheckedListener: (ArrayList<Info>) -> Unit): BottomSheetDialogFragment() {
 
-//    private val selectedList = ArrayList<Info>()
-//
-//    private val unselectedList = ArrayList<Info>()
+    companion object {
+        fun show(selected: ArrayList<Info>,
+                 unselected: ArrayList<Info>,
+                 maxSize: Int,
+                 fragmentManager: FragmentManager,
+                 tag: String = "CheckListDialog",
+                 onChecked: (ArrayList<Info>) -> Unit) {
+
+            val selectedData = if (selected == unselected) {
+                ArrayList()
+            } else {
+                selected
+            }
+            CheckListDialog(selectedData, unselected, maxSize, onChecked).show(fragmentManager, tag)
+        }
+    }
+
+    private val floatingTitleListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            (recyclerView.layoutManager as? LinearLayoutManager)?.let { layoutManager ->
+                val adapter = recyclerView.adapter as Adapter
+                val lastItem = layoutManager.findFirstCompletelyVisibleItemPosition()
+                if (lastItem < adapter.unselectedTitlePosition) {
+                    floatTitle.translationY = 0F
+                    floatTitle.findViewById<TextView>(R.id.titleView)
+                        .setText(R.string.title_check_list_selected)
+                } else if (lastItem == adapter.unselectedTitlePosition) {
+                    val top = layoutManager.findViewByPosition(lastItem)?.top?:0
+                    val height = floatTitle.height * 1F
+                    floatTitle.translationY = if (top > height) { 0F } else { top - height }
+                } else {
+                    floatTitle.translationY = 0F
+                    floatTitle.findViewById<TextView>(R.id.titleView)
+                        .setText(R.string.title_check_list_unselected)
+                }
+            }
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.dialog_check_list, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        recyclerView.layoutManager = LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
+        recyclerView.adapter = Adapter(selectedList, unselectedList,
+            getString(R.string.title_check_list_selected),
+            getString(R.string.title_check_list_unselected), maxSize, layoutInflater)
+        recyclerView.addOnScrollListener(floatingTitleListener)
+        recyclerView.adapter?.notifyDataSetChanged()
+    }
+
+    override fun onDetach() {
+        // 断开时返回结果
+        onCheckedListener(selectedList)
+        super.onDetach()
+    }
 
     private class Adapter(
         private val selectedData: ArrayList<Info>,
@@ -61,7 +125,7 @@ class CheckListDialog: BottomSheetDialogFragment() {
                 TYPE_EMPTY -> EmptyItem.create(layoutInflater, parent)
                 TYPE_TITLE -> TitleItem.create(layoutInflater, parent)
                 else -> DefaultItem.create(layoutInflater, parent).onItemClick {
-                    onInfoSelected(it)
+                    onInfoSelected(getInfo(it))
                 }
             }
         }
@@ -97,19 +161,16 @@ class CheckListDialog: BottomSheetDialogFragment() {
                 return emptyInfo
             }
             // 接着是未选择项目的标题
-            if (position == selectedTitlePosition) {
+            if (position == unselectedTitlePosition) {
                 return unselectedTitleInfo
             }
-            return when {
-                position < unselectedTitlePosition -> {
-                    selectedData[position - 1]
-                }
-                emptyInfoPosition > 0 -> {
-                    unselectedData[position - 3]
-                }
-                else -> {
-                    unselectedData[position - 2]
-                }
+            if (position < unselectedTitlePosition) {
+                return selectedData[position - 1]
+            }
+            return if (emptyInfoPosition > 0) {
+                unselectedData[position - selectedData.size - 3]
+            } else {
+                unselectedData[position - selectedData.size - 2]
             }
         }
 
@@ -126,8 +187,8 @@ class CheckListDialog: BottomSheetDialogFragment() {
                 selectedData.add(info)
                 // 由于有title的存在，因此新添加的位置为selectedData.size - 1 + 1
                 to = selectedData.size
-                // 内部的位置，叠加未选择标题的位置，叠加标题本身的位置
-                from = unselectedData.indexOf(info) + unselectedTitlePosition + 1
+                // 内部的位置，叠加未选择标题的位置
+                from = unselectedData.indexOf(info) + unselectedTitlePosition
                 unselectedData.remove(info)
             } else {
                 // 本身的位置，叠加标题的位置
@@ -136,6 +197,9 @@ class CheckListDialog: BottomSheetDialogFragment() {
                 // 移动到未选中集合中时，始终放在第一个，动画会更好看，并且计算会更加方便
                 unselectedData.add(0, info)
                 to = unselectedTitlePosition + 1
+            }
+            if (selectedData.isEmpty()) {
+                to -= 1
             }
             // 执行移动动画
             notifyItemMoved(from, to)
@@ -147,10 +211,10 @@ class CheckListDialog: BottomSheetDialogFragment() {
             }
             if (maxSelectedSize > 0 && selectedData.size > maxSelectedSize) {
                 // 如果超过最大的大小了，那么移除他
-                val info = selectedData.removeAt(0)
+                val old = selectedData.removeAt(0)
                 // 始终移除第一个，因此移除动画的开始位置始终是1
                 from = 1
-                unselectedData.add(0, info)
+                unselectedData.add(0, old)
                 // 目的地的位置始终是未选中集合的第一个
                 to = unselectedTitlePosition + 1
                 // 再次执行移动动画
@@ -166,24 +230,20 @@ class CheckListDialog: BottomSheetDialogFragment() {
 
     private open class Item(view: View): RecyclerView.ViewHolder(view), View.OnClickListener {
 
-        private var bindInfo: Info? = null
-        private var onItemClickListener: ((Info) -> Unit)? = null
+        private var onItemClickListener: ((Int) -> Unit)? = null
 
-        fun onItemClick(lis: (Info) -> Unit): Item {
+        fun onItemClick(lis: (Int) -> Unit): Item {
             itemView.setOnClickListener(this)
             onItemClickListener = lis
             return this
         }
 
         open fun onBind(info: Info) {
-            bindInfo = info
         }
 
         override fun onClick(v: View?) {
             if (v == itemView) {
-                bindInfo?.let {
-                    onItemClickListener?.invoke(it)
-                }
+                onItemClickListener?.invoke(adapterPosition)
             }
         }
     }
@@ -202,6 +262,7 @@ class CheckListDialog: BottomSheetDialogFragment() {
             view.findViewById<TextView>(R.id.titleView).apply {
                 gravity = Gravity.CENTER
                 setText(R.string.empty)
+                alpha = 0.6F
             }
         }
     }
@@ -242,6 +303,6 @@ class CheckListDialog: BottomSheetDialogFragment() {
         }
     }
 
-    class Info(val name: String, val id: Int)
+    data class Info(val name: String, val id: Int)
 
 }

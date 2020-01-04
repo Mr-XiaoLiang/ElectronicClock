@@ -693,5 +693,6 @@
     </string-array>
 
     <string name="empty">Nothing</string>
-
+    <string name="title_check_list_selected">Selected</string>
+    <string name="title_check_list_unselected">To be selected</string>
 </resources>
