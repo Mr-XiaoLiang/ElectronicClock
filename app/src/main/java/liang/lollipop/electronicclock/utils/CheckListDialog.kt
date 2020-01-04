@@ -1,10 +1,13 @@
 package liang.lollipop.electronicclock.utils
 
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import liang.lollipop.electronicclock.R
 
 /**
  * @author lollipop
@@ -13,15 +16,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
  */
 class CheckListDialog: BottomSheetDialogFragment() {
 
-    private val selectedList = ArrayList<Info>()
-
-    private val unselectedList = ArrayList<Info>()
+//    private val selectedList = ArrayList<Info>()
+//
+//    private val unselectedList = ArrayList<Info>()
 
     private class Adapter(
         private val selectedData: ArrayList<Info>,
         private val unselectedData: ArrayList<Info>,
         selectedTitle: String,
         unselectedTitle: String,
+        private val maxSelectedSize: Int,
         private val layoutInflater: LayoutInflater
     ): RecyclerView.Adapter<Item>() {
 
@@ -53,7 +57,13 @@ class CheckListDialog: BottomSheetDialogFragment() {
             }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Item {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            return when(viewType) {
+                TYPE_EMPTY -> EmptyItem.create(layoutInflater, parent)
+                TYPE_TITLE -> TitleItem.create(layoutInflater, parent)
+                else -> DefaultItem.create(layoutInflater, parent).onItemClick {
+                    onInfoSelected(it)
+                }
+            }
         }
 
         override fun getItemCount(): Int {
@@ -103,7 +113,50 @@ class CheckListDialog: BottomSheetDialogFragment() {
             }
         }
 
-
+        private fun onInfoSelected(info: Info) {
+            val isAdd = !selectedData.contains(info)
+            var to: Int
+            var from: Int
+            if (isAdd) {
+                // 如果原来是空的，那么移除占位对象
+                if (selectedData.isEmpty()) {
+                    notifyItemRemoved(1)
+                }
+                // 追加到末尾
+                selectedData.add(info)
+                // 由于有title的存在，因此新添加的位置为selectedData.size - 1 + 1
+                to = selectedData.size
+                // 内部的位置，叠加未选择标题的位置，叠加标题本身的位置
+                from = unselectedData.indexOf(info) + unselectedTitlePosition + 1
+                unselectedData.remove(info)
+            } else {
+                // 本身的位置，叠加标题的位置
+                from = selectedData.indexOf(info) + 1
+                selectedData.remove(info)
+                // 移动到未选中集合中时，始终放在第一个，动画会更好看，并且计算会更加方便
+                unselectedData.add(0, info)
+                to = unselectedTitlePosition + 1
+            }
+            // 执行移动动画
+            notifyItemMoved(from, to)
+            if (selectedData.isEmpty()) {
+                // 如果为空，那么增加一个占位item
+                notifyItemInserted(1)
+                // 如果选中项已经空了，那么不可能触发超出容量的逻辑了
+                return
+            }
+            if (maxSelectedSize > 0 && selectedData.size > maxSelectedSize) {
+                // 如果超过最大的大小了，那么移除他
+                val info = selectedData.removeAt(0)
+                // 始终移除第一个，因此移除动画的开始位置始终是1
+                from = 1
+                unselectedData.add(0, info)
+                // 目的地的位置始终是未选中集合的第一个
+                to = unselectedTitlePosition + 1
+                // 再次执行移动动画
+                notifyItemMoved(from, to)
+            }
+        }
 
         override fun onBindViewHolder(holder: Item, position: Int) {
             holder.onBind(getInfo(position))
@@ -111,8 +164,82 @@ class CheckListDialog: BottomSheetDialogFragment() {
 
     }
 
-    private abstract class Item(view: View): RecyclerView.ViewHolder(view) {
-        abstract fun onBind(info: Info)
+    private open class Item(view: View): RecyclerView.ViewHolder(view), View.OnClickListener {
+
+        private var bindInfo: Info? = null
+        private var onItemClickListener: ((Info) -> Unit)? = null
+
+        fun onItemClick(lis: (Info) -> Unit): Item {
+            itemView.setOnClickListener(this)
+            onItemClickListener = lis
+            return this
+        }
+
+        open fun onBind(info: Info) {
+            bindInfo = info
+        }
+
+        override fun onClick(v: View?) {
+            if (v == itemView) {
+                bindInfo?.let {
+                    onItemClickListener?.invoke(it)
+                }
+            }
+        }
+    }
+
+    private class EmptyItem private constructor(view: View): Item(view) {
+
+        companion object {
+            fun create(layoutInflater: LayoutInflater, parent: ViewGroup): EmptyItem {
+                return EmptyItem(
+                    layoutInflater.inflate(
+                        R.layout.item_check_list, parent, false))
+            }
+        }
+
+        init {
+            view.findViewById<TextView>(R.id.titleView).apply {
+                gravity = Gravity.CENTER
+                setText(R.string.empty)
+            }
+        }
+    }
+
+    private class DefaultItem private constructor(view: View): Item(view) {
+
+        companion object {
+            fun create(layoutInflater: LayoutInflater, parent: ViewGroup): DefaultItem {
+                return DefaultItem(
+                    layoutInflater.inflate(
+                        R.layout.item_check_list, parent, false))
+            }
+        }
+
+        val titleView: TextView = view.findViewById(R.id.titleView)
+
+        override fun onBind(info: Info) {
+            super.onBind(info)
+            titleView.text = info.name
+        }
+    }
+
+    private class TitleItem private constructor(view: View): Item(view) {
+
+        companion object {
+            fun create(layoutInflater: LayoutInflater, parent: ViewGroup): TitleItem {
+                return TitleItem(
+                    layoutInflater.inflate(
+                        R.layout.item_check_list_title, parent, false))
+            }
+        }
+
+        val titleView: TextView = view.findViewById(R.id.titleView)
+
+        override fun onBind(info: Info) {
+            super.onBind(info)
+            titleView.text = info.name
+        }
     }
 
     class Info(val name: String, val id: Int)
