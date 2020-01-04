@@ -46,18 +46,20 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
             (recyclerView.layoutManager as? LinearLayoutManager)?.let { layoutManager ->
                 val adapter = recyclerView.adapter as Adapter
                 val lastItem = layoutManager.findFirstCompletelyVisibleItemPosition()
-                if (lastItem < adapter.unselectedTitlePosition) {
-                    floatTitle.translationY = 0F
-                    floatTitle.findViewById<TextView>(R.id.titleView)
-                        .setText(R.string.title_check_list_selected)
-                } else if (lastItem == adapter.unselectedTitlePosition) {
+                if (lastItem == adapter.unselectedTitlePosition) {
                     val top = layoutManager.findViewByPosition(lastItem)?.top?:0
                     val height = floatTitle.height * 1F
                     floatTitle.translationY = if (top > height) { 0F } else { top - height }
+                    floatTitle.findViewById<TextView>(R.id.titleView)
+                        .setText(R.string.title_check_list_selected)
                 } else {
                     floatTitle.translationY = 0F
                     floatTitle.findViewById<TextView>(R.id.titleView)
-                        .setText(R.string.title_check_list_unselected)
+                        .setText(if (lastItem < adapter.unselectedTitlePosition) {
+                            R.string.title_check_list_selected
+                        } else {
+                            R.string.title_check_list_unselected
+                        })
                 }
             }
         }
