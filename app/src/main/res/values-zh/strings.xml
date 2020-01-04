@@ -148,4 +148,6 @@
     <string name="pref_title_square_grid">使用方形格子</string>
     <string name="pref_summer_t_square_grid">已启用方形格子，可能与屏幕存在边距</string>
     <string name="pref_summer_f_square_grid">以停用方形格子，可能对某些小部件造成影响</string>
+
+    <string name="empty">什么也没有</string>
 </resources>
