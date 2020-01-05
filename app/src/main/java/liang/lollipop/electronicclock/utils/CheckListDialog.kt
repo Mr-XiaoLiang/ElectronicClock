@@ -30,13 +30,15 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
                  fragmentManager: FragmentManager,
                  tag: String = "CheckListDialog",
                  onChecked: (ArrayList<Info>) -> Unit) {
-
-            val selectedData = if (selected == unselected) {
-                ArrayList()
-            } else {
-                selected
+            // 构造新的对象，以此来避免内部数据操作与外部的直接干涉
+            // 但是数据info不做额外的处理，因为本身是final的，不会产生中途的修改
+            val selectedData = ArrayList<Info>()
+            if (selected == unselected) {
+                selectedData.addAll(selected)
             }
-            CheckListDialog(selectedData, unselected, maxSize, onChecked).show(fragmentManager, tag)
+            val unselectedData = ArrayList<Info>()
+            unselectedData.addAll(unselected)
+            CheckListDialog(selectedData, unselectedData, maxSize, onChecked).show(fragmentManager, tag)
         }
     }
 
@@ -305,6 +307,20 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
         }
     }
 
-    data class Info(val name: String, val id: Int)
+    data class Info(val name: String, val id: Int) {
+        override fun equals(other: Any?): Boolean {
+            other?:return false
+            if (other is Info) {
+                return this.id == other.id
+            }
+            return false
+        }
+
+        override fun hashCode(): Int {
+            var result = name.hashCode()
+            result = 31 * result + id
+            return result
+        }
+    }
 
 }
