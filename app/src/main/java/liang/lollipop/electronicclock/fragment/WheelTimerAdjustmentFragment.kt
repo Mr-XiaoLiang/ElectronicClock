@@ -5,6 +5,7 @@ import liang.lollipop.electronicclock.bean.AdjustmentInfo
 import liang.lollipop.electronicclock.widget.info.WheelTimerPanelInfo
 import liang.lollipop.electronicclock.widget.panel.WheelTimerPanel
 import liang.lollipop.widget.widget.PanelInfo
+import org.json.JSONObject
 
 /**
  * @author lollipop
@@ -21,18 +22,24 @@ class WheelTimerAdjustmentFragment: PanelInfoAdjustmentFragment() {
     }
 
     override fun getPanelView(): View {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return wheelTimerPanel.getView(context!!)
     }
 
     override fun getPanelInfo(): PanelInfo {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return wheelTimerPanelInfo
     }
 
     override fun onInfoFoundById(info: PanelInfo?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        info?.let { wheelTimerPanelInfo.copy(it) }
+        putAdjustmentInfo()
+        panelInitComplete()
+    }
+
+    private fun putAdjustmentInfo() {
+        TODO("not implemented")
     }
 
     override fun initInfoByValue(info: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        wheelTimerPanelInfo.parse(JSONObject(info))
     }
 }
