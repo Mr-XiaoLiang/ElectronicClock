@@ -17,10 +17,6 @@ class WheelTimerAdjustmentFragment: PanelInfoAdjustmentFragment() {
     private val wheelTimerPanelInfo = WheelTimerPanelInfo()
     private val wheelTimerPanel = WheelTimerPanel(wheelTimerPanelInfo)
 
-    override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun getPanelView(): View {
         return wheelTimerPanel.getView(context!!)
     }
@@ -37,6 +33,10 @@ class WheelTimerAdjustmentFragment: PanelInfoAdjustmentFragment() {
 
     private fun putAdjustmentInfo() {
         TODO("not implemented")
+    }
+
+    override fun onInfoChange(info: AdjustmentInfo, newValue: Any) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun initInfoByValue(info: String) {

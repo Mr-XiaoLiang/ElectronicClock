@@ -284,6 +284,8 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         return AdjustmentImages(run)
     }
 
+
+
     protected fun Any.optBoolean(def: Boolean): Boolean {
         if (this is Boolean) {
             return this
