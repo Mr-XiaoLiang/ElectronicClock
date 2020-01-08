@@ -13,6 +13,8 @@ class AdjustmentCheckList(run: AdjustmentCheckList.() -> Unit):
     val unselectedList = ArrayList<CheckListDialog.Info>()
     val selectedList = ArrayList<CheckListDialog.Info>()
 
+    var maxSize = 0
+
     fun add(name: String, id: Int) {
         if (isSelected(id)) {
             return
