@@ -27,6 +27,10 @@ class AdjustmentCheckList(run: AdjustmentCheckList.() -> Unit):
             unselectedList.remove(it)
             selectedList.add(it)
         }
+        while (maxSize > 0 && selectedList.size > maxSize) {
+            val info = selectedList.removeAt(0)
+            unselectedList.add(info)
+        }
     }
 
     fun onSelectedChange(selected: ArrayList<CheckListDialog.Info>) {
@@ -35,6 +39,10 @@ class AdjustmentCheckList(run: AdjustmentCheckList.() -> Unit):
         selectedList.addAll(selected)
         for (info in selected) {
             unselectedList.remove(info)
+        }
+        while (maxSize > 0 && selectedList.size > maxSize) {
+            val info = selectedList.removeAt(0)
+            unselectedList.add(info)
         }
     }
 
