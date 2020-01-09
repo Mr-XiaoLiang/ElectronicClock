@@ -1,17 +1,22 @@
 package liang.lollipop.electronicclock.utils
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.dialog_check_list.*
 import liang.lollipop.electronicclock.R
+import java.lang.RuntimeException
 
 /**
  * @author lollipop
@@ -24,6 +29,28 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
                       private val onCheckedListener: (ArrayList<Info>) -> Unit): BottomSheetDialogFragment() {
 
     companion object {
+
+        fun show(selected: ArrayList<Info>,
+                       unselected: ArrayList<Info>,
+                       maxSize: Int,
+                       context: Context,
+                       tag: String = "CheckListDialog",
+                       onChecked: (ArrayList<Info>) -> Unit) {
+            val fragmentManager = findFragmentManager(context)?:throw RuntimeException(
+                    "Context is not a FragmentActivity")
+            show(selected, unselected, maxSize, fragmentManager, tag, onChecked)
+        }
+
+        private fun findFragmentManager(context: Context): FragmentManager? {
+            if (context is FragmentActivity) {
+                return context.supportFragmentManager
+            }
+            if (context is ContextWrapper) {
+                return findFragmentManager(context.baseContext)
+            }
+            return null
+        }
+
         fun show(selected: ArrayList<Info>,
                  unselected: ArrayList<Info>,
                  maxSize: Int,
