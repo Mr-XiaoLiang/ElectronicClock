@@ -152,4 +152,32 @@
     <string name="empty">什么也没有</string>
     <string name="title_check_list_selected">已选中</string>
     <string name="title_check_list_unselected">待选择</string>
+
+    <string name="month_en_name">英语月份</string>
+    <string name="month_cn_name">简体月份</string>
+    <string name="month_tr_name">繁体月份</string>
+
+    <string name="day_of_month_en_name">英语日期</string>
+    <string name="day_of_month_cn_name">简体日期</string>
+    <string name="day_of_month_tr_name">繁体日期</string>
+
+    <string name="day_of_week_en_name">英语星期</string>
+    <string name="day_of_week_cn_name">简体星期</string>
+    <string name="day_of_week_tr_name">繁体星期</string>
+    <string name="day_of_week_jp_name">日语星期</string>
+
+    <string name="hour_num_name">数字小时</string>
+    <string name="hour_en_name">英语小时</string>
+    <string name="hour_cn_name">简体小时</string>
+    <string name="hour_tr_name">繁体小时</string>
+
+    <string name="minute_num_name">数字分钟</string>
+    <string name="minute_en_name">英语分钟</string>
+    <string name="minute_cn_name">简体分钟</string>
+    <string name="minute_tr_name">繁体分钟</string>
+
+    <string name="second_num_name">数字秒钟</string>
+    <string name="second_en_name">英语秒钟</string>
+    <string name="second_cn_name">简体秒钟</string>
+    <string name="second_tr_name">繁体秒钟</string>
 </resources>

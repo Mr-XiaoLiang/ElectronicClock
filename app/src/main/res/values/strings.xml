@@ -695,4 +695,32 @@
     <string name="empty">Nothing</string>
     <string name="title_check_list_selected">Selected</string>
     <string name="title_check_list_unselected">To be selected</string>
+
+    <string name="month_en_name">English month</string>
+    <string name="month_cn_name">Simplified month</string>
+    <string name="month_tr_name">Traditional Chinese month</string>
+
+    <string name="day_of_month_en_name">English day</string>
+    <string name="day_of_month_cn_name">Simplified day</string>
+    <string name="day_of_month_tr_name">Traditional Chinese day</string>
+
+    <string name="day_of_week_en_name">English weekday</string>
+    <string name="day_of_week_cn_name">Simplified weekday</string>
+    <string name="day_of_week_tr_name">Traditional Chinese weekday</string>
+    <string name="day_of_week_jp_name">Japanese weekday</string>
+
+    <string name="hour_num_name">Digital hours</string>
+    <string name="hour_en_name">English hours</string>
+    <string name="hour_cn_name">Simplified hours</string>
+    <string name="hour_tr_name">Traditional Chinese hours</string>
+
+    <string name="minute_num_name">Number of minutes</string>
+    <string name="minute_en_name">English minutes</string>
+    <string name="minute_cn_name">Simplified minutes</string>
+    <string name="minute_tr_name">Traditional Chinese Minutes</string>
+
+    <string name="second_num_name">Number of seconds</string>
+    <string name="second_en_name">English seconds</string>
+    <string name="second_cn_name">Simplified seconds</string>
+    <string name="second_tr_name">Traditional Chinese seconds</string>
 </resources>
