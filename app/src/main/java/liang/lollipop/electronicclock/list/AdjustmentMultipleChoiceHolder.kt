@@ -12,6 +12,7 @@ import java.lang.StringBuilder
 /**
  * @author lollipop
  * @date 2020-01-09 23:02
+ * 多选的Holder
  */
 class AdjustmentMultipleChoiceHolder(view: View): AdjustmentHolder<AdjustmentCheckList>(view) {
 
