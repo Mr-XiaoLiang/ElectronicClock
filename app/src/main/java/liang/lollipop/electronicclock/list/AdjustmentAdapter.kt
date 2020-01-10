@@ -25,6 +25,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
         private const val TYPE_PADDING = 3
         private const val TYPE_LIST = 4
         private const val TYPE_PHOTOS = 5
+        private const val TYPE_MULTIPLE = 6
     }
 
     /**
@@ -45,6 +46,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
             TYPE_PADDING -> AdjustmentPaddingHolder.create(inflater, parent)
             TYPE_LIST -> AdjustmentSelectHolder.create(inflater, parent)
             TYPE_PHOTOS -> AdjustmentPhotosHolder.create(inflater, parent)
+            TYPE_MULTIPLE -> AdjustmentMultipleChoiceHolder.create(inflater, parent)
             else -> throw RuntimeException("unknown the viewType:$viewType")
         }
         holder.onValueChangeListener = this
@@ -101,6 +103,7 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
             is AdjustmentPadding -> TYPE_PADDING
             is AdjustmentSelect -> TYPE_LIST
             is AdjustmentImages -> TYPE_PHOTOS
+            is AdjustmentCheckList -> TYPE_MULTIPLE
             else -> throw RuntimeException("unknown the AdjustmentInfo type")
         }
     }
@@ -124,6 +127,9 @@ class AdjustmentAdapter(private val data: ArrayList<AdjustmentInfo>,
                 holder.onBind(info)
             }
             is AdjustmentPhotosHolder -> if (info is AdjustmentImages) {
+                holder.onBind(info)
+            }
+            is AdjustmentMultipleChoiceHolder -> if (info is AdjustmentCheckList) {
                 holder.onBind(info)
             }
         }

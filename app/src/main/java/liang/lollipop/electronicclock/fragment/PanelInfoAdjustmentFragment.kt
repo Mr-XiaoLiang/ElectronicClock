@@ -284,7 +284,9 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         return AdjustmentImages(run)
     }
 
-
+    fun multiple(run: AdjustmentCheckList.() -> Unit): AdjustmentCheckList {
+        return AdjustmentCheckList(run)
+    }
 
     protected fun Any.optBoolean(def: Boolean): Boolean {
         if (this is Boolean) {
