@@ -71,7 +71,7 @@ class HollowCircleDrawable: Drawable() {
         paint.xfermode = null
     }
 
-    override fun onBoundsChange(bounds: Rect?) {
+    override fun onBoundsChange(bounds: Rect) {
         super.onBoundsChange(bounds)
         boundsF.set(bounds)
         invalidateSelf()
