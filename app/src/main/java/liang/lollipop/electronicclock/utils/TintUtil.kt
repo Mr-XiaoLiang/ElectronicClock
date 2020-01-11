@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -96,6 +97,8 @@ object TintUtil {
 
         private var colors: ColorStateList = ColorStateList.valueOf(Color.BLACK)
 
+        private var tintMode: PorterDuff.Mode? = null
+
         companion object {
 
             fun whitResId(context: Context, resId:Int):TintDrawableBuilder{
@@ -125,7 +128,15 @@ object TintUtil {
             return this
         }
 
+        fun setMode(mode: PorterDuff.Mode): TintDrawableBuilder{
+            tintMode = mode
+            return this
+        }
+
         fun tint(): Drawable{
+            tintMode?.let {
+                DrawableCompat.setTintMode(drawable, it)
+            }
             DrawableCompat.setTintList(drawable, colors)
             return drawable
         }
