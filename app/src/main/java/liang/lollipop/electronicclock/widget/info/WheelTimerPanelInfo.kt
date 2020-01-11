@@ -9,6 +9,16 @@ import liang.lollipop.widget.widget.PanelInfo
  */
 class WheelTimerPanelInfo: PanelInfo() {
 
+    companion object {
+        const val MONTH = "MONTH"
+        const val DAY = "DAY"
+        const val WEEK = "WEEK"
+        const val HOUR = "HOUR"
+        const val MINUTE = "MINUTE"
+        const val SECOND = "SECOND"
+        const val ANIMATION = "ANIMATION"
+    }
+
     val monthValues = ArrayList<Int>()
     val dayValues = ArrayList<Int>()
     val weekValues = ArrayList<Int>()

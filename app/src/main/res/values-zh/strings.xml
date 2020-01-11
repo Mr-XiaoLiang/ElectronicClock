@@ -180,4 +180,17 @@
     <string name="second_en_name">英语秒钟</string>
     <string name="second_cn_name">简体秒钟</string>
     <string name="second_tr_name">繁体秒钟</string>
+
+    <string name="title_wheel_month">月份</string>
+    <string name="summary_wheel_month">不显示月份</string>
+    <string name="title_wheel_day">日期</string>
+    <string name="summary_wheel_day">不显示日期</string>
+    <string name="title_wheel_week">星期</string>
+    <string name="summary_wheel_week">不显示星期</string>
+    <string name="title_wheel_hour">小时</string>
+    <string name="summary_wheel_hour">不显示小时</string>
+    <string name="title_wheel_minute">分钟</string>
+    <string name="summary_wheel_minute">不显示分钟</string>
+    <string name="title_wheel_second">秒钟</string>
+    <string name="summary_wheel_second">不显示秒钟</string>
 </resources>
