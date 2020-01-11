@@ -5,14 +5,9 @@ package liang.lollipop.electronicclock.bean
  * @date 2019-09-01 17:50
  * 调整padding类型
  */
-class AdjustmentPadding(run: AdjustmentPadding.() -> Unit):
-    AdjustmentInfo() {
+class AdjustmentPadding: AdjustmentInfo() {
 
     val paddings = FloatArray(4)
-
-    init {
-        run(this)
-    }
 
     fun reset(p: FloatArray) {
         paddings[0] = p[0]
