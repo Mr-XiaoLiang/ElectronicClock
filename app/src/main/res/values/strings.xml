@@ -723,4 +723,17 @@
     <string name="second_en_name">English seconds</string>
     <string name="second_cn_name">Simplified seconds</string>
     <string name="second_tr_name">Traditional Chinese seconds</string>
+
+    <string name="title_wheel_month">Month</string>
+    <string name="summary_wheel_month">Do not display</string>
+    <string name="title_wheel_day">Day</string>
+    <string name="summary_wheel_day">Do not display</string>
+    <string name="title_wheel_week">Week</string>
+    <string name="summary_wheel_week">Do not display</string>
+    <string name="title_wheel_hour">Hour</string>
+    <string name="summary_wheel_hour">Do not display</string>
+    <string name="title_wheel_minute">Minute</string>
+    <string name="summary_wheel_minute">Do not display</string>
+    <string name="title_wheel_second">Second</string>
+    <string name="summary_wheel_second">Do not display</string>
 </resources>

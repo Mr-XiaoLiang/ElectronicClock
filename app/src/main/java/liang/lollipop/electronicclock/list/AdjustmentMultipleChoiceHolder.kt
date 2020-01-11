@@ -55,7 +55,7 @@ class AdjustmentMultipleChoiceHolder(view: View): AdjustmentHolder<AdjustmentChe
     private fun getSelectedValue(info: AdjustmentCheckList): String {
         val selected = info.selectedList
         if (selected.isEmpty()) {
-            return ""
+            return info.summary
         }
         builder.clear()
         for (index in selected.indices) {
