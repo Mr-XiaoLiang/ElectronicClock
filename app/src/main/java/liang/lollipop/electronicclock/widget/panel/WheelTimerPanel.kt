@@ -31,9 +31,14 @@ class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo
             it.setMinuteBValue(panelInfo.minuteValues.valueB)
             it.setSecondAValue(panelInfo.secondValues.valueA)
             it.setSecondBValue(panelInfo.secondValues.valueB)
+            it.simulation = panelInfo.simulation
+            it.showGrid = panelInfo.showGrid
             if (!panelInfo.animation) {
                 it.stop()
+            } else if (isActive) {
+                it.start()
             }
+            it.notifyDataSetChange()
         }
     }
 
@@ -41,6 +46,7 @@ class WheelTimerPanel(panelInfo: WheelTimerPanelInfo): Panel<WheelTimerPanelInfo
         super.onColorChange(color, light)
         tryMyView<WheelTimerView> {
             it.color = color
+            it.gridColor = color.changeAlpha((light * 88).toInt())
         }
     }
 

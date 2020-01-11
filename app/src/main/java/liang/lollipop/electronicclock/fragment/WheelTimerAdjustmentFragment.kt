@@ -1,8 +1,10 @@
 package liang.lollipop.electronicclock.fragment
 
+import android.content.Context
 import android.view.View
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.bean.AdjustmentInfo
+import liang.lollipop.electronicclock.utils.CheckListDialog
 import liang.lollipop.electronicclock.widget.info.WheelTimerPanelInfo
 import liang.lollipop.electronicclock.widget.panel.WheelTimerPanel
 import liang.lollipop.widget.widget.PanelInfo
@@ -30,6 +32,17 @@ class WheelTimerAdjustmentFragment: PanelInfoAdjustmentFragment() {
         info?.let { wheelTimerPanelInfo.copy(it) }
         putAdjustmentInfo()
         panelInitComplete()
+        wheelTimerPanel.onInfoChange()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        wheelTimerPanel.isActive = true
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        wheelTimerPanel.isActive = false
     }
 
     private fun putAdjustmentInfo() {
@@ -39,9 +52,9 @@ class WheelTimerAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 title = getString(R.string.title_wheel_month)
                 summary = getString(R.string.summary_wheel_month)
                 maxSize = 2
-                add(getString(R.string.month_en_name), R.array.minute_en)
-                add(getString(R.string.month_cn_name), R.array.minute_cn)
-                add(getString(R.string.month_tr_name), R.array.minute_tr)
+                add(getString(R.string.month_en_name), R.array.month_en)
+                add(getString(R.string.month_cn_name), R.array.month_cn)
+                add(getString(R.string.month_tr_name), R.array.month_tr)
                 for (id in wheelTimerPanelInfo.minuteValues) {
                     selected(id)
                 }
@@ -116,6 +129,20 @@ class WheelTimerAdjustmentFragment: PanelInfoAdjustmentFragment() {
                 summaryOfTrue = getString(R.string.summary_animation_enable)
                 summaryOfFalse = getString(R.string.summary_animation_disable)
                 value = wheelTimerPanelInfo.animation
+            },
+            switch {
+                key = WheelTimerPanelInfo.SIMULATION
+                title = getString(R.string.title_is_simulation)
+                summaryOfTrue = getString(R.string.summary_simulation_enable)
+                summaryOfFalse = getString(R.string.summary_simulation_disable)
+                value = wheelTimerPanelInfo.simulation
+            },
+            switch {
+                key = WheelTimerPanelInfo.SHOW_GRID
+                title = getString(R.string.title_show_border)
+                summaryOfTrue = getString(R.string.summary_show_border)
+                summaryOfFalse = getString(R.string.summary_hide_border)
+                value = wheelTimerPanelInfo.showGrid
             }
         )
     }
@@ -124,6 +151,12 @@ class WheelTimerAdjustmentFragment: PanelInfoAdjustmentFragment() {
         when (info.key) {
             WheelTimerPanelInfo.ANIMATION -> {
                 wheelTimerPanelInfo.animation = newValue.optBoolean(true)
+            }
+            WheelTimerPanelInfo.SIMULATION -> {
+                wheelTimerPanelInfo.simulation = newValue.optBoolean(true)
+            }
+            WheelTimerPanelInfo.SHOW_GRID -> {
+                wheelTimerPanelInfo.showGrid = newValue.optBoolean(true)
             }
             WheelTimerPanelInfo.MONTH -> {
                 newValue.tryPutId(wheelTimerPanelInfo.monthValues)
@@ -149,11 +182,9 @@ class WheelTimerAdjustmentFragment: PanelInfoAdjustmentFragment() {
 
     private fun Any.tryPutId(list: ArrayList<Int>) {
         list.clear()
-        if (this is ArrayList<*>) {
+        if (this is IntArray) {
             for (id in this) {
-                if (id is Int) {
-                    list.add(id)
-                }
+                list.add(id)
             }
         }
     }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
+import android.util.Log
 import java.util.*
 import kotlin.math.abs
 
@@ -137,9 +138,6 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
     }
 
     override fun draw(canvas: Canvas) {
-        if (backgroundColor != 0) {
-            canvas.drawColor(backgroundColor)
-        }
         checkType()
         checkDayTime()
         checkHourTime()
@@ -189,7 +187,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             dayTimeMillis = now / ONE_DAY
             calendar.timeInMillis = now
             monthDayPosition = calendar.get(Calendar.DAY_OF_MONTH) - 1
-            monthPosition = calendar.get(Calendar.MONTH)
+            monthPosition = calendar.get(Calendar.MONTH) + 1
             weekPosition = calendar.get(Calendar.DAY_OF_WEEK) - 1
             monthDayCount = getDayCountByMonth(now)
 
@@ -239,7 +237,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
         }
         val fontSize = fontSizeArray[type]
         val stepAngle = 360F / (itemCount * arcWeight) * getAngleWeight(type)
-        val offsetAngle = stepAngle * (getAngleOffset(type))
+        val offsetAngle = stepAngle * getAngleOffset(type)
         val count = (90 / stepAngle + 1).toInt()
         val width = sectorThickness[type]
         drawText(canvas, array[position], index.toFloat(),
@@ -316,31 +314,31 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             MONTH -> if (simulation) {
                 val day = calendar.get(Calendar.DAY_OF_MONTH)
                 val allDay = getDayCountByMonth(now)
-                day * 1F / allDay
+                (day * 1F / allDay) - 0.5F
             } else {
                 0F
             }
             DAY, WEEK -> if (simulation) {
                 val newTime = calendar.timeZone.getOffset(now) + now
-                newTime % ONE_DAY / ONE_HOUR / 24F
+                (newTime % ONE_DAY / ONE_HOUR / 24F) - 0.5F
             } else {
                 0F
             }
             HOUR -> if (simulation) {
-                now % ONE_HOUR / ONE_MINUTE / 60F
+                (now % ONE_HOUR / ONE_MINUTE / 60F) - 0.5F
             } else {
                 0F
             }
             MINUTE -> if (simulation) {
-                now % ONE_MINUTE / ONE_SECOND / 60F
+                (now % ONE_MINUTE / ONE_SECOND / 60F) - 0.5F
             } else {
                 0F
             }
             SECOND -> {
-                now % ONE_SECOND / 1000F
+                (now % ONE_SECOND / 1000F) - 0.5F
             }
             else -> 0F
-        } - 0.5F
+        }
     }
 
     override fun onBoundsChange(bounds: Rect?) {
