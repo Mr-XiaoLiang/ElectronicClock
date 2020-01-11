@@ -4,16 +4,11 @@ package liang.lollipop.electronicclock.bean
  * @author lollipop
  * @date 2019-10-08 20:33
  */
-class AdjustmentSelect(run: AdjustmentSelect.() -> Unit):
-    AdjustmentInfo() {
+class AdjustmentSelect: AdjustmentInfo() {
 
     val itemList = ArrayList<String>()
 
     var selectedIndex = -1
-
-    init {
-        run(this)
-    }
 
     fun addItem(vararg items: String) {
         itemList.addAll(items)

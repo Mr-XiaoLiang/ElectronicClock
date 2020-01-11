@@ -7,16 +7,11 @@ import android.net.Uri
  * @date 2019-09-01 17:50
  * 调整padding类型
  */
-class AdjustmentImages(run: AdjustmentImages.() -> Unit):
-    AdjustmentInfo() {
+class AdjustmentImages: AdjustmentInfo() {
 
     val images = ArrayList<Uri>()
 
     var maxSize = -1
-
-    init {
-        run(this)
-    }
 
     fun reset(p: ArrayList<Uri>) {
         images.clear()

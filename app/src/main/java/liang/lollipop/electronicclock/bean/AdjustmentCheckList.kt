@@ -7,8 +7,7 @@ import liang.lollipop.electronicclock.utils.CheckListDialog
  * @date 2020-01-05 17:38
  * 多选列表的偏好设置项
  */
-class AdjustmentCheckList(run: AdjustmentCheckList.() -> Unit):
-    AdjustmentInfo() {
+class AdjustmentCheckList: AdjustmentInfo() {
 
     val unselectedList = ArrayList<CheckListDialog.Info>()
     val selectedList = ArrayList<CheckListDialog.Info>()

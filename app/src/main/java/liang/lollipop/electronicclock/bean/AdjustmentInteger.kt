@@ -5,17 +5,12 @@ package liang.lollipop.electronicclock.bean
  * @date 2019-09-01 17:50
  * 调整Boolean类型
  */
-class AdjustmentInteger(run: AdjustmentInteger.() -> Unit):
-    AdjustmentInfo() {
+class AdjustmentInteger: AdjustmentInfo() {
 
     var value = 0
 
     var min = 0
     var max = 100
-
-    init {
-        run(this)
-    }
 
     override fun copy(info: AdjustmentInfo) {
         super.copy(info)
