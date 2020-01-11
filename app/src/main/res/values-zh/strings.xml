@@ -193,4 +193,8 @@
     <string name="summary_wheel_minute">不显示分钟</string>
     <string name="title_wheel_second">秒钟</string>
     <string name="summary_wheel_second">不显示秒钟</string>
+    <string name="wheel_time">滚轮时间</string>
+    <string name="title_is_simulation">拟真模式</string>
+    <string name="summary_simulation_enable">拟真模式已开启，可能会影响阅读</string>
+    <string name="summary_simulation_disable">拟真模式已关闭，显示可能会有点呆板</string>
 </resources>

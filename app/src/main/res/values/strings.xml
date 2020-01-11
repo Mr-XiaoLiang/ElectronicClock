@@ -736,4 +736,8 @@
     <string name="summary_wheel_minute">Do not display</string>
     <string name="title_wheel_second">Second</string>
     <string name="summary_wheel_second">Do not display</string>
+    <string name="wheel_time">Wheel Time</string>
+    <string name="title_is_simulation">拟真模式</string>
+    <string name="summary_simulation_enable">拟真模式已开启，可能会影响阅读</string>
+    <string name="summary_simulation_disable">拟真模式已关闭，显示可能会有点呆板</string>
 </resources>

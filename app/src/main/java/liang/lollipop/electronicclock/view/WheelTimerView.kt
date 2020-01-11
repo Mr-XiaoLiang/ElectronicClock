@@ -76,6 +76,22 @@ class WheelTimerView(context: Context, attr: AttributeSet?,
             return timerDrawable.color
         }
 
+    var gridColor: Int
+        set(value) {
+            timerDrawable.backgroundColor = value
+        }
+        get() {
+            return timerDrawable.backgroundColor
+        }
+
+    var showGrid: Boolean
+        set(value) {
+            timerDrawable.showGrid = value
+        }
+        get() {
+            return timerDrawable.showGrid
+        }
+
     fun setPaddingWeight(left: Float, top: Float, right: Float, bottom: Float) {
         timerDrawable.paddings.let {
             it[0] = left

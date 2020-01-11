@@ -60,7 +60,7 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
             // 构造新的对象，以此来避免内部数据操作与外部的直接干涉
             // 但是数据info不做额外的处理，因为本身是final的，不会产生中途的修改
             val selectedData = ArrayList<Info>()
-            if (selected == unselected) {
+            if (selected != unselected) {
                 selectedData.addAll(selected)
             }
             val unselectedData = ArrayList<Info>()

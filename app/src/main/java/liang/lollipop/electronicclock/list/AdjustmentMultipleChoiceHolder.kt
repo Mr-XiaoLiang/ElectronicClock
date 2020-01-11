@@ -17,8 +17,8 @@ import java.lang.StringBuilder
 class AdjustmentMultipleChoiceHolder(view: View): AdjustmentHolder<AdjustmentCheckList>(view) {
 
     companion object {
-        fun create(inflater: LayoutInflater, group: ViewGroup): AdjustmentSelectHolder {
-            return AdjustmentSelectHolder(
+        fun create(inflater: LayoutInflater, group: ViewGroup): AdjustmentMultipleChoiceHolder {
+            return AdjustmentMultipleChoiceHolder(
                 inflater.inflate(R.layout.item_adjustment_select, group, false))
         }
     }
@@ -40,7 +40,8 @@ class AdjustmentMultipleChoiceHolder(view: View): AdjustmentHolder<AdjustmentChe
                     clickView.context) { selected ->
                     info.onSelectedChange(selected)
                     onBind(info)
-                    onValueChangeListener?.onValueChange(this, selected)
+                    onValueChangeListener?.onValueChange(this,
+                        IntArray(selected.size) {selected[it].id})
                 }
             }
         }

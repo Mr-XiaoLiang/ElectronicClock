@@ -261,31 +261,31 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
     }
 
     fun switch(run: AdjustmentBoolean.() -> Unit): AdjustmentBoolean {
-        return AdjustmentBoolean(run)
+        return AdjustmentBoolean().apply(run)
     }
 
     fun seekBar(run: AdjustmentInteger.() -> Unit): AdjustmentInteger {
-        return AdjustmentInteger(run)
+        return AdjustmentInteger().apply(run)
     }
 
     fun colors(run: AdjustmentColor.() -> Unit): AdjustmentColor {
-        return AdjustmentColor(run)
+        return AdjustmentColor().apply(run)
     }
 
     fun paddings(run: AdjustmentPadding.() -> Unit): AdjustmentPadding {
-        return AdjustmentPadding(run)
+        return AdjustmentPadding().apply(run)
     }
 
     fun select(run: AdjustmentSelect.() -> Unit): AdjustmentSelect {
-        return AdjustmentSelect(run)
+        return AdjustmentSelect().apply(run)
     }
 
     fun photos(run: AdjustmentImages.() -> Unit): AdjustmentImages {
-        return AdjustmentImages(run)
+        return AdjustmentImages().apply(run)
     }
 
     fun multiple(run: AdjustmentCheckList.() -> Unit): AdjustmentCheckList {
-        return AdjustmentCheckList(run)
+        return AdjustmentCheckList().apply(run)
     }
 
     protected fun Any.optBoolean(def: Boolean): Boolean {
