@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
-import android.util.Log
 import java.util.*
 import kotlin.math.abs
 
