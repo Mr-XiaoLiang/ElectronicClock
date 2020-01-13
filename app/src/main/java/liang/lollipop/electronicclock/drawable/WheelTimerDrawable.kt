@@ -186,7 +186,7 @@ class WheelTimerDrawable(private val valueProvider: ValueProvider): Drawable(), 
             dayTimeMillis = now / ONE_DAY
             calendar.timeInMillis = now
             monthDayPosition = calendar.get(Calendar.DAY_OF_MONTH) - 1
-            monthPosition = calendar.get(Calendar.MONTH) + 1
+            monthPosition = calendar.get(Calendar.MONTH)
             weekPosition = calendar.get(Calendar.DAY_OF_WEEK) - 1
             monthDayCount = getDayCountByMonth(now)
 
