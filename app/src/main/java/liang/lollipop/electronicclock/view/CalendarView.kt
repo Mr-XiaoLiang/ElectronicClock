@@ -248,9 +248,9 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
             calendar.firstWeek
         } else {
             // 为了防止出现负数，做一点处理
-            (calendar.firstWeek + 7 - 1) % 7
+            (calendar.firstWeek - 1 + 7) % 7
         }
-        val endIndex = if (options.isStartingOnSunday) { 6 }  else { 0 }
+        val endIndex = 6
         // 直接开始排版
         val elementArray = calendar.elementArray
         var x = left + dayWidth * startIndex
@@ -340,6 +340,8 @@ class CalendarView(context: Context, attrs: AttributeSet?, defStyleAttr:Int)
         if (!options.isStartingOnSunday) {
             firstWeek -= 1
         }
+        // 避免-1之后为负数
+        firstWeek = (firstWeek + 7 ) % 7
         val daySize = calendar.elementArray.size + firstWeek
         weekSize = daySize / 7
         // 如果不是完整的周，那么再加一周
