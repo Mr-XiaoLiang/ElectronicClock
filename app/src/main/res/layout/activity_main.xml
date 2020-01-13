@@ -16,40 +16,4 @@
             android:layout_width="0px"
             android:layout_height="0px"/>
 
-    <liang.lollipop.electronicclock.view.NumberView
-            android:id="@+id/numberView1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:background="#FFF"/>
-    <liang.lollipop.electronicclock.view.NumberView
-            android:id="@+id/numberView2"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/numberView1"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:background="#FFF"/>
-    <liang.lollipop.electronicclock.view.NumberView
-            android:id="@+id/numberView3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/numberView2"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:background="#FFF"/>
-    <liang.lollipop.electronicclock.view.NumberView
-            android:id="@+id/numberView4"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/numberView3"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:background="#FFF"/>
-    <liang.lollipop.electronicclock.view.NumberView
-            android:id="@+id/numberView5"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/numberView4"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:background="#FFF"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
