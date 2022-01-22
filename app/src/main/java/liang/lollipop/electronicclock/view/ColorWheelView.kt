@@ -92,7 +92,7 @@ class ColorWheelView(context: Context, attr: AttributeSet?,
             }
         }
 
-        override fun onBoundsChange(bounds: Rect?) {
+        override fun onBoundsChange(bounds: Rect) {
             super.onBoundsChange(bounds)
             drawBounds.set(bounds)
         }

@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.fragment
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,17 +11,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_adjustment_info.*
-import liang.lollipop.electronicclock.R
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.bean.*
+import liang.lollipop.electronicclock.databinding.FragmentAdjustmentInfoBinding
 import liang.lollipop.electronicclock.list.AdjustmentAdapter
-import liang.lollipop.widget.utils.doAsync
-import liang.lollipop.widget.utils.uiThread
 import liang.lollipop.widget.utils.DatabaseHelper
 import liang.lollipop.widget.utils.Utils
+import liang.lollipop.widget.utils.doAsync
+import liang.lollipop.widget.utils.uiThread
 import liang.lollipop.widget.widget.PanelInfo
 
-inline fun <reified T: PanelInfoAdjustmentFragment> T.bindId(id: Int): T {
+inline fun <reified T : PanelInfoAdjustmentFragment> T.bindId(id: Int): T {
     return this.apply {
         arguments = Bundle().apply {
             if (id != PanelInfo.NO_ID) {
@@ -35,7 +36,7 @@ inline fun <reified T: PanelInfoAdjustmentFragment> T.bindId(id: Int): T {
  * @date 2019-08-25 15:23
  * 面板信息调整的Fragment
  */
-abstract class PanelInfoAdjustmentFragment: Fragment() {
+abstract class PanelInfoAdjustmentFragment : Fragment() {
 
     companion object {
         const val ARG_INFO_ID = "ARG_INFO_ID"
@@ -59,37 +60,44 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
 
     private val tmpInfoList = ArrayList<AdjustmentInfo>()
 
+    private val binding: FragmentAdjustmentInfoBinding by lazyBind()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            infoId = it.getString(ARG_INFO_ID)?:""
-            infoValue = it.getString(ARG_INFO_VALUE)?:""
+            infoId = it.getString(ARG_INFO_ID) ?: ""
+            infoValue = it.getString(ARG_INFO_VALUE) ?: ""
         }
     }
 
     fun putInfoValue(value: String) {
-        arguments = (arguments?:Bundle()).apply {
+        arguments = (arguments ?: Bundle()).apply {
             putString(ARG_INFO_VALUE, value)
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_adjustment_info, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView.layoutManager = LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
-        adapter = AdjustmentAdapter(adjustmentInfoList, LayoutInflater.from(context), { info, newValue ->
-            infoChange(info, newValue)
-        }, { intent, requestCode ->
-            infoLoadCallback?.requestActivityForResult(intent, requestCode)
-        })
-        recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager =
+            LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
+        adapter =
+            AdjustmentAdapter(adjustmentInfoList, LayoutInflater.from(context), { info, newValue ->
+                infoChange(info, newValue)
+            }, { intent, requestCode ->
+                infoLoadCallback?.requestActivityForResult(intent, requestCode)
+            })
+        binding.recyclerView.adapter = adapter
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     protected fun notifyDataSetChanged() {
         adapter?.notifyDataSetChanged()
     }
@@ -104,7 +112,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
     private fun inspectAdjustmentInfo() {
         for (info in adjustmentInfoList) {
             if (info.relevantKey.isNotEmpty()) {
-                val relevantInfo = findInfoByKey(info.relevantKey)?:continue
+                val relevantInfo = findInfoByKey(info.relevantKey) ?: continue
                 if (relevantInfo is AdjustmentBoolean) {
                     info.enable = info.relevantEnable == relevantInfo.value
                 }
@@ -133,7 +141,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
         }
     }
 
-    fun findInfoByKey(key: String) : AdjustmentInfo? {
+    fun findInfoByKey(key: String): AdjustmentInfo? {
         if (TextUtils.isEmpty(key)) {
             return null
         }
@@ -227,7 +235,7 @@ abstract class PanelInfoAdjustmentFragment: Fragment() {
                 logE("init panel info from database error:" + e.localizedMessage)
             }) {
                 DatabaseHelper
-                    .read(activity!!)
+                    .read(requireActivity())
                     .findInfoById(infoId) { resultInfo ->
                         uiThread {
                             stopLoading()

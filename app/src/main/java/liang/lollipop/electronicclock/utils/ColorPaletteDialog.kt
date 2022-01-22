@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.utils
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -7,8 +8,9 @@ import android.os.Bundle
 import android.view.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.dialog_color_palette.*
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.databinding.DialogColorPaletteBinding
 import liang.lollipop.electronicclock.list.base.LItemTouchCallback
 import liang.lollipop.electronicclock.list.base.LItemTouchHelper
 import liang.lollipop.electronicclock.view.HuePaletteView
@@ -25,7 +27,9 @@ import kotlin.collections.ArrayList
  * 调色板的对话框
  * @author Lollipop
  */
-class ColorPaletteDialog private constructor(context: Context) : Dialog(context),
+class ColorPaletteDialog private constructor(
+    context: Context
+) : Dialog(context),
     HuePaletteView.HueCallback, SatValPaletteView.HSVCallback,
     TransparencyPaletteView.TransparencyCallback,
     LItemTouchCallback.OnItemTouchCallbackListener {
@@ -37,6 +41,9 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
 
         private const val ERROR_DURATION = 3000L
     }
+
+
+    private val binding: DialogColorPaletteBinding by lazyBind()
 
     private val colorArray = ArrayList<Int>()
     private val hsvTemp = FloatArray(3)
@@ -53,12 +60,14 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
 
     var callback: Callback? = null
 
+    @SuppressLint("NotifyDataSetChanged")
     fun putColors(vararg colors: Int) {
         colorArray.clear()
         colors.forEach { colorArray.add(it) }
         colorAdapter?.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun putColors(colors: ArrayList<Int>) {
         colorArray.clear()
         colorArray.addAll(colors)
@@ -77,7 +86,7 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.dialog_color_palette)
+        setContentView(binding.root)
         initView()
 
         val layoutParams = window?.attributes ?: return
@@ -86,31 +95,33 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
         window?.setWindowAnimations(R.style.dialogAnim)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun initView() {
-        huePalette.hueCallback = this
-        satValPalette.hsvCallback = this
-        transparencyPalette.transparencyCallback = this
+        binding.huePalette.hueCallback = this
+        binding.satValPalette.hsvCallback = this
+        binding.transparencyPalette.transparencyCallback = this
 
-        addBtn.setOnClickListener {
+        binding.addBtn.setOnClickListener {
             addColorToList()
         }
 
-        positiveBtn.setOnClickListener {
+        binding.positiveBtn.setOnClickListener {
             submit()
         }
 
-        negativeBtn.setOnClickListener {
+        binding.negativeBtn.setOnClickListener {
             dismiss()
         }
 
-        colorListView.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        binding.colorListView.layoutManager =
+            LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         colorAdapter = ColorAdapter(colorArray, LayoutInflater.from(context)) { colorHolder ->
             onColorDeleteBtnClick(colorHolder)
         }
-        colorListView.adapter = colorAdapter
+        binding.colorListView.adapter = colorAdapter
         colorAdapter?.notifyDataSetChanged()
 
-        LItemTouchHelper.bindTo(colorListView, this) { canDrag = true }
+        LItemTouchHelper.bindTo(binding.colorListView, this) { canDrag = true }
 
         val initColor = if (colorArray.isEmpty()) {
             Color.RED
@@ -152,15 +163,15 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
     }
 
     private fun showError(value: Int) {
-        errorView.animate().cancel()
-        errorView.alpha = 1F
-        errorView.setText(value)
-        errorView.animate()
+        binding.errorView.animate().cancel()
+        binding.errorView.alpha = 1F
+        binding.errorView.setText(value)
+        binding.errorView.animate()
             .alpha(0F)
             .setDuration(ERROR_DURATION)
             .lifecycleBinding {
                 onEnd {
-                    errorView.text = ""
+                    binding.errorView.text = ""
                     removeThis(it)
                 }
                 onCancel {
@@ -181,13 +192,13 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
 
     private fun selected(color: Int) {
         Color.colorToHSV(color, hsvTemp)
-        huePalette.parser(hsvTemp[0])
-        satValPalette.parser(hsvTemp[1], hsvTemp[2])
-        transparencyPalette.parser(Color.alpha(color))
+        binding.huePalette.parser(hsvTemp[0])
+        binding.satValPalette.parser(hsvTemp[1], hsvTemp[2])
+        binding.transparencyPalette.parser(Color.alpha(color))
     }
 
     override fun onHueSelect(hue: Int) {
-        satValPalette.onHueChange(hue.toFloat())
+        binding.satValPalette.onHueChange(hue.toFloat())
     }
 
     override fun onHSVSelect(hsv: FloatArray, rgb: Int) {
@@ -202,8 +213,8 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
 
     private fun onColorChange() {
         val color = merge()
-        selectedColorView.setStatusColor(color)
-        colorValueView.text = color.colorValue()
+        binding.selectedColorView.setStatusColor(color)
+        binding.colorValueView.text = color.colorValue()
     }
 
     private fun merge(alpha: Int = colorAlpha, rgb: Int = colorRGB): Int {
@@ -235,7 +246,7 @@ class ColorPaletteDialog private constructor(context: Context) : Dialog(context)
         while (builder.length < digit) {
             builder.insert(0, "0")
         }
-        return builder.toString().toUpperCase(Locale.US)
+        return builder.toString().uppercase(Locale.US)
     }
 
     private class ColorAdapter(

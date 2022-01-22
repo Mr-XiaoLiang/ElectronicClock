@@ -1,10 +1,8 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    compileSdk 31
 
     defaultConfig {
         minSdkVersion 21
@@ -20,7 +18,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    viewBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -29,6 +36,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.4.0-alpha02'
     implementation 'androidx.core:core-ktx:1.6.0-alpha02'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation project(path: ':base')
 }
 repositories {
     mavenCentral()

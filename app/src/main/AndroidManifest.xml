@@ -16,7 +16,7 @@
         <service
                 android:name=".service.WidgetWallpaper"
                 android:enabled="true"
-                android:exported="true"></service>
+                android:exported="true" />
 
         <activity android:name=".activity.PrivateAppsSettingActivity" />
         <activity
@@ -30,6 +30,7 @@
         <activity android:name=".activity.EditActivity" />
         <activity
                 android:name=".activity.WidgetActivity"
+                android:exported="true"
                 android:launchMode="singleInstance">
             <intent-filter>
                 <category android:name="android.intent.category.HOME" />
@@ -40,10 +41,11 @@
                 <category android:name="android.intent.category.MONKEY" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity">
+        <activity
+                android:name=".activity.MainActivity"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

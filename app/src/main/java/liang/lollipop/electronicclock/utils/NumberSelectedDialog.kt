@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.utils
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
@@ -11,8 +12,9 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import kotlinx.android.synthetic.main.dialog_number_selected.*
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.databinding.DialogNumberSelectedBinding
 import liang.lollipop.widget.utils.dp
 
 /**
@@ -20,7 +22,7 @@ import liang.lollipop.widget.utils.dp
  * @date 2019-08-15 22:54
  * 数字选择的dialog
  */
-class NumberSelectedDialog(private val builder: Builder): Dialog(builder.context) {
+class NumberSelectedDialog(private val builder: Builder) : Dialog(builder.context) {
 
     companion object {
         const val TEXT_COLOR = Color.WHITE
@@ -35,17 +37,21 @@ class NumberSelectedDialog(private val builder: Builder): Dialog(builder.context
         }
     }
 
+    private val binding: DialogNumberSelectedBinding by lazyBind()
+
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.dialog_number_selected)
-        recyclerView.layoutManager = StaggeredGridLayoutManager(2, RecyclerView.HORIZONTAL)
-        recyclerView.adapter = NumberAdapter(builder.context, builder.min, builder.max, FONT_SIZE) {
-            onNumberSelected(builder.min + it.adapterPosition)
-        }
-        recyclerView.adapter?.notifyDataSetChanged()
+        binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, RecyclerView.HORIZONTAL)
+        binding.recyclerView.adapter =
+            NumberAdapter(builder.context, builder.min, builder.max, FONT_SIZE) {
+                onNumberSelected(builder.min + it.adapterPosition)
+            }
+        binding.recyclerView.adapter?.notifyDataSetChanged()
 
-        titleView.text = builder.title
+        binding.titleView.text = builder.title
 
 //        window?.setBackgroundDrawableResource(android.R.color.transparent)
 
@@ -70,12 +76,13 @@ class NumberSelectedDialog(private val builder: Builder): Dialog(builder.context
         }
     }
 
-    private class NumberAdapter(private val context: Context,
-                                private val min: Int,
-                                private val max: Int,
-                                private val fontSize: Float,
-                                private val onClickListener: (RecyclerView.ViewHolder) -> Unit)
-        : RecyclerView.Adapter<NumberHolder>() {
+    private class NumberAdapter(
+        private val context: Context,
+        private val min: Int,
+        private val max: Int,
+        private val fontSize: Float,
+        private val onClickListener: (RecyclerView.ViewHolder) -> Unit
+    ) : RecyclerView.Adapter<NumberHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NumberHolder {
             return NumberHolder.create(context, fontSize, onClickListener)
@@ -91,11 +98,17 @@ class NumberSelectedDialog(private val builder: Builder): Dialog(builder.context
 
     }
 
-    private class NumberHolder(private val textView: TextView,
-                               private val onClickListener: (RecyclerView.ViewHolder) -> Unit): RecyclerView.ViewHolder(textView) {
+    private class NumberHolder(
+        private val textView: TextView,
+        private val onClickListener: (RecyclerView.ViewHolder) -> Unit
+    ) : RecyclerView.ViewHolder(textView) {
 
         companion object {
-            fun create(context: Context, fontSize: Float, lis: (RecyclerView.ViewHolder) -> Unit): NumberHolder {
+            fun create(
+                context: Context,
+                fontSize: Float,
+                lis: (RecyclerView.ViewHolder) -> Unit
+            ): NumberHolder {
                 val view = TextView(context).apply {
                     textSize = fontSize
                     gravity = Gravity.CENTER
@@ -109,7 +122,7 @@ class NumberSelectedDialog(private val builder: Builder): Dialog(builder.context
         }
 
         init {
-            textView.setOnClickListener{
+            textView.setOnClickListener {
                 onClickListener(this)
             }
         }

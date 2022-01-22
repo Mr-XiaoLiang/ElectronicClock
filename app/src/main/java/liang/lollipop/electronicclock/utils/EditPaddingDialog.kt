@@ -5,14 +5,14 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.telecom.Call
 import android.view.KeyEvent
 import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import com.google.android.material.textfield.TextInputEditText
-import kotlinx.android.synthetic.main.dialog_padding_edit.*
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.databinding.DialogPaddingEditBinding
 import liang.lollipop.electronicclock.view.PaddingView
 import java.text.DecimalFormat
 
@@ -23,12 +23,17 @@ import java.text.DecimalFormat
 class EditPaddingDialog private constructor(context: Context) : Dialog(context) {
 
     companion object {
-        fun create(context: Context, run: (EditPaddingDialog.() -> Unit)? = null) : EditPaddingDialog {
+        fun create(
+            context: Context,
+            run: (EditPaddingDialog.() -> Unit)? = null
+        ): EditPaddingDialog {
             val dialog = EditPaddingDialog(context)
             run?.invoke(dialog)
             return dialog
         }
     }
+
+    private val binding: DialogPaddingEditBinding by lazyBind()
 
     var touchWidthDp = 20F
     var pointRadiusDp = 5F
@@ -56,7 +61,7 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
 
     private val tmpPadding = FloatArray(4)
 
-    fun onPaddingConfirmed(run: (FloatArray) -> Unit) : EditPaddingDialog {
+    fun onPaddingConfirmed(run: (FloatArray) -> Unit): EditPaddingDialog {
         callback = object : Callback {
             override fun onPaddingConfirmed(paddings: FloatArray) {
                 run(paddings)
@@ -79,7 +84,7 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.dialog_padding_edit)
+        setContentView(binding.root)
         initView()
 
         val layoutParams = window?.attributes ?: return
@@ -89,101 +94,120 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
     }
 
     private fun initView() {
-        paddingView.touchWidthDp(touchWidthDp)
-        paddingView.pointRadiusDp(pointRadiusDp)
-        paddingView.borderWidthDp(borderWidthDp)
-        paddingView.color = borderColor
+        binding.paddingView.touchWidthDp(touchWidthDp)
+        binding.paddingView.pointRadiusDp(pointRadiusDp)
+        binding.paddingView.borderWidthDp(borderWidthDp)
+        binding.paddingView.color = borderColor
 
-        positiveBtn.setOnClickListener {
+        binding.positiveBtn.setOnClickListener {
             submit()
         }
 
-        negativeBtn.setOnClickListener {
+        binding.negativeBtn.setOnClickListener {
             dismiss()
         }
 
-        paddingView.onDragEndListener = {
+        binding.paddingView.onDragEndListener = {
             onDragEnd()
         }
-        paddingView.onDragStartListener = {target ->
+        binding.paddingView.onDragStartListener = { target ->
             onDragStart(target)
         }
-        paddingView.onDragMoveListener = { target, left, top, right, bottom ->
+        binding.paddingView.onDragMoveListener = { target, left, top, right, bottom ->
             onDragMove(target, left, top, right, bottom)
         }
-        paddingView.putPaddingValue(tmpPadding[0], tmpPadding[1], tmpPadding[2], tmpPadding[3])
+        binding.paddingView.putPaddingValue(
+            tmpPadding[0],
+            tmpPadding[1],
+            tmpPadding[2],
+            tmpPadding[3]
+        )
 
-        leftInput.onImeDown {
+        binding.leftInput.onImeDown {
             it.clearFocus()
-            val value = formatValueToFloat(it,
-                1 - (paddingView.paddingRight * 1F / paddingView.width))
-            leftInput.setText(value.formatNum())
-            paddingView.setPadding(PaddingView.TouchTarget.Left, value)
+            val value = formatValueToFloat(
+                it,
+                1 - (binding.paddingView.paddingRight * 1F / binding.paddingView.width)
+            )
+            binding.leftInput.setText(value.formatNum())
+            binding.paddingView.setPadding(PaddingView.TouchTarget.Left, value)
         }
-        topInput.onImeDown {
+        binding.topInput.onImeDown {
             it.clearFocus()
-            val value = formatValueToFloat(it,
-                1 - (paddingView.paddingBottom * 1F / paddingView.height))
-            topInput.setText(value.formatNum())
-            paddingView.setPadding(PaddingView.TouchTarget.Top, value)
+            val value = formatValueToFloat(
+                it,
+                1 - (binding.paddingView.paddingBottom * 1F / binding.paddingView.height)
+            )
+            binding.topInput.setText(value.formatNum())
+            binding.paddingView.setPadding(PaddingView.TouchTarget.Top, value)
         }
-        rightInput.onImeDown {
+        binding.rightInput.onImeDown {
             it.clearFocus()
-            val value = formatValueToFloat(it,
-                1 - (paddingView.paddingLeft * 1F / paddingView.width))
-            rightInput.setText(value.formatNum())
-            paddingView.setPadding(PaddingView.TouchTarget.Right, value)
+            val value = formatValueToFloat(
+                it,
+                1 - (binding.paddingView.paddingLeft * 1F / binding.paddingView.width)
+            )
+            binding.rightInput.setText(value.formatNum())
+            binding.paddingView.setPadding(PaddingView.TouchTarget.Right, value)
         }
-        bottomInput.onImeDown {
+        binding.bottomInput.onImeDown {
             it.clearFocus()
-            val value = formatValueToFloat(it,
-                1 - (paddingView.paddingTop * 1F / paddingView.height))
-            bottomInput.setText(value.formatNum())
-            paddingView.setPadding(PaddingView.TouchTarget.Bottom, value)
+            val value = formatValueToFloat(
+                it,
+                1 - (binding.paddingView.paddingTop * 1F / binding.paddingView.height)
+            )
+            binding.bottomInput.setText(value.formatNum())
+            binding.paddingView.setPadding(PaddingView.TouchTarget.Bottom, value)
         }
 
-        onDragMove(PaddingView.TouchTarget.Full, tmpPadding[0], tmpPadding[1], tmpPadding[2], tmpPadding[3])
+        onDragMove(
+            PaddingView.TouchTarget.Full,
+            tmpPadding[0],
+            tmpPadding[1],
+            tmpPadding[2],
+            tmpPadding[3]
+        )
         onDragEnd()
     }
 
     private fun submit() {
         callback?.let {
             val padding = FloatArray(4)
-            padding[0] = paddingView.paddingLeft * 1F / paddingView.width
-            padding[1] = paddingView.paddingTop * 1F / paddingView.height
-            padding[2] = paddingView.paddingRight * 1F / paddingView.width
-            padding[3] = paddingView.paddingBottom * 1F / paddingView.height
+            padding[0] = binding.paddingView.paddingLeft * 1F / binding.paddingView.width
+            padding[1] = binding.paddingView.paddingTop * 1F / binding.paddingView.height
+            padding[2] = binding.paddingView.paddingRight * 1F / binding.paddingView.width
+            padding[3] = binding.paddingView.paddingBottom * 1F / binding.paddingView.height
             it.onPaddingConfirmed(padding)
         }
         dismiss()
     }
 
     private fun onDragEnd() {
-        leftIcon.imageTintList = defaultTint
-        topIcon.imageTintList = defaultTint
-        rightIcon.imageTintList = defaultTint
-        bottomIcon.imageTintList = defaultTint
+        binding.leftIcon.imageTintList = defaultTint
+        binding.topIcon.imageTintList = defaultTint
+        binding.rightIcon.imageTintList = defaultTint
+        binding.bottomIcon.imageTintList = defaultTint
     }
 
     private fun onDragStart(target: PaddingView.TouchTarget) {
         when (target) {
             PaddingView.TouchTarget.Left -> {
-                leftIcon.imageTintList = selectedTint
+                binding.leftIcon.imageTintList = selectedTint
             }
             PaddingView.TouchTarget.Top -> {
-                topIcon.imageTintList = selectedTint
+                binding.topIcon.imageTintList = selectedTint
             }
             PaddingView.TouchTarget.Right -> {
-                rightIcon.imageTintList = selectedTint
+                binding.rightIcon.imageTintList = selectedTint
             }
             PaddingView.TouchTarget.Bottom -> {
-                bottomIcon.imageTintList = selectedTint
+                binding.bottomIcon.imageTintList = selectedTint
             }
             PaddingView.TouchTarget.Full -> {
-                leftIcon.imageTintList = selectedTint
-                topIcon.imageTintList = selectedTint
-                rightIcon.imageTintList = selectedTint
-                bottomIcon.imageTintList = selectedTint
+                binding.leftIcon.imageTintList = selectedTint
+                binding.topIcon.imageTintList = selectedTint
+                binding.rightIcon.imageTintList = selectedTint
+                binding.bottomIcon.imageTintList = selectedTint
             }
             PaddingView.TouchTarget.None -> {
                 // do nothing
@@ -191,25 +215,31 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
         }
     }
 
-    private fun onDragMove(target: PaddingView.TouchTarget, left: Float, top: Float, right: Float, bottom: Float) {
+    private fun onDragMove(
+        target: PaddingView.TouchTarget,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float
+    ) {
         when (target) {
             PaddingView.TouchTarget.Left -> {
-                leftInput.setText(left.formatNum())
+                binding.leftInput.setText(left.formatNum())
             }
             PaddingView.TouchTarget.Top -> {
-                topInput.setText(top.formatNum())
+                binding.topInput.setText(top.formatNum())
             }
             PaddingView.TouchTarget.Right -> {
-                rightInput.setText(right.formatNum())
+                binding.rightInput.setText(right.formatNum())
             }
             PaddingView.TouchTarget.Bottom -> {
-                bottomInput.setText(bottom.formatNum())
+                binding.bottomInput.setText(bottom.formatNum())
             }
             PaddingView.TouchTarget.Full -> {
-                leftInput.setText(left.formatNum())
-                topInput.setText(top.formatNum())
-                rightInput.setText(right.formatNum())
-                bottomInput.setText(bottom.formatNum())
+                binding.leftInput.setText(left.formatNum())
+                binding.topInput.setText(top.formatNum())
+                binding.rightInput.setText(right.formatNum())
+                binding.bottomInput.setText(bottom.formatNum())
             }
             PaddingView.TouchTarget.None -> {
                 // do nothing
@@ -226,7 +256,8 @@ class EditPaddingDialog private constructor(context: Context) : Dialog(context) 
             if (actionId == EditorInfo.IME_ACTION_SEND
                 || actionId == EditorInfo.IME_ACTION_DONE ||
                 (KeyEvent.KEYCODE_ENTER == event?.keyCode
-                        && KeyEvent.ACTION_DOWN == event.action)) {
+                        && KeyEvent.ACTION_DOWN == event.action)
+            ) {
                 run(v as TextInputEditText)
             }
             return@setOnEditorActionListener false

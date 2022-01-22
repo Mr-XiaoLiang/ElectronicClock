@@ -1,5 +1,6 @@
 package liang.lollipop.electronicclock.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +9,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import kotlinx.android.synthetic.main.activity_private_apps_setting.*
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.databinding.ActivityPrivateAppsSettingBinding
 import liang.lollipop.electronicclock.utils.LauncherHelper
 import liang.lollipop.widget.utils.doAsync
 import liang.lollipop.widget.utils.uiThread
@@ -21,8 +23,7 @@ import liang.lollipop.widget.utils.uiThread
  */
 class PrivateAppsSettingActivity: BottomNavigationActivity() {
 
-    override val contentViewId: Int
-        get() = R.layout.activity_private_apps_setting
+    private val binding: ActivityPrivateAppsSettingBinding by lazyBind()
 
     private val appList = ArrayList<LauncherHelper.AppInfo>()
 
@@ -48,19 +49,24 @@ class PrivateAppsSettingActivity: BottomNavigationActivity() {
                 selectedList.add(info)
             }
         }, { selectedList.contains(it) })
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = StaggeredGridLayoutManager(4, RecyclerView.VERTICAL)
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = StaggeredGridLayoutManager(4, RecyclerView.VERTICAL)
 
-        recyclerView.post {
-            recyclerView.layoutManager?.let { manager ->
+        binding.recyclerView.post {
+            binding.recyclerView.layoutManager?.let { manager ->
                 if (manager is StaggeredGridLayoutManager) {
                     val itemWidth = resources.getDimensionPixelSize(R.dimen.launcher_item_width)
-                    manager.spanCount = recyclerView.width / itemWidth
+                    manager.spanCount = binding.recyclerView.width / itemWidth
                 }
             }
         }
     }
 
+    override fun createContentView(): View {
+        return binding.root
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
     private fun initData() {
         startContentLoading()
         doAsync {
@@ -68,7 +74,7 @@ class PrivateAppsSettingActivity: BottomNavigationActivity() {
             appList.addAll(0, selectedList)
             uiThread {
                 stopContentLoading()
-                recyclerView.adapter?.notifyDataSetChanged()
+                binding.recyclerView.adapter?.notifyDataSetChanged()
             }
         }
     }

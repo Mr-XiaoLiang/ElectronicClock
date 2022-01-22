@@ -13,6 +13,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Handler
+import android.os.Looper
 import android.util.SparseArray
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.utils.*
@@ -221,7 +222,7 @@ class WidgetHelper private constructor(private val activity: Context,
     /**
      * 用于做延时任务的Handler
      */
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
 
     /**
      * 每秒更新的任务，用于每秒触发一次页面更新任务

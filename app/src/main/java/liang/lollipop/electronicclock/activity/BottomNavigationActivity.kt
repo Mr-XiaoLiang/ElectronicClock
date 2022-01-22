@@ -3,102 +3,95 @@ package liang.lollipop.electronicclock.activity
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_bottom_navigation.*
+import liang.lollipop.base.WindowInsetsHelper
+import liang.lollipop.base.fixInsetsByPadding
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.databinding.ActivityBottomNavigationBinding
 
 /**
  * @author lollipop
  * @date 2019-08-13 22:28
  * 底部操作栏的Activity
  */
-open class BottomNavigationActivity: BaseActivity() {
+abstract class BottomNavigationActivity : BaseActivity() {
 
-    companion object {
-        private const val DEF_LAYOUT_ID = R.layout.activity_bottom_navigation
-    }
+    private val binding: ActivityBottomNavigationBinding by lazyBind()
 
-    protected open val contentViewId = 0
-
-    protected open val layoutId = DEF_LAYOUT_ID
+    protected val fab: FloatingActionButton
+        get() {
+            return binding.fab
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (layoutId != 0) {
-            setContentView(layoutId)
-            if (layoutId == DEF_LAYOUT_ID) {
-                isPaddingToolbarWithInset = false
-                transparentSystemUI()
-                initInsetListener(rootGroup)
-                bindToolBar(appBarLayout)
-                fab.hide()
-                contentGroup.post {
-                    contentGroup.setPadding(0, 0, 0, appBarLayout.height)
-                }
-                if (contentViewId != 0) {
-                    layoutInflater.inflate(contentViewId, contentGroup, true)
-                }
-                contentLoading.putColor(Color.WHITE,
-                    ContextCompat.getColor(this, R.color.colorPrimary),
-                    ContextCompat.getColor(this, R.color.colorAccent))
+        setContentView(binding.root)
+        initView()
+    }
+
+    private fun initView() {
+        transparentSystemUI()
+        bindToolBar(binding.appBarLayout)
+        binding.fab.hide()
+        binding.contentGroup.post {
+            binding.contentGroup.setPadding(
+                0,
+                0,
+                0,
+                binding.appBarLayout.height
+            )
+        }
+        createContentView()?.let {
+            if (it.layoutParams == null) {
+                binding.contentGroup.addView(
+                    it,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            } else {
+                binding.contentGroup.addView(it)
             }
         }
+        binding.contentLoading.putColor(
+            Color.WHITE,
+            ContextCompat.getColor(this, R.color.colorPrimary),
+            ContextCompat.getColor(this, R.color.colorAccent)
+        )
+        binding.rootGroup.fixInsetsByPadding(WindowInsetsHelper.Edge.HEADER)
     }
 
-    override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
-        super.onWindowInsetsChange(left, top, right, bottom)
-        if (layoutId == DEF_LAYOUT_ID) {
-            val newInset = filterRootGroupInset(left, top, right, bottom)
-            rootGroup.setPadding(newInset[0], newInset[1], newInset[2], 0)
-        }
-    }
-
-    open fun filterRootGroupInset(left: Int, top: Int, right: Int, bottom: Int): IntArray {
-        return intArrayOf(left, top, right, bottom)
-    }
+    abstract fun createContentView(): View?
 
     protected fun showFAB(icon: Int, run: ((FloatingActionButton) -> Unit)? = null) {
-        fab.setImageResource(icon)
-        fab.show()
-        run?.invoke(fab)
-    }
-
-    protected fun getFab(run: (FloatingActionButton?) -> Unit) {
-        run(if (layoutId == DEF_LAYOUT_ID) { fab } else { null })
+        binding.fab.setImageResource(icon)
+        binding.fab.show()
+        run?.invoke(binding.fab)
     }
 
     protected fun Snackbar.avoidWeight(): Snackbar {
-        if (layoutId == DEF_LAYOUT_ID) {
-            if (fab.isShown) {
-                this.anchorView = fab
-            } else {
-                this.anchorView = appBarLayout
-            }
+        if (binding.fab.isShown) {
+            this.anchorView = binding.fab
+        } else {
+            this.anchorView = binding.appBarLayout
         }
         return this
     }
 
     protected fun startContentLoading() {
-        contentLoading.show()
+        binding.contentLoading.show()
     }
 
     protected fun stopContentLoading() {
-        contentLoading.hide()
+        binding.contentLoading.hide()
     }
 
     private fun transparentSystemUI() {
-        val attributes = window.attributes
-        attributes.systemUiVisibility = (
-                attributes.systemUiVisibility or
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-        window.clearFlags(
-            WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+        WindowInsetsHelper.initWindowFlag(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = 0
         window.navigationBarColor = ContextCompat.getColor(this, R.color.navigationBarColor)

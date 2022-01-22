@@ -2,18 +2,19 @@ package liang.lollipop.electronicclock.activity
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.OrientationEventListener
 import android.view.WindowManager
-import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_widget.*
-import liang.lollipop.electronicclock.R
-import liang.lollipop.electronicclock.utils.*
+import liang.lollipop.base.WindowInsetsHelper
+import liang.lollipop.base.fixInsetsByPadding
+import liang.lollipop.base.lazyBind
+import liang.lollipop.electronicclock.databinding.ActivityWidgetBinding
+import liang.lollipop.electronicclock.utils.BroadcastHelper
+import liang.lollipop.electronicclock.utils.PreferenceHelper
+import liang.lollipop.electronicclock.utils.clockOrientation
+import liang.lollipop.electronicclock.utils.gridSize
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
-import liang.lollipop.widget.utils.Utils
-import liang.lollipop.widget.utils.dp
 
 /**
  * 小部件展示的页面
@@ -21,9 +22,9 @@ import liang.lollipop.widget.utils.dp
  */
 class WidgetActivity : BaseActivity() {
 
-    private lateinit var widgetHelper: WidgetHelper
+    private val binding: ActivityWidgetBinding by lazyBind()
 
-    private val logger = Utils.loggerI("WidgetActivity")
+    private lateinit var widgetHelper: WidgetHelper
 
     private var orientationEventListener: OrientationEventListener? = null
 
@@ -32,15 +33,14 @@ class WidgetActivity : BaseActivity() {
         setScreenOrientation()
         fullScreen()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setContentView(R.layout.activity_widget)
-        initInsetListener(rootGroup)
+        setContentView(binding.root)
         initView()
         initData()
 
         broadcastHelper.addActions(BroadcastHelper.ACTION_WIDGET_INFO_CHANGE)
         broadcastHelper.register(this)
 
-        orientationEventListener = object: OrientationEventListener(this) {
+        orientationEventListener = object : OrientationEventListener(this) {
             override fun onOrientationChanged(orientation: Int) {
                 fullScreen()
             }
@@ -53,20 +53,21 @@ class WidgetActivity : BaseActivity() {
             BroadcastHelper.ACTION_WIDGET_INFO_CHANGE -> {
                 initData()
             }
-            else -> { }
+            else -> {}
         }
     }
 
     private fun initView() {
-        widgetGroup.lockedGrid = true
-        widgetGroup.gridCount = this.gridSize
-        widgetHelper = PreferenceHelper.createWidgetHelper(this, widgetGroup)
+        binding.widgetGroup.lockedGrid = true
+        binding.widgetGroup.gridCount = this.gridSize
+        widgetHelper = PreferenceHelper.createWidgetHelper(this, binding.widgetGroup)
             .onCantLayout {
-            for (panel in it) {
-                widgetHelper.removePanel(panel)
+                for (panel in it) {
+                    widgetHelper.removePanel(panel)
+                }
             }
-        }
         widgetHelper.isInEditMode = false
+        binding.widgetGroup.fixInsetsByPadding(WindowInsetsHelper.Edge.ALL)
     }
 
     private fun setScreenOrientation() {
@@ -80,9 +81,9 @@ class WidgetActivity : BaseActivity() {
     private fun initData() {
         widgetHelper.updateByDB { status ->
             if (status == WidgetHelper.LoadStatus.START) {
-                loadingView.show()
+                binding.loadingView.show()
             } else {
-                loadingView.hide()
+                binding.loadingView.hide()
                 if (widgetHelper.panelCount < 1) {
                     onWidgetEmpty()
                 }
@@ -91,9 +92,12 @@ class WidgetActivity : BaseActivity() {
     }
 
     private fun onWidgetEmpty() {
-        widgetGroup.post {
+        binding.widgetGroup.post {
             val clockPanelInfo = ClockPanelInfo()
-            clockPanelInfo.sizeChange(widgetGroup.spanCountX, widgetGroup.spanCountY)
+            clockPanelInfo.sizeChange(
+                binding.widgetGroup.spanCountX,
+                binding.widgetGroup.spanCountY
+            )
             clockPanelInfo.offset(0, 0)
             widgetHelper.addPanel(clockPanelInfo)
         }
@@ -114,12 +118,6 @@ class WidgetActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         broadcastHelper.unregister(this)
-    }
-
-    override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
-        super.onWindowInsetsChange(left, top, right, bottom)
-        logger("onWindowInsetsChange($left, $top, $right, $bottom)")
-        widgetGroup.setPadding(left, top, right, bottom)
     }
 
 }

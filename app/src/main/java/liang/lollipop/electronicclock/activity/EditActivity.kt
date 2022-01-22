@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -14,10 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_edit.*
+import liang.lollipop.base.WindowInsetsHelper
+import liang.lollipop.base.fixInsetsByPadding
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
 import liang.lollipop.electronicclock.bean.ActionInfo
 import liang.lollipop.electronicclock.bean.WidgetInfo
+import liang.lollipop.electronicclock.databinding.ActivityEditBinding
+import liang.lollipop.electronicclock.edit.EditAction
 import liang.lollipop.electronicclock.list.ActionAdapter
 import liang.lollipop.electronicclock.utils.*
 import liang.lollipop.guidelinesview.Guidelines
@@ -53,29 +58,7 @@ class EditActivity : BaseActivity() {
         private const val MIN_LOAD_TIME = 500L
     }
 
-    /**
-     * 操作意图的ID
-     */
-    private object ActionId {
-        /** 删除 **/
-        const val DELETE = -1
-        /** 完成 **/
-        const val DONE = 0
-        /** 返回 **/
-        const val BACK = 1
-        /** 系统小部件 **/
-        const val WIDGET = 2
-        /** 预览 **/
-        const val PREVIEW = 3
-        /** 颜色反转 **/
-        const val INVERTED = 4
-        /** 自动亮度 **/
-        const val AUTO_LIGHT = 5
-        /** 重置 **/
-        const val RESET = 6
-        /** 调整 **/
-        const val ADJUSTMENT = 7
-    }
+    private val binding: ActivityEditBinding by lazyBind()
 
     private val logger = Utils.loggerI("EditActivity")
 
@@ -91,7 +74,11 @@ class EditActivity : BaseActivity() {
      */
     private val actionList: RecyclerView
         get() {
-            return if (isPortrait) { rightList } else { bottomList }
+            return if (isPortrait) {
+                binding.rightList
+            } else {
+                binding.bottomList
+            }
         }
 
     /**
@@ -101,7 +88,11 @@ class EditActivity : BaseActivity() {
      */
     private val widgetList: RecyclerView
         get() {
-            return if (isPortrait) { bottomList } else { rightList }
+            return if (isPortrait) {
+                binding.bottomList
+            } else {
+                binding.rightList
+            }
         }
 
     private var startLoadingTime = 0L
@@ -120,9 +111,8 @@ class EditActivity : BaseActivity() {
         setScreenOrientation()
         fullScreen()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit)
+        setContentView(binding.root)
         isPortrait = this.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        initInsetListener(rootGroup)
         initView()
         initActions()
         initWidgets()
@@ -135,13 +125,14 @@ class EditActivity : BaseActivity() {
     private fun initGuidelines() {
         isShowGuidelines = getPreferences(SHOW_EDIT_GUIDELINES, true)
         if (isShowGuidelines) {
-            widgetGroup.onPanelAddedListener {
+            binding.widgetGroup.onPanelAddedListener {
                 if (isShowGuidelines && it.view != null) {
                     isShowGuidelines = false
-                    Guidelines.target(it.view!!).showIn(this).value(R.string.guidelines_panel_item).onClose {
-                        putPreferences(SHOW_EDIT_GUIDELINES, false)
-                        widgetGroup.onPanelAddedListener(null)
-                    }.show()
+                    Guidelines.target(it.view!!).showIn(this).value(R.string.guidelines_panel_item)
+                        .onClose {
+                            putPreferences(SHOW_EDIT_GUIDELINES, false)
+                            binding.widgetGroup.onPanelAddedListener(null)
+                        }.show()
                 }
             }
         }
@@ -153,24 +144,24 @@ class EditActivity : BaseActivity() {
             BroadcastHelper.ACTION_WIDGET_INFO_CHANGE -> {
                 onInfoChange = true
             }
-            else -> { }
+            else -> {}
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initView() {
         // 退出预览模式的按钮
-        exitPreviewBtn.setOnClickListener {
+        binding.exitPreviewBtn.setOnClickListener {
             isPreview(false)
         }
 
         // 绘制格子在屏幕上，以便观察屏幕
-        widgetGroup.drawGrid = true
-        widgetGroup.gridColor = Color.GRAY
-        widgetGroup.scaleX
+        binding.widgetGroup.drawGrid = true
+        binding.widgetGroup.gridColor = Color.GRAY
 
-        widgetGroup.gridCount = this.gridSize
+        binding.widgetGroup.gridCount = this.gridSize
         // 通过辅助类来完成标准小部件容器的事件绑定
-        widgetHelper = PreferenceHelper.createWidgetHelper(this, widgetGroup).let {
+        widgetHelper = PreferenceHelper.createWidgetHelper(this, binding.widgetGroup).let {
             it.isAutoInverted = false
             it.canDrag = true
             it.isInEditMode = true
@@ -187,56 +178,59 @@ class EditActivity : BaseActivity() {
         }
 
 
-        loadView.setOnTouchListener { _, _ -> true }
+        binding.loadView.setOnTouchListener { _, _ -> true }
+
+        binding.rootGroup.fixInsetsByPadding(WindowInsetsHelper.Edge.ALL)
     }
 
     /**
      * 初始化控制按钮的列表
      */
+    @SuppressLint("NotifyDataSetChanged")
     private fun initActions() {
         actionInfoArray.add(
             ActionInfo(
-                ActionId.BACK,
+                EditAction.BACK,
                 R.drawable.ic_arrow_back_black_24dp,
                 R.string.action_back
             ),
             ActionInfo(
-                ActionId.DONE,
+                EditAction.DONE,
                 R.drawable.ic_done_black_24dp,
                 R.string.action_done
             ),
             ActionInfo(
-                ActionId.ADJUSTMENT,
+                EditAction.ADJUSTMENT,
                 R.drawable.ic_settings_black_24dp,
                 R.string.action_adjustment
             ),
             ActionInfo(
-                ActionId.DELETE,
+                EditAction.DELETE,
                 R.drawable.ic_delete_black_24dp,
                 R.string.action_delete
             ),
             ActionInfo(
-                ActionId.WIDGET,
+                EditAction.WIDGET,
                 R.drawable.ic_dashboard_black_24dp,
                 R.string.action_widget
             ),
             ActionInfo(
-                ActionId.PREVIEW,
+                EditAction.PREVIEW,
                 R.drawable.ic_visibility_black_24dp,
                 R.string.action_preview
             ),
             ActionInfo(
-                ActionId.INVERTED,
+                EditAction.INVERTED,
                 R.drawable.ic_invert_colors_black_24dp,
                 R.string.action_inverted
             ),
             ActionInfo(
-                ActionId.AUTO_LIGHT,
+                EditAction.AUTO_LIGHT,
                 R.drawable.ic_brightness_auto_black_24dp,
                 R.string.action_auto_light
             ),
             ActionInfo(
-                ActionId.RESET,
+                EditAction.RESET,
                 R.drawable.ic_replay_black_24dp,
                 R.string.action_reset
             )
@@ -245,19 +239,28 @@ class EditActivity : BaseActivity() {
         val adapter = ActionAdapter(actionInfoArray, layoutInflater, true) { holder ->
             onActionSelected(actionInfoArray[holder.adapterPosition].action)
         }
-        val orientation = if (isPortrait) { RecyclerView.VERTICAL } else { RecyclerView.HORIZONTAL }
+        val orientation = if (isPortrait) {
+            RecyclerView.VERTICAL
+        } else {
+            RecyclerView.HORIZONTAL
+        }
         actionList.layoutManager = LinearLayoutManager(this, orientation, false)
         actionList.adapter = adapter
         adapter.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun initWidgets() {
         widgetInfoArray.addAll(LPanelProviders.getWidgetInfoList())
 
         val adapter = ActionAdapter(widgetInfoArray, layoutInflater, false) { holder ->
             onWidgetSelected(widgetInfoArray[holder.adapterPosition])
         }
-        val orientation = if (isPortrait) { RecyclerView.HORIZONTAL } else { RecyclerView.VERTICAL }
+        val orientation = if (isPortrait) {
+            RecyclerView.HORIZONTAL
+        } else {
+            RecyclerView.VERTICAL
+        }
         widgetList.layoutManager = StaggeredGridLayoutManager(2, orientation)
         widgetList.adapter = adapter
         adapter.notifyDataSetChanged()
@@ -315,46 +318,50 @@ class EditActivity : BaseActivity() {
      * 当操作按钮被点击时的事件处理方法
      * @param action 时间的id
      */
-    private fun onActionSelected(action: Int) {
-        when(action) {
+    private fun onActionSelected(action: EditAction) {
+        when (action) {
             // 返回
-            ActionId.BACK -> {
+            EditAction.BACK -> {
                 onBackPressed()
             }
             // 删除当前选中的小部件
-            ActionId.DELETE -> {
+            EditAction.DELETE -> {
                 widgetHelper.removeSelectedPanel()
             }
             // 完成并保存
-            ActionId.DONE -> {
-                widgetHelper.saveToDB{
+            EditAction.DONE -> {
+                widgetHelper.saveToDB {
                     if (it == WidgetHelper.LoadStatus.START) {
                         startLoading()
                     } else {
                         stopLoading()
-                        Snackbar.make(widgetGroup, R.string.saved, Snackbar.LENGTH_LONG).show()
+                        Snackbar.make(
+                            binding.widgetGroup,
+                            R.string.saved,
+                            Snackbar.LENGTH_LONG
+                        ).show()
                         initData()
                     }
                 }
             }
             // 选择并添加系统小部件
-            ActionId.WIDGET -> {
+            EditAction.WIDGET -> {
                 widgetHelper.selectAppWidget()
             }
             // 启动预览模式
-            ActionId.PREVIEW -> {
+            EditAction.PREVIEW -> {
                 isPreview(true)
             }
             // 反色调整
-            ActionId.INVERTED -> {
+            EditAction.INVERTED -> {
                 widgetHelper.isInverted = !widgetHelper.isInverted
             }
             // 自动亮度
-            ActionId.AUTO_LIGHT -> {
+            EditAction.AUTO_LIGHT -> {
                 widgetHelper.isAutoLight = !widgetHelper.isAutoLight
             }
             // 重置数据
-            ActionId.RESET -> {
+            EditAction.RESET -> {
                 alert {
                     // 设置对话框内容
                     setMessage(R.string.dialog_message_reset)
@@ -372,10 +379,14 @@ class EditActivity : BaseActivity() {
                 }
             }
             // 调整小部件
-            ActionId.ADJUSTMENT -> {
-                val selectedPanel = widgetGroup.selectedPanel
+            EditAction.ADJUSTMENT -> {
+                val selectedPanel = binding.widgetGroup.selectedPanel
                 if (selectedPanel == null) {
-                    Snackbar.make(widgetGroup, R.string.must_place_widget, Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(
+                        binding.widgetGroup,
+                        R.string.must_place_widget,
+                        Snackbar.LENGTH_LONG
+                    ).show()
                     return
                 }
                 if (selectedPanel is SystemWidgetPanel) {
@@ -384,7 +395,11 @@ class EditActivity : BaseActivity() {
                 }
                 val intent = selectedPanel.panelInfo.getIntent()
                 if (intent == null) {
-                    Snackbar.make(widgetGroup, R.string.no_adjusted_panels, Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(
+                        binding.widgetGroup,
+                        R.string.no_adjusted_panels,
+                        Snackbar.LENGTH_LONG
+                    ).show()
                     return
                 }
                 startActivity(intent)
@@ -401,44 +416,39 @@ class EditActivity : BaseActivity() {
     }
 
     private fun isPreview(value: Boolean) {
-        val groupAnimator = widgetGroup.animate()
+        val groupAnimator = binding.widgetGroup.animate()
         groupAnimator.cancel()
 
-        val rightAnimator = rightList.animate()
+        val rightAnimator = binding.rightList.animate()
         rightAnimator.cancel()
 
-        val bottomAnimator = bottomList.animate()
+        val bottomAnimator = binding.bottomList.animate()
         bottomAnimator.cancel()
         if (value) {
-            exitPreviewBtn.visibility = View.VISIBLE
-            logger("widgetGroup-mini:[${widgetGroup.width}, ${widgetGroup.height}]")
+            binding.exitPreviewBtn.visibility = View.VISIBLE
+            logger("widgetGroup-mini:[${binding.widgetGroup.width}, ${binding.widgetGroup.height}]")
             groupAnimator
                 .scaleX(1F)
                 .scaleY(1F)
-                .setListener(object: AnimatorListenerAdapter() {
+                .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator?) {
                         super.onAnimationEnd(animation)
                         groupAnimator.setListener(null)
-                        widgetGroup.drawGrid = false
-                        logger("widgetGroup-expand:[${widgetGroup.width}, ${widgetGroup.height}]")
+                        binding.widgetGroup.drawGrid = false
+                        logger("widgetGroup-expand:[${binding.widgetGroup.width}, ${binding.widgetGroup.height}]")
                     }
                 }).start()
-            rightAnimator.translationX(rightList.width.toFloat()).start()
-            bottomAnimator.translationY(bottomList.height.toFloat()).start()
+            rightAnimator.translationX(binding.rightList.width.toFloat()).start()
+            bottomAnimator.translationY(binding.bottomList.height.toFloat()).start()
         } else {
-            widgetGroup.drawGrid = true
-            exitPreviewBtn.visibility = View.INVISIBLE
+            binding.widgetGroup.drawGrid = true
+            binding.exitPreviewBtn.visibility = View.INVISIBLE
             groupAnimator.scaleX(0.8F).scaleY(0.8F).start()
             rightAnimator.translationX(0F).start()
             bottomAnimator.translationY(0F).start()
         }
-        widgetGroup.lockedTouch = value
-        widgetGroup.selectedPanel = null
-    }
-
-    override fun onWindowInsetsChange(left: Int, top: Int, right: Int, bottom: Int) {
-        super.onWindowInsetsChange(left, top, right, bottom)
-        rootGroup.setPadding(left, top, right, bottom)
+        binding.widgetGroup.lockedTouch = value
+        binding.widgetGroup.selectedPanel = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -460,16 +470,16 @@ class EditActivity : BaseActivity() {
 
     private fun startLoading() {
         startLoadingTime = System.currentTimeMillis()
-        loadView.alpha = 0F
-        val animate = loadView.animate()
+        binding.loadView.alpha = 0F
+        val animate = binding.loadView.animate()
         animate.cancel()
         animate.alpha(1F)
-            .setListener(object: AnimatorListenerAdapter() {
+            .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationStart(animation: Animator?) {
                     super.onAnimationStart(animation)
                     animate.setListener(null)
-                    loadView.visibility = View.VISIBLE
-                    loadProgressBar.isIndeterminate = true
+                    binding.loadView.visibility = View.VISIBLE
+                    binding.loadProgressBar.isIndeterminate = true
                 }
             }).start()
     }
@@ -477,18 +487,18 @@ class EditActivity : BaseActivity() {
     private fun stopLoading() {
         val diff = MIN_LOAD_TIME + startLoadingTime - System.currentTimeMillis()
         if (diff > 0) {
-            loadView.postDelayed({ stopLoading() }, diff)
+            binding.loadView.postDelayed({ stopLoading() }, diff)
             return
         }
-        val animate = loadView.animate()
+        val animate = binding.loadView.animate()
         animate.cancel()
         animate.alpha(0F)
-            .setListener(object: AnimatorListenerAdapter() {
+            .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
                     super.onAnimationEnd(animation)
                     animate.setListener(null)
-                    loadView.visibility = View.INVISIBLE
-                    loadProgressBar.isIndeterminate = false
+                    binding.loadView.visibility = View.INVISIBLE
+                    binding.loadProgressBar.isIndeterminate = false
                 }
             }).start()
     }

@@ -1,6 +1,6 @@
 package liang.lollipop.electronicclock.utils
 
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
 import android.os.Bundle
@@ -14,30 +14,35 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.dialog_check_list.*
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
-import java.lang.RuntimeException
+import liang.lollipop.electronicclock.databinding.DialogCheckListBinding
 
 /**
  * @author lollipop
  * @date 2020-01-01 15:30
  * 可以选择的列表对话框
  */
-class CheckListDialog private constructor(private val selectedList: ArrayList<Info>,
-                      private val unselectedList: ArrayList<Info>,
-                      private val maxSize: Int,
-                      private val onCheckedListener: (ArrayList<Info>) -> Unit): BottomSheetDialogFragment() {
+class CheckListDialog private constructor(
+    private val selectedList: ArrayList<Info>,
+    private val unselectedList: ArrayList<Info>,
+    private val maxSize: Int,
+    private val onCheckedListener: (ArrayList<Info>) -> Unit
+) : BottomSheetDialogFragment() {
 
     companion object {
 
-        fun show(selected: ArrayList<Info>,
-                       unselected: ArrayList<Info>,
-                       maxSize: Int,
-                       context: Context,
-                       tag: String = "CheckListDialog",
-                       onChecked: (ArrayList<Info>) -> Unit) {
-            val fragmentManager = findFragmentManager(context)?:throw RuntimeException(
-                    "Context is not a FragmentActivity")
+        fun show(
+            selected: ArrayList<Info>,
+            unselected: ArrayList<Info>,
+            maxSize: Int,
+            context: Context,
+            tag: String = "CheckListDialog",
+            onChecked: (ArrayList<Info>) -> Unit
+        ) {
+            val fragmentManager = findFragmentManager(context) ?: throw RuntimeException(
+                "Context is not a FragmentActivity"
+            )
             show(selected, unselected, maxSize, fragmentManager, tag, onChecked)
         }
 
@@ -51,12 +56,14 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
             return null
         }
 
-        fun show(selected: ArrayList<Info>,
-                 unselected: ArrayList<Info>,
-                 maxSize: Int,
-                 fragmentManager: FragmentManager,
-                 tag: String = "CheckListDialog",
-                 onChecked: (ArrayList<Info>) -> Unit) {
+        fun show(
+            selected: ArrayList<Info>,
+            unselected: ArrayList<Info>,
+            maxSize: Int,
+            fragmentManager: FragmentManager,
+            tag: String = "CheckListDialog",
+            onChecked: (ArrayList<Info>) -> Unit
+        ) {
             // 构造新的对象，以此来避免内部数据操作与外部的直接干涉
             // 但是数据info不做额外的处理，因为本身是final的，不会产生中途的修改
             val selectedData = ArrayList<Info>()
@@ -65,9 +72,14 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
             }
             val unselectedData = ArrayList<Info>()
             unselectedData.addAll(unselected)
-            CheckListDialog(selectedData, unselectedData, maxSize, onChecked).show(fragmentManager, tag)
+            CheckListDialog(selectedData, unselectedData, maxSize, onChecked).show(
+                fragmentManager,
+                tag
+            )
         }
     }
+
+    private val binding: DialogCheckListBinding by lazyBind()
 
     private val floatingTitleListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -76,37 +88,48 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
                 val adapter = recyclerView.adapter as Adapter
                 val lastItem = layoutManager.findFirstCompletelyVisibleItemPosition()
                 if (lastItem == adapter.unselectedTitlePosition) {
-                    val top = layoutManager.findViewByPosition(lastItem)?.top?:0
-                    val height = floatTitle.height * 1F
-                    floatTitle.translationY = if (top > height) { 0F } else { top - height }
-                    floatTitle.findViewById<TextView>(R.id.titleView)
+                    val top = layoutManager.findViewByPosition(lastItem)?.top ?: 0
+                    val height = binding.floatTitle.root.height * 1F
+                    binding.floatTitle.root.translationY = if (top > height) {
+                        0F
+                    } else {
+                        top - height
+                    }
+                    binding.floatTitle.root.findViewById<TextView>(R.id.titleView)
                         .setText(R.string.title_check_list_selected)
                 } else {
-                    floatTitle.translationY = 0F
-                    floatTitle.findViewById<TextView>(R.id.titleView)
-                        .setText(if (lastItem < adapter.unselectedTitlePosition) {
-                            R.string.title_check_list_selected
-                        } else {
-                            R.string.title_check_list_unselected
-                        })
+                    binding.floatTitle.root.translationY = 0F
+                    binding.floatTitle.root.findViewById<TextView>(R.id.titleView)
+                        .setText(
+                            if (lastItem < adapter.unselectedTitlePosition) {
+                                R.string.title_check_list_selected
+                            } else {
+                                R.string.title_check_list_unselected
+                            }
+                        )
                 }
             }
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.dialog_check_list, container, false)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView.layoutManager = LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
-        recyclerView.adapter = Adapter(selectedList, unselectedList,
+        binding.recyclerView.layoutManager = LinearLayoutManager(view.context, RecyclerView.VERTICAL, false)
+        binding.recyclerView.adapter = Adapter(
+            selectedList, unselectedList,
             getString(R.string.title_check_list_selected),
-            getString(R.string.title_check_list_unselected), maxSize, layoutInflater)
-        recyclerView.addOnScrollListener(floatingTitleListener)
-        recyclerView.adapter?.notifyDataSetChanged()
+            getString(R.string.title_check_list_unselected), maxSize, layoutInflater
+        )
+        binding.recyclerView.addOnScrollListener(floatingTitleListener)
+        binding.recyclerView.adapter?.notifyDataSetChanged()
     }
 
     override fun onDetach() {
@@ -122,7 +145,7 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
         unselectedTitle: String,
         private val maxSelectedSize: Int,
         private val layoutInflater: LayoutInflater
-    ): RecyclerView.Adapter<Item>() {
+    ) : RecyclerView.Adapter<Item>() {
 
         companion object {
             private const val TYPE_ITEM = 0
@@ -148,11 +171,15 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
 
         val emptyInfoPosition: Int
             get() {
-                return if (selectedData.isEmpty()) { 1 } else { -1 }
+                return if (selectedData.isEmpty()) {
+                    1
+                } else {
+                    -1
+                }
             }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Item {
-            return when(viewType) {
+            return when (viewType) {
                 TYPE_EMPTY -> EmptyItem.create(layoutInflater, parent)
                 TYPE_TITLE -> TitleItem.create(layoutInflater, parent)
                 else -> DefaultItem.create(layoutInflater, parent).onItemClick {
@@ -259,7 +286,7 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
 
     }
 
-    private open class Item(view: View): RecyclerView.ViewHolder(view), View.OnClickListener {
+    private open class Item(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         private var onItemClickListener: ((Int) -> Unit)? = null
 
@@ -279,13 +306,15 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
         }
     }
 
-    private class EmptyItem private constructor(view: View): Item(view) {
+    private class EmptyItem private constructor(view: View) : Item(view) {
 
         companion object {
             fun create(layoutInflater: LayoutInflater, parent: ViewGroup): EmptyItem {
                 return EmptyItem(
                     layoutInflater.inflate(
-                        R.layout.item_check_list, parent, false))
+                        R.layout.item_check_list, parent, false
+                    )
+                )
             }
         }
 
@@ -298,13 +327,15 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
         }
     }
 
-    private class DefaultItem private constructor(view: View): Item(view) {
+    private class DefaultItem private constructor(view: View) : Item(view) {
 
         companion object {
             fun create(layoutInflater: LayoutInflater, parent: ViewGroup): DefaultItem {
                 return DefaultItem(
                     layoutInflater.inflate(
-                        R.layout.item_check_list, parent, false))
+                        R.layout.item_check_list, parent, false
+                    )
+                )
             }
         }
 
@@ -316,13 +347,15 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
         }
     }
 
-    private class TitleItem private constructor(view: View): Item(view) {
+    private class TitleItem private constructor(view: View) : Item(view) {
 
         companion object {
             fun create(layoutInflater: LayoutInflater, parent: ViewGroup): TitleItem {
                 return TitleItem(
                     layoutInflater.inflate(
-                        R.layout.item_check_list_title, parent, false))
+                        R.layout.item_check_list_title, parent, false
+                    )
+                )
             }
         }
 
@@ -336,7 +369,7 @@ class CheckListDialog private constructor(private val selectedList: ArrayList<In
 
     data class Info(val name: String, val id: Int) {
         override fun equals(other: Any?): Boolean {
-            other?:return false
+            other ?: return false
             if (other is Info) {
                 return this.id == other.id
             }

@@ -2,6 +2,7 @@ package liang.lollipop.electronicclock.activity
 
 import android.Manifest
 import android.animation.Animator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -25,9 +26,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_bottom_navigation.*
-import kotlinx.android.synthetic.main.activity_select.*
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.databinding.ActivitySelectBinding
 import liang.lollipop.guidelinesview.util.*
 
 
@@ -57,14 +58,14 @@ class ImageSelectActivity : BottomNavigationActivity() {
         }
 
         fun getUriList(data: Intent?): Array<Uri> {
-            data?:return Array(0) { Uri.EMPTY }
-            val uriList = data.getStringArrayListExtra(ARG_RESULT_URI)?:return Array(0) { Uri.EMPTY }
+            data ?: return Array(0) { Uri.EMPTY }
+            val uriList =
+                data.getStringArrayListExtra(ARG_RESULT_URI) ?: return Array(0) { Uri.EMPTY }
             return Array(uriList.size) { i -> Uri.parse(uriList[i]) }
         }
     }
 
-    override val contentViewId: Int
-        get() = R.layout.activity_select
+    private val binding: ActivitySelectBinding by lazyBind()
 
     private var maxSize = 0
 
@@ -91,10 +92,12 @@ class ImageSelectActivity : BottomNavigationActivity() {
         )
 
         override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-            return CursorLoader(this@ImageSelectActivity,
+            return CursorLoader(
+                this@ImageSelectActivity,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 IMAGE_PROJECTION, "$SIZE > 0 AND $MIME_TYPE = ? OR $MIME_TYPE = ? ",
-                arrayOf("image/jpeg", "image/png"),"$DATE_ADDED DESC")
+                arrayOf("image/jpeg", "image/png"), "$DATE_ADDED DESC"
+            )
         }
 
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
@@ -107,8 +110,10 @@ class ImageSelectActivity : BottomNavigationActivity() {
             val name = data.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME)
             while (data.moveToNext()) {
                 val imageId = data.getLong(id)
-                val imageUri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    "$imageId")
+                val imageUri = Uri.withAppendedPath(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    "$imageId"
+                )
                 val imageName = data.getString(name)
                 imageList.add(ImageBean(imageUri, imageName))
             }
@@ -121,6 +126,7 @@ class ImageSelectActivity : BottomNavigationActivity() {
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -129,7 +135,11 @@ class ImageSelectActivity : BottomNavigationActivity() {
         showFAB(R.drawable.ic_done_black_24dp) { fab ->
             fab.setOnClickListener {
                 if (selectedList.isEmpty()) {
-                    Snackbar.make(imageListView, R.string.toast_result_empty, Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(
+                        binding.imageListView,
+                        R.string.toast_result_empty,
+                        Snackbar.LENGTH_LONG
+                    ).show()
                     return@setOnClickListener
                 }
                 setResult(Activity.RESULT_OK, Intent().apply {
@@ -143,22 +153,28 @@ class ImageSelectActivity : BottomNavigationActivity() {
             }
         }
 
-        imageListView.layoutManager = GridLayoutManager(this, 4,
-            RecyclerView.VERTICAL, false)
-        imageListView.adapter = adapter
+        binding.imageListView.layoutManager = GridLayoutManager(
+            this, 4,
+            RecyclerView.VERTICAL, false
+        )
+        binding.imageListView.adapter = adapter
         adapter.notifyDataSetChanged()
 
         initImages()
 
-        when (PermissionChecker.checkCallingOrSelfPermission(this,
-            Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        when (PermissionChecker.checkCallingOrSelfPermission(
+            this,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )) {
             PermissionChecker.PERMISSION_GRANTED -> {
                 bindLoader()
             }
             PermissionChecker.PERMISSION_DENIED -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                        REQUEST_PERMISSION)
+                    requestPermissions(
+                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        REQUEST_PERMISSION
+                    )
                 }
             }
             else -> {
@@ -169,8 +185,13 @@ class ImageSelectActivity : BottomNavigationActivity() {
 
     }
 
+    override fun createContentView(): View {
+        return binding.root
+    }
+
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when (requestCode) {
@@ -216,13 +237,14 @@ class ImageSelectActivity : BottomNavigationActivity() {
             selectedChange()
             return true
         }
-        Snackbar.make(imageListView, R.string.toast_already_max, Snackbar.LENGTH_LONG).avoidWeight().show()
+        Snackbar.make(binding.imageListView, R.string.toast_already_max, Snackbar.LENGTH_LONG)
+            .avoidWeight().show()
 
         return false
     }
 
     private fun selectedChange() {
-        sizeView.text = if (maxSize > 0) {
+        binding.sizeView.text = if (maxSize > 0) {
             "${selectedList.size} / $maxSize"
         } else {
             "${selectedList.size}"
@@ -235,16 +257,17 @@ class ImageSelectActivity : BottomNavigationActivity() {
         startContentLoading()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun onLoaded() {
         stopContentLoading()
         if (imageList.isEmpty()) {
-            emptyIcon.visibility = View.VISIBLE
-            emptyText.visibility = View.VISIBLE
+            binding.emptyIcon.visibility = View.VISIBLE
+            binding.emptyText.visibility = View.VISIBLE
         } else {
-            emptyIcon.visibility = View.INVISIBLE
-            emptyText.visibility = View.INVISIBLE
+            binding.emptyIcon.visibility = View.INVISIBLE
+            binding.emptyText.visibility = View.INVISIBLE
 
-            imageListView.layoutManager?.let { manager ->
+            binding.imageListView.layoutManager?.let { manager ->
                 if (manager is GridLayoutManager) {
                     manager.spanCount = when {
                         imageList.size < 10 -> 2
@@ -267,12 +290,13 @@ class ImageSelectActivity : BottomNavigationActivity() {
         private val data: ArrayList<ImageBean>,
         private val layoutInflater: LayoutInflater,
         private val isChecked: (ImageBean) -> Boolean,
-        private val onClick: (Int) -> Boolean): RecyclerView.Adapter<ImageHolder>() {
+        private val onClick: (Int) -> Boolean
+    ) : RecyclerView.Adapter<ImageHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
             return ImageHolder.createHolder(layoutInflater, parent,
-                {holder -> isChecked(data[holder.adapterPosition])},
-                {holder -> onClick(holder.adapterPosition)})
+                { holder -> isChecked(data[holder.adapterPosition]) },
+                { holder -> onClick(holder.adapterPosition) })
         }
 
         override fun getItemCount(): Int {
@@ -288,19 +312,27 @@ class ImageSelectActivity : BottomNavigationActivity() {
     private data class ImageBean(val uri: Uri, val name: String)
 
     private class ImageHolder
-        private constructor(view: View,
-                            private val isChecked: (ImageHolder) -> Boolean,
-                            private val onClick: (ImageHolder) -> Boolean): RecyclerView.ViewHolder(view) {
+    private constructor(
+        view: View,
+        private val isChecked: (ImageHolder) -> Boolean,
+        private val onClick: (ImageHolder) -> Boolean
+    ) : RecyclerView.ViewHolder(view) {
         companion object {
-            fun createHolder(layoutInflater: LayoutInflater, parent: ViewGroup,
-                             isChecked: (ImageHolder) -> Boolean,
-                             onClick: (ImageHolder) -> Boolean): ImageHolder {
-                return ImageHolder(layoutInflater.inflate(
-                    R.layout.item_image_select, parent, false), isChecked, onClick)
+            fun createHolder(
+                layoutInflater: LayoutInflater, parent: ViewGroup,
+                isChecked: (ImageHolder) -> Boolean,
+                onClick: (ImageHolder) -> Boolean
+            ): ImageHolder {
+                return ImageHolder(
+                    layoutInflater.inflate(
+                        R.layout.item_image_select, parent, false
+                    ), isChecked, onClick
+                )
             }
 
             private val glideOption = RequestOptions().error(R.drawable.ic_broken_image_white_24dp)
-            private val fadeFactory = DrawableCrossFadeFactory.Builder(300).setCrossFadeEnabled(true).build()
+            private val fadeFactory =
+                DrawableCrossFadeFactory.Builder(300).setCrossFadeEnabled(true).build()
         }
 
         private val photoView: ImageView = view.findViewById(R.id.photoView)

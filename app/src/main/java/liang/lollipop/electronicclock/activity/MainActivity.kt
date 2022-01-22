@@ -5,9 +5,10 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_bottom_navigation.*
-import kotlinx.android.synthetic.main.activity_main.*
+import android.view.View
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.databinding.ActivityMainBinding
 import liang.lollipop.electronicclock.utils.PreferenceHelper
 import liang.lollipop.electronicclock.utils.getPreferences
 import liang.lollipop.electronicclock.utils.putPreferences
@@ -24,8 +25,7 @@ class MainActivity : BottomNavigationActivity() {
         private const val SHOW_START_BTN_GUIDELINES = "MAIN_ACTIVITY_SHOW_START_BTN_GUIDELINES"
     }
 
-    override val contentViewId: Int
-        get() = R.layout.activity_main
+    private val binding: ActivityMainBinding by lazyBind()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,16 +35,22 @@ class MainActivity : BottomNavigationActivity() {
                 startActivity(Intent(this, WidgetActivity::class.java))
             }
         }
-        PreferenceHelper.bindPreferenceGroup(preferenceGroup)
+        PreferenceHelper.bindPreferenceGroup(binding.preferenceGroup)
 
         showGuidelines()
     }
 
+    override fun createContentView(): View {
+        return binding.root
+    }
+
     private fun showGuidelines() {
         if (getPreferences(SHOW_START_BTN_GUIDELINES, true)) {
-            Guidelines.target(fab).showIn(this).value(R.string.guidelines_start_btn).onClose {
-                putPreferences(SHOW_START_BTN_GUIDELINES, false)
-            }.show()
+            Guidelines.target(fab)
+                .showIn(this)
+                .value(R.string.guidelines_start_btn).onClose {
+                    putPreferences(SHOW_START_BTN_GUIDELINES, false)
+                }.show()
         }
     }
 

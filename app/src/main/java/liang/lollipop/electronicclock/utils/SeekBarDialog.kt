@@ -5,8 +5,9 @@ import android.content.Context
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
-import kotlinx.android.synthetic.main.dialog_seekbar.*
+import liang.lollipop.base.lazyBind
 import liang.lollipop.electronicclock.R
+import liang.lollipop.electronicclock.databinding.DialogSeekbarBinding
 import liang.lollipop.electronicclock.view.AutoSeekBar
 
 /**
@@ -14,7 +15,8 @@ import liang.lollipop.electronicclock.view.AutoSeekBar
  * @author Lollipop
  * @date 2019/09/03
  */
-class SeekBarDialog private constructor(context: Context): Dialog(context), AutoSeekBar.OnProgressChangeListener {
+class SeekBarDialog private constructor(context: Context) : Dialog(context),
+    AutoSeekBar.OnProgressChangeListener {
 
     companion object {
 
@@ -22,6 +24,8 @@ class SeekBarDialog private constructor(context: Context): Dialog(context), Auto
             return SeekBarDialog(context).apply(run)
         }
     }
+
+    private val binding: DialogSeekbarBinding by lazyBind()
 
     var title = ""
     var value = 0
@@ -42,26 +46,26 @@ class SeekBarDialog private constructor(context: Context): Dialog(context), Auto
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.dialog_seekbar)
+        setContentView(binding.root)
         initView()
 
-        val layoutParams = window?.attributes?:return
+        val layoutParams = window?.attributes ?: return
         layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
         window?.attributes = layoutParams
         window?.setWindowAnimations(R.style.dialogAnim)
     }
 
     private fun initView() {
-        titleView.text = title
-        seekBar.max = max.toFloat()
-        seekBar.min = min.toFloat()
-        seekBar.onProgressChangeListener = this
-        seekBar.progress = value.toFloat()
+        binding.titleView.text = title
+        binding.seekBar.max = max.toFloat()
+        binding.seekBar.min = min.toFloat()
+        binding.seekBar.onProgressChangeListener = this
+        binding.seekBar.progress = value.toFloat()
 
-        negativeBtn.setOnClickListener {
+        binding.negativeBtn.setOnClickListener {
             dismiss()
         }
-        positiveBtn.setOnClickListener {
+        binding.positiveBtn.setOnClickListener {
             onProgressConfirmListener?.onProgressConfirm(value)
             dismiss()
         }
@@ -69,7 +73,7 @@ class SeekBarDialog private constructor(context: Context): Dialog(context), Auto
 
     override fun onProgressChange(view: AutoSeekBar, progress: Float) {
         value = progress.toInt()
-        valueView.text = "$value"
+        binding.valueView.text = "$value"
     }
 
     interface OnProgressConfirmListener {

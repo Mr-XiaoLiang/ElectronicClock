@@ -6,6 +6,9 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.PointF
+import android.os.Build
+import android.os.Bundle
+import android.util.SizeF
 import android.view.*
 import android.widget.FrameLayout
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
@@ -67,7 +70,11 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
 
     override fun onSizeChange(width: Int, height: Int) {
         super.onSizeChange(width, height)
-        widgetView.updateAppWidgetSize(null, width, height, width, height)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            widgetView.updateAppWidgetSize(Bundle(), listOf(SizeF(width.toFloat(), height.toFloat())))
+        } else {
+            widgetView.updateAppWidgetSize(null, width, height, width, height)
+        }
         widgetView.requestLayout()
     }
 
