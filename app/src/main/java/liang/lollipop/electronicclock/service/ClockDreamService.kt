@@ -9,7 +9,7 @@ import liang.lollipop.electronicclock.utils.PreferenceHelper
 import liang.lollipop.electronicclock.view.ContentLoadingProgressBar
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.info.ClockPanelInfo
-import liang.lollipop.widget.widget.WidgetGroup
+import liang.lollipop.widget.widget.GridWidgetGroup
 
 /**
  * @author lollipop
@@ -21,7 +21,7 @@ class ClockDreamService: DreamService() {
 
     private var widgetHelper: WidgetHelper? = null
 
-    private val widgetGroup: WidgetGroup?
+    private val widgetGroup: GridWidgetGroup?
         get() {
             return findViewById(R.id.widgetGroup)
         }

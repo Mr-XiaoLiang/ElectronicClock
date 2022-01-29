@@ -15,7 +15,7 @@ import liang.lollipop.electronicclock.bean.PreferenceNumber
 import liang.lollipop.electronicclock.list.PreferenceAdapter
 import liang.lollipop.widget.WidgetHelper
 import liang.lollipop.widget.utils.dp
-import liang.lollipop.widget.widget.WidgetGroup
+import liang.lollipop.widget.widget.GridWidgetGroup
 
 /**
  * @author lollipop
@@ -47,7 +47,7 @@ object PreferenceHelper {
         return PreferenceHelperImpl(group)
     }
 
-    fun createWidgetHelper(activity: Context, widgetGroup: WidgetGroup): WidgetHelper {
+    fun createWidgetHelper(activity: Context, widgetGroup: GridWidgetGroup): WidgetHelper {
         return WidgetHelper.with(activity, widgetGroup).let {
             it.dragStrokeWidth = activity.resources.dp(20F)
             it.selectedBorderWidth = activity.resources.dp(2F)

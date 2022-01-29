@@ -56,6 +56,11 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
      */
     var customClick = true
 
+    /**
+     * 当两个面板重叠时，会优先触发优先级高的View
+     */
+    var priority: Int = 0
+
     fun callOnClick(v: View? = null) {
         onClick(v ?: view)
     }

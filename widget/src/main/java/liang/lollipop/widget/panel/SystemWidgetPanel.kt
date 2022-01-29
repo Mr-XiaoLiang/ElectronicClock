@@ -14,7 +14,7 @@ import android.widget.FrameLayout
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.Panel
-import liang.lollipop.widget.widget.WidgetGroup
+import liang.lollipop.widget.widget.GridWidgetGroup
 import kotlin.math.abs
 
 
@@ -33,7 +33,7 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
         }
     }
 
-    override fun updatePanelInfo(group: WidgetGroup) {
+    override fun updatePanelInfo(group: GridWidgetGroup) {
         super.updatePanelInfo(group)
         if (panelInfo.updateSpanByGroup) {
             return

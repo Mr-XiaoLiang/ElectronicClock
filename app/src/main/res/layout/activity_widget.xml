@@ -9,7 +9,7 @@
         android:id="@+id/rootGroup"
         android:background="@android:color/black">
 
-    <liang.lollipop.widget.widget.WidgetGroup
+    <liang.lollipop.widget.widget.GridWidgetGroup
             android:id="@+id/widgetGroup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
