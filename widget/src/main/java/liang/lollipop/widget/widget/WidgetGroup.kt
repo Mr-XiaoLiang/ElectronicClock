@@ -108,7 +108,7 @@ open class WidgetGroup(
         /**
          * 用来绘制选中面板边框效果的回调函数
          */
-        fun onDrawSelectedPanel(panel: Panel<*>, mode: AbsolutelyWidgetGroup.DragMode, canvas: Canvas)
+        fun onDrawSelectedPanel(panel: Panel<*>, mode: DragMode, canvas: Canvas)
 
         /**
          * 子View的点击事件

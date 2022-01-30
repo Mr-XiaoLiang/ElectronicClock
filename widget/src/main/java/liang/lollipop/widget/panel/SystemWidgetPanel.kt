@@ -13,8 +13,9 @@ import android.view.*
 import android.widget.FrameLayout
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.utils.Utils
-import liang.lollipop.widget.widget.Panel
 import liang.lollipop.widget.widget.GridWidgetGroup
+import liang.lollipop.widget.widget.Panel
+import liang.lollipop.widget.widget.WidgetGroup
 import kotlin.math.abs
 
 
@@ -23,8 +24,10 @@ import kotlin.math.abs
  * @date 2019-08-05 13:24
  * 系统小部件的面板
  */
-class SystemWidgetPanel(info: SystemWidgetPanelInfo,
-                        private val widgetView: AppWidgetHostView): Panel<SystemWidgetPanelInfo>(info) {
+class SystemWidgetPanel(
+    info: SystemWidgetPanelInfo,
+    private val widgetView: AppWidgetHostView
+) : Panel<SystemWidgetPanelInfo>(info) {
 
     companion object {
         private fun pointInView(v: View, localX: Float, localY: Float, slop: Int): Boolean {
@@ -33,8 +36,16 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
         }
     }
 
-    override fun updatePanelInfo(group: GridWidgetGroup) {
+    override fun updatePanelInfo(group: WidgetGroup) {
         super.updatePanelInfo(group)
+        if (group is GridWidgetGroup) {
+            updateByGrid(group)
+        } else {
+            // TODO
+        }
+    }
+
+    private fun updateByGrid(group: GridWidgetGroup) {
         if (panelInfo.updateSpanByGroup) {
             return
         }
@@ -71,7 +82,10 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
     override fun onSizeChange(width: Int, height: Int) {
         super.onSizeChange(width, height)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            widgetView.updateAppWidgetSize(Bundle(), listOf(SizeF(width.toFloat(), height.toFloat())))
+            widgetView.updateAppWidgetSize(
+                Bundle(),
+                listOf(SizeF(width.toFloat(), height.toFloat()))
+            )
         } else {
             widgetView.updateAppWidgetSize(null, width, height, width, height)
         }
@@ -102,7 +116,7 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
         widgetView.callOnClick()
     }
 
-    private class LongPressGroup(context: Context): FrameLayout(context) {
+    private class LongPressGroup(context: Context) : FrameLayout(context) {
 
         private val logger = Utils.loggerI("LongPressGroup")
 
@@ -162,7 +176,8 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
                     val y = ev.y
                     if (!pointInView(this, x, y, slop)
                         || abs(x - touchDown.x) > slop
-                        || abs(y - touchDown.y) > slop) {
+                        || abs(y - touchDown.y) > slop
+                    ) {
                         longPressHelper.cancelLongPress()
                         logger("ACTION_MOVE -> cancelLongPress")
                     }
@@ -206,10 +221,11 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
 
         private var longPressPending: CheckForLongPress? = null
 
-        private inner class CheckForLongPress: Runnable {
+        private inner class CheckForLongPress : Runnable {
             override fun run() {
                 if (targetView.parent != null && targetView.hasWindowFocus()
-                    && !hasPerformedLongPress) {
+                    && !hasPerformedLongPress
+                ) {
                     logger("CheckForLongPress.run")
                     val handled = targetView.performLongClick()
                     if (handled) {
@@ -240,21 +256,23 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
 
     }
 
-    class StylusEventHelper(private val onPressed: ((view: View) -> Boolean)?,
-                            private val onReleased: ((view: View) -> Boolean)?,
-                            private val targetView: View) {
+    class StylusEventHelper(
+        private val onPressed: ((view: View) -> Boolean)?,
+        private val onReleased: ((view: View) -> Boolean)?,
+        private val targetView: View
+    ) {
 
         var isButtonPressed: Boolean = false
         private val slop = ViewConfiguration.get(targetView.context).scaledTouchSlop
 
         fun onMotionEvent(event: MotionEvent?): Boolean {
-            event?:return false
+            event ?: return false
             val stylusButtonPressed = isStylusButtonPressed(event)
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     isButtonPressed = stylusButtonPressed
                     if (isButtonPressed) {
-                        return onPressed?.invoke(targetView)?:false
+                        return onPressed?.invoke(targetView) ?: false
                     }
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -263,15 +281,15 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
                     }
                     if (!isButtonPressed && stylusButtonPressed) {
                         isButtonPressed = true
-                        return onPressed?.invoke(targetView)?:false
+                        return onPressed?.invoke(targetView) ?: false
                     } else if (isButtonPressed && !stylusButtonPressed) {
                         isButtonPressed = false
-                        return onReleased?.invoke(targetView)?:false
+                        return onReleased?.invoke(targetView) ?: false
                     }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> if (isButtonPressed) {
                     isButtonPressed = false
-                    return onReleased?.invoke(targetView)?:false
+                    return onReleased?.invoke(targetView) ?: false
                 }
             }
             return false
@@ -282,7 +300,6 @@ class SystemWidgetPanel(info: SystemWidgetPanelInfo,
                     && event.buttonState and MotionEvent.BUTTON_SECONDARY == MotionEvent.BUTTON_SECONDARY
         }
     }
-
 
 
 }
