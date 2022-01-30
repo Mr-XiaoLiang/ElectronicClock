@@ -17,10 +17,7 @@ import android.os.Looper
 import android.util.SparseArray
 import liang.lollipop.widget.info.SystemWidgetPanelInfo
 import liang.lollipop.widget.utils.*
-import liang.lollipop.widget.widget.Panel
-import liang.lollipop.widget.widget.PanelAdapter
-import liang.lollipop.widget.widget.PanelInfo
-import liang.lollipop.widget.widget.WidgetGroup
+import liang.lollipop.widget.widget.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -31,11 +28,11 @@ import kotlin.math.min
  * 小部件辅助器
  */
 class WidgetHelper private constructor(private val activity: Context,
-                                       private val widgetGroup: WidgetGroup,
+                                       private val widgetGroup: GridWidgetGroup,
                                        private val hostId: Int = AppWidgetHelper.DEF_HOST_ID) {
 
     companion object {
-        fun with(context: Context, group: WidgetGroup): WidgetHelper {
+        fun with(context: Context, group: GridWidgetGroup): WidgetHelper {
             return WidgetHelper(context, group)
         }
 
