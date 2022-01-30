@@ -31,6 +31,11 @@ class AbsolutelyWidgetGroup(
     constructor(context: Context, attr: AttributeSet?) : this(context, attr, 0)
     constructor(context: Context) : this(context, null)
 
+    /**
+     * 自定义绘制及优先级顺序的列表
+     * 它主要存在于可以重叠的布局中
+     * 因为GridWidgetGroup不允许重叠，所以不需要考虑优先级
+     */
     private val priorityList = ArrayList<Panel<*>>()
 
     /**
@@ -66,6 +71,7 @@ class AbsolutelyWidgetGroup(
             panel.updatePanelLifecycle(true)
         }
         listener?.onPanelAdded(panel)
+        notifyPanelPriorityChanged()
         return true
     }
 
@@ -81,6 +87,7 @@ class AbsolutelyWidgetGroup(
         if (panelList.remove(panel)) {
             super.removeView(panel.view)
         }
+        priorityList.remove(panel)
     }
 
     /**
@@ -127,11 +134,26 @@ class AbsolutelyWidgetGroup(
     }
 
     override fun getChildDrawingOrder(childCount: Int, drawingPosition: Int): Int {
+        // 如果序号是在重排序的面板集合范围内，那么尝试从其中拿
+        if (drawingPosition in priorityList.indices) {
+            val panel = priorityList[drawingPosition]
+            // 找到真实的序号
+            val index = indexOfChild(panel.view)
+            if (index >= 0) {
+                return index
+            }
+        }
         return super.getChildDrawingOrder(childCount, drawingPosition)
     }
 
+    /**
+     * 通知并发起一次优先级的重排序
+     */
     fun notifyPanelPriorityChanged() {
-        // TODO
+        priorityList.clear()
+        priorityList.addAll(panelList)
+        priorityList.sortBy { it.priority }
+        invalidate()
     }
 
 
