@@ -9,6 +9,7 @@ import java.util.*
 
 /**
  * 绝对位置小部件管理器
+ * 大过年的写什么代码，醉了
  */
 class AbsolutelyWidgetGroup(
     context: Context,
