@@ -1,6 +1,7 @@
 package liang.lollipop.widget.widget
 
 import android.content.Context
+import android.graphics.PointF
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -53,6 +54,16 @@ class AbsolutelyWidgetGroup(
      * 子View的长按点击事件
      */
     private var childLongClickListener: ((panel: Panel<*>) -> Boolean)? = null
+
+    /**
+     * 当前活跃的手指的id
+     */
+    private var activeTouchId = -1
+
+    /**
+     * 上次手指的位置
+     */
+    private var lastTouchLocation = PointF()
 
     /**
      * 添加面板
