@@ -21,6 +21,7 @@ class AbsolutelyWidgetGroup(
 
     companion object {
         private val logger = Utils.loggerI("AbsolutelyWeightGroup")
+        private const val NO_ID = -1
     }
 
     constructor(context: Context, attr: AttributeSet?, defStyleAttr: Int) : this(
@@ -64,6 +65,34 @@ class AbsolutelyWidgetGroup(
      * 上次手指的位置
      */
     private var lastTouchLocation = PointF()
+
+    /**
+     * 手指按下的时间戳
+     */
+    private var touchDownTime = 0L
+
+    /**
+     * 是否是拖拽模式
+     */
+    private val isDragState: Boolean
+        get() {
+            return selectedPanel != null
+        }
+
+    /**
+     * 拖拽模式
+     */
+    private var dragMode = DragMode.None
+
+    /**
+     * 锁定拖动和尺寸改变
+     */
+    var lockedBuild = false
+
+    /**
+     * 锁定手指事件
+     */
+    var lockedTouch = false
 
     /**
      * 添加面板
