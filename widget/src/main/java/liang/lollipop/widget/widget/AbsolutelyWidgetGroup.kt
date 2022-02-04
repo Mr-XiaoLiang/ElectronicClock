@@ -5,6 +5,7 @@ import android.graphics.PointF
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import liang.lollipop.widget.utils.Utils
 import java.util.*
 
@@ -129,6 +130,22 @@ class AbsolutelyWidgetGroup(
             super.removeView(panel.view)
         }
         priorityList.remove(panel)
+    }
+
+    override fun performClick(): Boolean {
+        return if (isDragState && dragMode != DragMode.None) {
+            false
+        } else {
+            super.performClick()
+        }
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        return super.onInterceptTouchEvent(ev)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return super.onTouchEvent(event)
     }
 
     /**
