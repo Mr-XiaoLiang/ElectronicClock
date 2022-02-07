@@ -149,10 +149,22 @@ class AbsolutelyWidgetGroup(
         }
         ev ?: return super.onInterceptTouchEvent(ev)
 
+        // TODO
+
         return super.onInterceptTouchEvent(ev)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (lockedTouch) {
+            return true
+        }
+        if (lockedBuild) {
+            return false
+        }
+        event ?: return super.onTouchEvent(event)
+
+        // TODO
+
         return super.onTouchEvent(event)
     }
 
