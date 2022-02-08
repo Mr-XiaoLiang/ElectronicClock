@@ -149,9 +149,24 @@ class AbsolutelyWidgetGroup(
         }
         ev ?: return super.onInterceptTouchEvent(ev)
 
+        when(ev.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+
+            }
+            MotionEvent.ACTION_MOVE -> {
+
+            }
+            MotionEvent.ACTION_UP -> {
+
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+
+            }
+        }
+
         // TODO
 
-        return super.onInterceptTouchEvent(ev)
+        return isDragState || super.onInterceptTouchEvent(ev)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -163,9 +178,22 @@ class AbsolutelyWidgetGroup(
         }
         event ?: return super.onTouchEvent(event)
 
-        // TODO
+        when(event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
 
-        return super.onTouchEvent(event)
+            }
+            MotionEvent.ACTION_MOVE -> {
+
+            }
+            MotionEvent.ACTION_UP -> {
+
+            }
+            MotionEvent.ACTION_POINTER_UP -> {
+
+            }
+        }
+        // TODO
+        return isDragState || super.onTouchEvent(event)
     }
 
     /**
