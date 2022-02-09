@@ -1,5 +1,6 @@
 package liang.lollipop.widget.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.PointF
 import android.graphics.Rect
@@ -145,55 +146,79 @@ class AbsolutelyWidgetGroup(
             return true
         }
         if (lockedBuild) {
-            return false
+            return super.onInterceptTouchEvent(ev)
         }
         ev ?: return super.onInterceptTouchEvent(ev)
 
         when(ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-
+                onTouchDown(ev)
             }
             MotionEvent.ACTION_MOVE -> {
-
+                onTouchMove(ev)
             }
             MotionEvent.ACTION_UP -> {
-
+                onTouchUp(ev)
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                onTouchUp(ev)
             }
             MotionEvent.ACTION_POINTER_UP -> {
-
+                onTouchPointUp(ev)
             }
         }
-
-        // TODO
 
         return isDragState || super.onInterceptTouchEvent(ev)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (lockedTouch) {
             return true
         }
         if (lockedBuild) {
-            return false
+            return super.onTouchEvent(event)
         }
         event ?: return super.onTouchEvent(event)
 
         when(event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-
+                onTouchDown(event)
             }
             MotionEvent.ACTION_MOVE -> {
-
+                onTouchMove(event)
             }
             MotionEvent.ACTION_UP -> {
-
+                onTouchUp(event)
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                onTouchUp(event)
             }
             MotionEvent.ACTION_POINTER_UP -> {
-
+                onTouchPointUp(event)
             }
         }
-        // TODO
         return isDragState || super.onTouchEvent(event)
+    }
+
+    private fun onTouchDown(event: MotionEvent) {
+        // TODO
+    }
+
+    private fun onTouchMove(event: MotionEvent) {
+        // TODO
+    }
+
+    private fun onTouchUp(event: MotionEvent) {
+        // TODO
+    }
+
+    private fun onTouchCancel(event: MotionEvent) {
+        // TODO
+    }
+
+    private fun onTouchPointUp(event: MotionEvent) {
+        // TODO
     }
 
     /**
