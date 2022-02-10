@@ -7,6 +7,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import liang.lollipop.widget.utils.Utils
 import java.util.*
 
@@ -150,7 +151,7 @@ class AbsolutelyWidgetGroup(
         }
         ev ?: return super.onInterceptTouchEvent(ev)
 
-        when(ev.actionMasked) {
+        when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 onTouchDown(ev)
             }
@@ -181,7 +182,7 @@ class AbsolutelyWidgetGroup(
         }
         event ?: return super.onTouchEvent(event)
 
-        when(event.actionMasked) {
+        when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 onTouchDown(event)
             }
@@ -219,6 +220,18 @@ class AbsolutelyWidgetGroup(
 
     private fun onTouchPointUp(event: MotionEvent) {
         // TODO
+    }
+
+    private fun findPanelByLocation(x: Float, y: Float): Panel<*>? {
+        for (panel in priorityList) {
+            panel.view?.let { child ->
+                if (child.left <= x && child.right >= x
+                    && child.top <= y && child.bottom >= y) {
+                    return panel
+                }
+            }
+        }
+        return null
     }
 
     /**
