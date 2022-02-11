@@ -234,6 +234,91 @@ class AbsolutelyWidgetGroup(
         return null
     }
 
+    private fun touchInSelectedPanel(x: Int, y: Int): Boolean {
+        logger("touchInSelectedPanel")
+        dragMode = DragMode.None
+        val rect = getRect()
+        val panel = selectedPanel ?: return false
+        panel.copyBoundsByPixels(rect)
+        // 加上偏移量，应对拖拽场景
+        rect.offset(panel.translationX.toInt(), panel.translationY.toInt())
+        rect.selfCheck()
+        logger("touchInSelectedPanel, bounds:$rect, point:[$x,$y]")
+        if (rect.isEmpty) {
+            rect.recycle()
+            return false
+        }
+        val touchR = dragStrokeWidth / 2
+        // 是否点击在了左侧拖拽范围
+        // X在左侧边缘的有效范围内，并且Y在面板的高度范围内
+        if (x < rect.left + touchR && x > rect.left - touchR
+            && y > rect.top + touchR && y < rect.bottom - touchR
+        ) {
+            dragMode = DragMode.Left
+            rect.recycle()
+            return true
+        }
+
+        // 是否点击在了上侧拖拽范围
+        // X在面板的宽度范围内，并且Y在上侧边缘的有效范围内
+        if (x > rect.left + touchR && x < rect.right - touchR
+            && y > rect.top - touchR && y < rect.top + touchR
+        ) {
+            dragMode = DragMode.Top
+            rect.recycle()
+            return true
+        }
+
+        // 是否点击在了右侧拖拽范围
+        // X在右侧边缘的有效范围内，并且Y在面板的高度范围内
+        if (x < rect.right + touchR && x > rect.right - touchR
+            && y > rect.top + touchR && y < rect.bottom - touchR
+        ) {
+            dragMode = DragMode.Right
+            rect.recycle()
+            return true
+        }
+
+        // 是否点击在了下侧拖拽范围
+        // X在面板的宽度范围内，并且Y在下侧边缘的有效范围内
+        if (x > rect.left + touchR && x < rect.right - touchR
+            && y > rect.bottom - touchR && y < rect.bottom + touchR
+        ) {
+            dragMode = DragMode.Bottom
+            rect.recycle()
+            return true
+        }
+
+        // 如果都不符合，那么尝试检查是否在面板的范围内
+        // 如果在，那么就进入移动模式
+        if (rect.contains(x, y)) {
+            dragMode = DragMode.Move
+            rect.recycle()
+            return true
+        }
+
+        rect.recycle()
+        return false
+    }
+
+    /**
+     * 矩形的自检方法
+     * 当右边小于左边时，交换左右位置，
+     * 使面积及形状不变，但是尺寸正确
+     */
+    private fun Rect.selfCheck() {
+        if (this.left > this.right) {
+            val tmp = this.right
+            this.right = this.left
+            this.left = tmp
+        }
+        if (this.top > this.bottom) {
+            val tmp = this.bottom
+            this.bottom = this.top
+            this.top = tmp
+        }
+    }
+
     /**
      * 当子View被长按时，触发
      */
@@ -298,6 +383,17 @@ class AbsolutelyWidgetGroup(
         priorityList.addAll(panelList)
         priorityList.sortBy { it.priority }
         invalidate()
+    }
+
+    private fun getRect(): Rect {
+        if (recyclerRectList.isEmpty()) {
+            return Rect()
+        }
+        return recyclerRectList.removeFirst()
+    }
+
+    private fun Rect.recycle() {
+        recyclerRectList.add(this)
     }
 
 
