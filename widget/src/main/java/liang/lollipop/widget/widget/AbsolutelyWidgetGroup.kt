@@ -7,7 +7,6 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
-import android.view.View
 import liang.lollipop.widget.utils.Utils
 import java.util.*
 
@@ -62,7 +61,7 @@ class AbsolutelyWidgetGroup(
     /**
      * 当前活跃的手指的id
      */
-    private var activeTouchId = -1
+    private var activeTouchId = NO_ID
 
     /**
      * 上次手指的位置
@@ -203,7 +202,26 @@ class AbsolutelyWidgetGroup(
     }
 
     private fun onTouchDown(event: MotionEvent) {
-        // TODO
+        val activeLocation = event.activeLocation()
+        val x = activeLocation[0]
+        val y = activeLocation[1]
+        lastTouchLocation.set(x, y)
+        touchDownTime = now
+        // 检查现有的面板
+        if (selectedPanel != null && !panelList.contains(selectedPanel)) {
+            selectedPanel = null
+            dragMode = DragMode.None
+        }
+        // 没有的话查看当前按下的位置
+        if (selectedPanel == null) {
+            selectedPanel = findPanelByLocation(x, y)
+        }
+        // 如果仍然没有，那么就放弃了
+        if (selectedPanel == null) {
+            dragMode = DragMode.None
+            return
+        }
+        touchInSelectedPanel(x, y)
     }
 
     private fun onTouchMove(event: MotionEvent) {
@@ -226,7 +244,8 @@ class AbsolutelyWidgetGroup(
         for (panel in priorityList) {
             panel.view?.let { child ->
                 if (child.left <= x && child.right >= x
-                    && child.top <= y && child.bottom >= y) {
+                    && child.top <= y && child.bottom >= y
+                ) {
                     return panel
                 }
             }
@@ -234,7 +253,7 @@ class AbsolutelyWidgetGroup(
         return null
     }
 
-    private fun touchInSelectedPanel(x: Int, y: Int): Boolean {
+    private fun touchInSelectedPanel(x: Float, y: Float): Boolean {
         logger("touchInSelectedPanel")
         dragMode = DragMode.None
         val rect = getRect()
@@ -291,7 +310,7 @@ class AbsolutelyWidgetGroup(
 
         // 如果都不符合，那么尝试检查是否在面板的范围内
         // 如果在，那么就进入移动模式
-        if (rect.contains(x, y)) {
+        if (rect.contains(x.toInt(), y.toInt())) {
             dragMode = DragMode.Move
             rect.recycle()
             return true
@@ -300,6 +319,23 @@ class AbsolutelyWidgetGroup(
         rect.recycle()
         return false
     }
+
+    /**
+     * 获取当前活跃状态的位置
+     */
+    private fun MotionEvent.activeLocation(): FloatArray {
+        var index = this.findPointerIndex(activeTouchId)
+        if (index < 0) {
+            index = 0
+            activeTouchId = this.getPointerId(index)
+        }
+        return floatArrayOf(this.getX(index), this.getY(index))
+    }
+
+    private val now: Long
+        get() {
+            return System.currentTimeMillis()
+        }
 
     /**
      * 矩形的自检方法
