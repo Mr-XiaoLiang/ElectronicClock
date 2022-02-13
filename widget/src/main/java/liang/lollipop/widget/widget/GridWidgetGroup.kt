@@ -133,6 +133,11 @@ class GridWidgetGroup(
     private var onSelectedPanelChangeListener: ((panel: Panel<*>) -> Unit)? = null
 
     /**
+     * 是否是方形格子
+     */
+    var isSquareGrid = true
+
+    /**
      * 格子数量
      * 这个数量是指窄边的格子数
      * 长边的数量会依据此数量来进行变化
@@ -164,11 +169,6 @@ class GridWidgetGroup(
      * 按下位置
      */
     private var touchDown = PointF()
-
-    /**
-     * 拖拽模式
-     */
-    private var dragMode = DragMode.None
 
     /**
      * 锁定拖动和尺寸改变

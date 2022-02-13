@@ -2,6 +2,7 @@ package liang.lollipop.widget.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.PointF
 import android.graphics.Rect
 import android.util.AttributeSet
@@ -80,11 +81,6 @@ class AbsolutelyWidgetGroup(
         get() {
             return selectedPanel != null
         }
-
-    /**
-     * 拖拽模式
-     */
-    private var dragMode = DragMode.None
 
     /**
      * 锁定拖动和尺寸改变
@@ -221,10 +217,17 @@ class AbsolutelyWidgetGroup(
             dragMode = DragMode.None
             return
         }
-        touchInSelectedPanel(x, y)
+        // 如果没有按在面板上，那就算了
+        if (!touchInSelectedPanel(x, y)) {
+            dragMode = DragMode.None
+        }
     }
 
     private fun onTouchMove(event: MotionEvent) {
+        // 如果啥都没有，那么就放弃吧
+        if (dragMode.isNone) {
+            return
+        }
         // TODO
     }
 

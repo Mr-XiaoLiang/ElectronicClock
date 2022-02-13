@@ -37,16 +37,16 @@ open class WidgetGroup(
     protected var requestToLayout = false
 
     /**
+     * 拖拽模式
+     */
+    protected var dragMode = DragMode.None
+
+    /**
      * 拖拽的边框宽度，用于调整触发灵敏度
      */
     var dragStrokeWidth = resources.dp(5F)
 
     var isInEngineeringMode = false
-
-    /**
-     * 是否是方形格子
-     */
-    var isSquareGrid = true
 
     /**
      * 被选中的卡片
@@ -62,6 +62,14 @@ open class WidgetGroup(
      * 请求一次手势拦截
      */
     protected var pendingTouchRequest = false
+
+    override fun dispatchDraw(canvas: Canvas?) {
+        super.dispatchDraw(canvas)
+        canvas ?: return
+        selectedPanel?.let {
+            listener?.onDrawSelectedPanel(it, dragMode, canvas)
+        }
+    }
 
     protected fun Panel<*>.updatePanelLifecycle(active: Boolean) {
         isActive = active
@@ -142,7 +150,37 @@ open class WidgetGroup(
         Left(1),
         Top(2),
         Right(3),
-        Bottom(4)
+        Bottom(4);
+
+        val isNone: Boolean
+            get() {
+                return this == None
+            }
+
+        val isMove: Boolean
+            get() {
+                return this == Move
+            }
+
+        val isLeft: Boolean
+            get() {
+                return this == Left
+            }
+
+        val isTop: Boolean
+            get() {
+                return this == Top
+            }
+
+        val isRight: Boolean
+            get() {
+                return this == Right
+            }
+
+        val isBottom: Boolean
+            get() {
+                return this == Bottom
+            }
     }
 
 }
