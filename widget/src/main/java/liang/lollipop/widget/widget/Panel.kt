@@ -11,7 +11,7 @@ import android.view.ViewGroup
  * @date 2019-07-30 19:41
  * 面板组件的包装类
  */
-abstract class Panel<T: PanelInfo>(val panelInfo: T) {
+abstract class Panel<T : PanelInfo>(val panelInfo: T) {
 
     private val bounds = Rect()
 
@@ -76,8 +76,12 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     open fun updatePanelInfo(group: WidgetGroup) {}
 
     fun copyBounds(rect: Rect) {
-        rect.set(panelInfo.x, panelInfo.y,
-            panelInfo.x + panelInfo.spanX, panelInfo.y + panelInfo.spanY)
+        rect.set(
+            panelInfo.x,
+            panelInfo.y,
+            panelInfo.x + panelInfo.spanX,
+            panelInfo.y + panelInfo.spanY
+        )
     }
 
     fun copyBoundsByPixels(rect: Rect) {
@@ -85,7 +89,7 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     }
 
     fun create(layoutInflater: LayoutInflater, parent: WidgetGroup): View {
-        val v = createView(layoutInflater.context)?:onCreateView(layoutInflater, parent)
+        val v = createView(layoutInflater.context) ?: onCreateView(layoutInflater, parent)
         view = v
         if (v == null) {
             throw RuntimeException("view is null: mast be override onCreateView(Context) or onCreateView(LayoutInflater, ViewGroup)")
@@ -163,12 +167,20 @@ abstract class Panel<T: PanelInfo>(val panelInfo: T) {
     }
 
     var translationX: Float
-        get() { return view?.translationX?:0F }
-        set(value) { view?.translationX = value }
+        get() {
+            return view?.translationX ?: 0F
+        }
+        set(value) {
+            view?.translationX = value
+        }
 
     var translationY: Float
-        get() { return view?.translationY?:0F }
-        set(value) { view?.translationY = value }
+        get() {
+            return view?.translationY ?: 0F
+        }
+        set(value) {
+            view?.translationY = value
+        }
 
     fun saveGridLocation(x: Int, y: Int, spanX: Int, spanY: Int) {
         panelInfo.sizeChange(spanX, spanY)

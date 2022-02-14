@@ -2,13 +2,13 @@ package liang.lollipop.widget.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.PointF
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import liang.lollipop.widget.utils.Utils
+import liang.lollipop.widget.widget.WidgetGroup.DragMode.*
 import java.util.*
 
 /**
@@ -68,6 +68,8 @@ class AbsolutelyWidgetGroup(
      * 上次手指的位置
      */
     private var lastTouchLocation = PointF()
+
+    private var offsetTouch = PointF()
 
     /**
      * 手指按下的时间戳
@@ -130,7 +132,7 @@ class AbsolutelyWidgetGroup(
     }
 
     override fun performClick(): Boolean {
-        return if (isDragState && dragMode != DragMode.None) {
+        return if (isDragState && dragMode != None) {
             false
         } else {
             super.performClick()
@@ -199,14 +201,15 @@ class AbsolutelyWidgetGroup(
 
     private fun onTouchDown(event: MotionEvent) {
         val activeLocation = event.activeLocation()
-        val x = activeLocation[0]
-        val y = activeLocation[1]
+        val x = activeLocation.x
+        val y = activeLocation.y
         lastTouchLocation.set(x, y)
+        offsetTouch.set(0F, 0F)
         touchDownTime = now
         // 检查现有的面板
         if (selectedPanel != null && !panelList.contains(selectedPanel)) {
             selectedPanel = null
-            dragMode = DragMode.None
+            dragMode = None
         }
         // 没有的话查看当前按下的位置
         if (selectedPanel == null) {
@@ -214,12 +217,12 @@ class AbsolutelyWidgetGroup(
         }
         // 如果仍然没有，那么就放弃了
         if (selectedPanel == null) {
-            dragMode = DragMode.None
+            dragMode = None
             return
         }
         // 如果没有按在面板上，那就算了
         if (!touchInSelectedPanel(x, y)) {
-            dragMode = DragMode.None
+            dragMode = None
         }
     }
 
@@ -228,6 +231,27 @@ class AbsolutelyWidgetGroup(
         if (dragMode.isNone) {
             return
         }
+        val panel = selectedPanel
+        if (panel == null) {
+            dragMode = None
+            return
+        }
+        val activeLocation = event.activeLocation()
+        val offsetX = activeLocation.x - lastTouchLocation.x + offsetTouch.x
+        val offsetY = activeLocation.y - lastTouchLocation.y + offsetTouch.y
+        when (dragMode) {
+            None -> {
+                logger("onDrag but dragMode is None")
+            }
+            Move -> {
+                onDragMove(panel, offsetX, offsetY)
+            }
+            Left -> TODO()
+            Top -> TODO()
+            Right -> TODO()
+            Bottom -> TODO()
+        }
+        lastTouchLocation.set(activeLocation)
         // TODO
     }
 
@@ -241,6 +265,81 @@ class AbsolutelyWidgetGroup(
 
     private fun onTouchPointUp(event: MotionEvent) {
         // TODO
+    }
+
+    private fun onDragMove(panel: Panel<*>, offsetX: Float, offsetY: Float) {
+        val rect = getRect()
+        panel.copyBoundsByPixels(rect)
+        val srcLeft = rect.left
+        val srcTop = rect.top
+        val xInt = offsetX.toInt()
+        val yInt = offsetY.toInt()
+        rect.offset(xInt, yInt)
+        val startX = paddingLeft
+        val startY = paddingTop
+        if (rect.left < startX) {
+            rect.offset(startX - rect.left, 0)
+        }
+        if (rect.top < startY) {
+            rect.offset(0, startY - rect.top)
+        }
+        val groupWidth = width - startX - paddingRight
+        var resetSize = false
+        if (rect.right > groupWidth) {
+            if (rect.width() > groupWidth) {
+                rect.left = startX
+                rect.right = startX + groupWidth
+                resetSize = true
+            } else {
+                val out = width - paddingRight - rect.right
+                rect.offset(out, 0)
+            }
+        }
+        val groupHeight = height - startY - paddingBottom
+        if (rect.bottom > groupHeight) {
+            if (rect.height() > groupHeight) {
+                rect.top = startY
+                rect.bottom = startY + groupHeight
+                resetSize = true
+            } else {
+                val out = height - paddingBottom - rect.bottom
+                rect.offset(0, out)
+            }
+        }
+        if (resetSize) {
+            offsetTouch.set(0F, 0F)
+            panel.layout(rect.left, rect.top, rect.right, rect.bottom)
+            panel.panelInfo.offset(rect.left, rect.top)
+            panel.panelInfo.sizeChange(rect.width(), rect.height())
+        } else {
+            val realOffsetX = rect.left - srcLeft
+            val realOffsetY = rect.top - srcTop
+            offsetTouch.x = (offsetX - xInt) + (offsetX - realOffsetX)
+            offsetTouch.y = (offsetY - yInt) + (offsetY - realOffsetY)
+            panel.offset(realOffsetX, realOffsetY)
+            panel.panelInfo.offsetBy(realOffsetX, realOffsetY)
+        }
+        rect.recycle()
+        selectedPanelChange(panel)
+    }
+
+    private fun Panel<*>.offsetByDrag(x: Int, y: Int) {
+        if (x == 0 && y == 0) {
+            return
+        }
+        this.offset(x, y)
+        this.panelInfo.offsetBy(x, y)
+        selectedPanelChange(this)
+    }
+
+    /**
+     * 触发面板变更事件
+     */
+    private fun selectedPanelChange(p: Panel<*>) {
+        val panel = selectedPanel ?: return
+        if (panel == p) {
+            listener?.onSelectedPanelChange(panel)
+        }
     }
 
     private fun findPanelByLocation(x: Float, y: Float): Panel<*>? {
@@ -258,7 +357,7 @@ class AbsolutelyWidgetGroup(
 
     private fun touchInSelectedPanel(x: Float, y: Float): Boolean {
         logger("touchInSelectedPanel")
-        dragMode = DragMode.None
+        dragMode = None
         val rect = getRect()
         val panel = selectedPanel ?: return false
         panel.copyBoundsByPixels(rect)
@@ -276,7 +375,7 @@ class AbsolutelyWidgetGroup(
         if (x < rect.left + touchR && x > rect.left - touchR
             && y > rect.top + touchR && y < rect.bottom - touchR
         ) {
-            dragMode = DragMode.Left
+            dragMode = Left
             rect.recycle()
             return true
         }
@@ -286,7 +385,7 @@ class AbsolutelyWidgetGroup(
         if (x > rect.left + touchR && x < rect.right - touchR
             && y > rect.top - touchR && y < rect.top + touchR
         ) {
-            dragMode = DragMode.Top
+            dragMode = Top
             rect.recycle()
             return true
         }
@@ -296,7 +395,7 @@ class AbsolutelyWidgetGroup(
         if (x < rect.right + touchR && x > rect.right - touchR
             && y > rect.top + touchR && y < rect.bottom - touchR
         ) {
-            dragMode = DragMode.Right
+            dragMode = Right
             rect.recycle()
             return true
         }
@@ -306,7 +405,7 @@ class AbsolutelyWidgetGroup(
         if (x > rect.left + touchR && x < rect.right - touchR
             && y > rect.bottom - touchR && y < rect.bottom + touchR
         ) {
-            dragMode = DragMode.Bottom
+            dragMode = Bottom
             rect.recycle()
             return true
         }
@@ -314,7 +413,7 @@ class AbsolutelyWidgetGroup(
         // 如果都不符合，那么尝试检查是否在面板的范围内
         // 如果在，那么就进入移动模式
         if (rect.contains(x.toInt(), y.toInt())) {
-            dragMode = DragMode.Move
+            dragMode = Move
             rect.recycle()
             return true
         }
@@ -326,13 +425,13 @@ class AbsolutelyWidgetGroup(
     /**
      * 获取当前活跃状态的位置
      */
-    private fun MotionEvent.activeLocation(): FloatArray {
+    private fun MotionEvent.activeLocation(): PointF {
         var index = this.findPointerIndex(activeTouchId)
         if (index < 0) {
             index = 0
             activeTouchId = this.getPointerId(index)
         }
-        return floatArrayOf(this.getX(index), this.getY(index))
+        return PointF(this.getX(index), this.getY(index))
     }
 
     private val now: Long
@@ -432,7 +531,9 @@ class AbsolutelyWidgetGroup(
     }
 
     private fun Rect.recycle() {
-        recyclerRectList.add(this)
+        if (recyclerRectList.size < 20) {
+            recyclerRectList.add(this)
+        }
     }
 
 
