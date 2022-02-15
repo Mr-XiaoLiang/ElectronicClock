@@ -239,20 +239,8 @@ class AbsolutelyWidgetGroup(
         val activeLocation = event.activeLocation()
         val offsetX = activeLocation.x - lastTouchLocation.x + offsetTouch.x
         val offsetY = activeLocation.y - lastTouchLocation.y + offsetTouch.y
-        when (dragMode) {
-            None -> {
-                logger("onDrag but dragMode is None")
-            }
-            Move -> {
-                onDragMove(panel, offsetX, offsetY)
-            }
-            Left -> TODO()
-            Top -> TODO()
-            Right -> TODO()
-            Bottom -> TODO()
-        }
+        onDragMove(panel, offsetX, offsetY)
         lastTouchLocation.set(activeLocation)
-        // TODO
     }
 
     private fun onTouchUp(event: MotionEvent) {
@@ -264,6 +252,7 @@ class AbsolutelyWidgetGroup(
     }
 
     private fun onTouchPointUp(event: MotionEvent) {
+
         // TODO
     }
 
@@ -274,7 +263,32 @@ class AbsolutelyWidgetGroup(
         val srcTop = rect.top
         val xInt = offsetX.toInt()
         val yInt = offsetY.toInt()
-        rect.offset(xInt, yInt)
+        var resetSize = false
+        when (dragMode) {
+            None -> {
+                logger("onDrag but dragMode is None")
+            }
+            Move -> {
+                rect.offset(xInt, yInt)
+                resetSize = false
+            }
+            Left -> {
+                rect.left += xInt
+                resetSize = true
+            }
+            Top -> {
+                rect.top += yInt
+                resetSize = true
+            }
+            Right -> {
+                rect.right += xInt
+                resetSize = true
+            }
+            Bottom -> {
+                rect.bottom += yInt
+                resetSize = true
+            }
+        }
         val startX = paddingLeft
         val startY = paddingTop
         if (rect.left < startX) {
@@ -284,7 +298,6 @@ class AbsolutelyWidgetGroup(
             rect.offset(0, startY - rect.top)
         }
         val groupWidth = width - startX - paddingRight
-        var resetSize = false
         if (rect.right > groupWidth) {
             if (rect.width() > groupWidth) {
                 rect.left = startX
@@ -321,15 +334,6 @@ class AbsolutelyWidgetGroup(
         }
         rect.recycle()
         selectedPanelChange(panel)
-    }
-
-    private fun Panel<*>.offsetByDrag(x: Int, y: Int) {
-        if (x == 0 && y == 0) {
-            return
-        }
-        this.offset(x, y)
-        this.panelInfo.offsetBy(x, y)
-        selectedPanelChange(this)
     }
 
     /**
