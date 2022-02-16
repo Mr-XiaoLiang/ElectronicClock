@@ -159,10 +159,7 @@ class AbsolutelyWidgetGroup(
                 onTouchUp(ev)
             }
             MotionEvent.ACTION_CANCEL -> {
-                onTouchUp(ev)
-            }
-            MotionEvent.ACTION_POINTER_UP -> {
-                onTouchPointUp(ev)
+                onTouchCancel(ev)
             }
         }
 
@@ -190,10 +187,7 @@ class AbsolutelyWidgetGroup(
                 onTouchUp(event)
             }
             MotionEvent.ACTION_CANCEL -> {
-                onTouchUp(event)
-            }
-            MotionEvent.ACTION_POINTER_UP -> {
-                onTouchPointUp(event)
+                onTouchCancel(event)
             }
         }
         return isDragState || super.onTouchEvent(event)
@@ -241,19 +235,21 @@ class AbsolutelyWidgetGroup(
         val offsetY = activeLocation.y - lastTouchLocation.y + offsetTouch.y
         onDragMove(panel, offsetX, offsetY)
         lastTouchLocation.set(activeLocation)
+        invalidate()
     }
 
     private fun onTouchUp(event: MotionEvent) {
-        // TODO
+        dragMode = None
+        activeTouchId = NO_ID
+        listener?.onDragEnd(selectedPanel)
+        invalidate()
     }
 
     private fun onTouchCancel(event: MotionEvent) {
-        // TODO
-    }
-
-    private fun onTouchPointUp(event: MotionEvent) {
-
-        // TODO
+        dragMode = None
+        activeTouchId = NO_ID
+        listener?.onCancelDrag(selectedPanel)
+        invalidate()
     }
 
     private fun onDragMove(panel: Panel<*>, offsetX: Float, offsetY: Float) {
