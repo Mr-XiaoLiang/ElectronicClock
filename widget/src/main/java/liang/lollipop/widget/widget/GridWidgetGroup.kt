@@ -873,19 +873,6 @@ class GridWidgetGroup(
     }
 
     /**
-     * 根据View返回panel的对象
-     * 如果找不到对应的panel，那么将会抛出异常
-     */
-    private fun findPanelByView(view: View): Panel<*> {
-        for (panel in panelList) {
-            if (panel.view == view) {
-                return panel
-            }
-        }
-        throw InflateException("Found a view that does not correspond to a panel")
-    }
-
-    /**
      * 是否可以放置
      * 检查面板是否可以被放置
      * @return 如果为true，表示可以被放置

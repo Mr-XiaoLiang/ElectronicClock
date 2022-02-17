@@ -3,6 +3,8 @@ package liang.lollipop.widget.widget
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
+import android.view.InflateException
+import android.view.View
 import android.widget.FrameLayout
 import liang.lollipop.widget.utils.dp
 
@@ -69,6 +71,19 @@ open class WidgetGroup(
         selectedPanel?.let {
             listener?.onDrawSelectedPanel(it, dragMode, canvas)
         }
+    }
+
+    /**
+     * 根据View返回panel的对象
+     * 如果找不到对应的panel，那么将会抛出异常
+     */
+    protected fun findPanelByView(view: View): Panel<*> {
+        for (panel in panelList) {
+            if (panel.view == view) {
+                return panel
+            }
+        }
+        throw InflateException("Found a view that does not correspond to a panel")
     }
 
     protected fun Panel<*>.updatePanelLifecycle(active: Boolean) {

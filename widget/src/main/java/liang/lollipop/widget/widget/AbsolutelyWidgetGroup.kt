@@ -7,9 +7,12 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import liang.lollipop.widget.utils.Utils
 import liang.lollipop.widget.widget.WidgetGroup.DragMode.*
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * 绝对位置小部件管理器
@@ -201,9 +204,20 @@ class AbsolutelyWidgetGroup(
         offsetTouch.set(0F, 0F)
         touchDownTime = now
         // 检查现有的面板
-        if (selectedPanel != null && !panelList.contains(selectedPanel)) {
-            selectedPanel = null
-            dragMode = None
+        if (selectedPanel != null) {
+            // 如果设置的面板不是当前已经显示的，那么放弃他
+            if (!panelList.contains(selectedPanel)) {
+                listener?.onCancelDrag(selectedPanel)
+                selectedPanel = null
+                dragMode = None
+            } else {
+                // 如果手指按下位置不是指定的面板， 那么尝试修改
+                val panel = findPanelByLocation(x, y)
+                if (selectedPanel != panel) {
+                    listener?.onCancelDrag(selectedPanel)
+                    selectedPanel = panel
+                }
+            }
         }
         // 没有的话查看当前按下的位置
         if (selectedPanel == null) {
@@ -212,8 +226,10 @@ class AbsolutelyWidgetGroup(
         // 如果仍然没有，那么就放弃了
         if (selectedPanel == null) {
             dragMode = None
+            invalidate()
             return
         }
+        listener?.onSelectedPanelChange(selectedPanel!!)
         // 如果没有按在面板上，那就算了
         if (!touchInSelectedPanel(x, y)) {
             dragMode = None
@@ -467,14 +483,64 @@ class AbsolutelyWidgetGroup(
         }
     }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        val leftEdge = paddingLeft
+        val topEdge = paddingTop
+        val rightEdge = width - paddingRight
+        val bottomEdge = height - paddingBottom
+        foreachChild { view, panel ->
+            val panelInfo = panel.panelInfo
+            view.layout(
+                max(panelInfo.x, leftEdge),
+                max(panelInfo.y, topEdge),
+                min(panelInfo.x + panelInfo.spanX, rightEdge),
+                min(panelInfo.y + panelInfo.spanY, bottomEdge)
+            )
+        }
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val groupWidth = MeasureSpec.getSize(widthMeasureSpec)
+        val groupHeight = MeasureSpec.getSize(heightMeasureSpec)
+        foreachChild { view, panel ->
+            val panelInfo = panel.panelInfo
+            val needMeasure = panelInfo.x < 0 || panelInfo.y < 0
+            panelInfo.offset(max(panelInfo.x, 0), max(panelInfo.y, 0))
+            val widthSpec = if (needMeasure) {
+                MeasureSpec.makeMeasureSpec(groupWidth, MeasureSpec.AT_MOST)
+            } else {
+                MeasureSpec.makeMeasureSpec(panelInfo.spanX, MeasureSpec.EXACTLY)
+            }
+            val heightSpec = if (needMeasure) {
+                MeasureSpec.makeMeasureSpec(groupHeight, MeasureSpec.AT_MOST)
+            } else {
+                MeasureSpec.makeMeasureSpec(panelInfo.spanY, MeasureSpec.EXACTLY)
+            }
+            view.measure(widthSpec, heightSpec)
+            if (needMeasure) {
+                panelInfo.sizeChange(
+                    min(groupWidth, view.measuredWidth),
+                    min(groupHeight, view.measuredHeight)
+                )
+            }
+        }
+        setMeasuredDimension(groupWidth, groupHeight)
+    }
+
+    private fun foreachChild(callback: (View, Panel<*>) -> Unit) {
+        for (index in 0 until childCount) {
+            val view = getChildAt(index)
+            val panel = findPanelByView(view)
+            callback(view, panel)
+        }
+    }
+
     private fun cancelSelected() {
-        // TODO
-//        GridWidgetGroup.logger("cancelSelected")
-//        pushPanelWhenTouch()
-//        cancelDragListener?.invoke(selectedPanel)
-//        selectedPanel = null
-//        activeActionId = GridWidgetGroup.NO_ID
-//        invalidate()
+        logger("cancelSelected")
+        listener?.onCancelDrag(selectedPanel)
+        selectedPanel = null
+        activeTouchId = NO_ID
+        invalidate()
     }
 
     private fun setChildLongClick(panel: Panel<*>) {
