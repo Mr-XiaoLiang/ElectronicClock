@@ -151,6 +151,12 @@ class AbsolutelyWidgetGroup(
         }
         ev ?: return super.onInterceptTouchEvent(ev)
 
+        // 如果不在拖拽模式，那么放弃拦截任何手势
+        if (!isInEngineeringMode && !isDragState) {
+            logger("onInterceptTouchEvent, isDragState = false, break")
+            return super.onInterceptTouchEvent(ev)
+        }
+
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 onTouchDown(ev)
@@ -166,7 +172,7 @@ class AbsolutelyWidgetGroup(
             }
         }
 
-        return isDragState || super.onInterceptTouchEvent(ev)
+        return isDragState || super.onInterceptTouchEvent(ev) || isInEngineeringMode
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -178,6 +184,12 @@ class AbsolutelyWidgetGroup(
             return super.onTouchEvent(event)
         }
         event ?: return super.onTouchEvent(event)
+
+        // 如果不在拖拽模式，那么放弃拦截任何手势
+        if (!isInEngineeringMode && !isDragState) {
+            logger("onInterceptTouchEvent, isDragState = false, break")
+            return super.onInterceptTouchEvent(event)
+        }
 
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
